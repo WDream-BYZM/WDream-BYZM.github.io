@@ -2,8 +2,8 @@
   <view class="wd-nav" :class="{ 'is-scrolled': scrolled }">
     <view class="nav-inner">
       <view class="brand" @click="scrollTo('top')">
-        <view class="brand-logo"><text>W</text></view>
-        <text class="brand-name">WDream</text>
+        <view class="brand-logo"><text>B</text></view>
+        <text class="brand-name">BYZM</text>
       </view>
 
       <view class="nav-menu">
@@ -39,8 +39,7 @@ const activeKey = ref('home')
 const menus = computed(() => [
   { key: 'home', label: t('nav.home') },
   { key: 'about', label: t('nav.about') },
-  { key: 'skills', label: t('nav.skills') },
-  { key: 'projects', label: t('nav.projects') },
+  { key: 'ai', label: t('nav.ai') },
   { key: 'contact', label: t('nav.contact') }
 ])
 

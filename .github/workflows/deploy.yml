@@ -30,6 +30,15 @@ jobs:
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
+      - name: Inject DeepSeek API Key
+        run: |
+          if [ -n "${{ secrets.DEEPSEEK_API_KEY }}" ]; then
+            echo "VITE_DEEPSEEK_API_KEY=${{ secrets.DEEPSEEK_API_KEY }}" > .env.production
+            echo "API key injected from GitHub Secret"
+          else
+            echo "No DEEPSEEK_API_KEY secret found, using obfuscated fallback"
+          fi
+
       - name: Build H5
         run: npm run build:h5
 

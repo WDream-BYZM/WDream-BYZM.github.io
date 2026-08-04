@@ -1,11 +1,10 @@
 <template>
   <view class="page">
     <WdNav />
+    <WdDotNav />
     <WdHero />
     <WdAbout />
-    <WdSkills />
-    <WdChart />
-    <WdProjects />
+    <WdAI />
     <WdContact />
     <WdFooter />
   </view>

@@ -2,8 +2,8 @@
   <view class="wd-footer">
     <view class="footer-inner">
       <view class="footer-brand">
-        <view class="brand-logo"><text>W</text></view>
-        <text class="brand-name">WDream</text>
+        <view class="brand-logo"><text>B</text></view>
+        <text class="brand-name">BYZM</text>
       </view>
       <text class="copyright">{{ t('footer.copyright') }}❤️</text>
       <text class="powered">{{ t('footer.powered') }}</text>
