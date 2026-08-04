@@ -1,0 +1,15 @@
+# BYZM 联机对战 —— Cloudflare Worker 部署配置
+# 部署：npm i -g wrangler && wrangler deploy
+name = "byzm-multi"
+main = "index.js"
+compatibility_date = "2024-11-01"
+
+# Durable Objects 绑定（房间管理）
+[[durable_objects.bindings]]
+name = "ROOMS"
+class_name = "Room"
+
+# DO 数据库迁移
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Room"]

@@ -1,0 +1,12 @@
+{
+  "name": "byzm-multi-server",
+  "version": "1.0.0",
+  "description": "BYZM 联机对战 Node 服务器（方案四备选，协议与 Cloudflare Worker 一致）",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "ws": "^8.17.0"
+  }
+}

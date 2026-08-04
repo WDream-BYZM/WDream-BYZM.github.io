@@ -62,6 +62,15 @@ const games = computed(() => [
     url: ''
   },
   {
+    key: 'airplane',
+    emoji: '✈️',
+    name: t('games.items.airplane.name'),
+    desc: t('games.items.airplane.desc'),
+    gradient: 'linear-gradient(135deg, #ff6b9d, #00d2ff)',
+    playable: true,
+    url: '/legacy/airplane/index.html'
+  },
+  {
     key: 'jump',
     emoji: '🦘',
     name: t('games.items.jump.name'),

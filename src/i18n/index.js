@@ -51,7 +51,29 @@ const messages = {
           name: '跳一跳',
           desc: '按住蓄力，松开跳跃的益智小游戏。',
           tag: '益智'
+        },
+        airplane: {
+          name: '飞行棋',
+          desc: '经典飞行棋，掷骰子起飞，踩到对方可送回基地，2-4 人同屏游玩。',
+          tag: '经典'
         }
+      },
+      multi: {
+        title: '联机对战',
+        subtitle: 'ONLINE MULTIPLAYER',
+        desc: '创建房间或输入房间号，与好友实时对战。消除行数会攻击对手！',
+        game: '选择游戏',
+        gameTetris: '俄罗斯方块（2-4 人）',
+        players: '人数',
+        nickname: '昵称',
+        nicknamePh: '输入昵称',
+        create: '创建房间',
+        joinTitle: '加入房间',
+        roomPh: '输入 4 位房间号',
+        join: '加入',
+        roomCreated: '房间创建成功：',
+        needName: '请先输入昵称',
+        needRoom: '请输入 4 位房间号'
       }
     },
     features: {
@@ -141,7 +163,29 @@ const messages = {
           name: 'Jump Jump',
           desc: 'Hold to charge and release to jump. A fun puzzle game.',
           tag: 'Puzzle'
+        },
+        airplane: {
+          name: 'Flying Chess',
+          desc: 'Classic flying chess. Roll the dice to take off, land on rivals to send them home. 2-4 players.',
+          tag: 'Classic'
         }
+      },
+      multi: {
+        title: 'Multiplayer',
+        subtitle: 'ONLINE MULTIPLAYER',
+        desc: 'Create a room or join with a room code to battle in real time. Clearing lines attacks your rivals!',
+        game: 'Select Game',
+        gameTetris: 'Tetris (2-4 players)',
+        players: 'Players',
+        nickname: 'Nickname',
+        nicknamePh: 'Enter nickname',
+        create: 'Create Room',
+        joinTitle: 'Join Room',
+        roomPh: 'Enter 4-digit room code',
+        join: 'Join',
+        roomCreated: 'Room created: ',
+        needName: 'Please enter a nickname',
+        needRoom: 'Please enter a 4-digit room code'
       }
     },
     features: {

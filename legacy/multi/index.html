@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>联机对战 · 俄罗斯方块</title>
+<script src="./config.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+  html, body { height: 100%; background: linear-gradient(145deg,#0b0f1c 0%,#1a1f33 100%); font-family: 'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; color: #e8ecf7; }
+  body { display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .home-btn { position: fixed; top: 16px; left: 16px; z-index: 40; padding: 8px 18px; border-radius: 18px; background: rgba(21,26,44,.85); border: 1px solid rgba(255,255,255,.15); color: #e8ecf7; text-decoration: none; font-size: 13px; font-weight: 600; backdrop-filter: blur(6px); transition: all .25s ease; }
+  .home-btn:hover { border-color: rgba(108,92,231,.6); background: rgba(108,92,231,.25); color:#fff; }
+
+  /* ===== 大厅 ===== */
+  #lobby { width: min(460px, 92vw); text-align: center; }
+  #lobby h2 { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
+  #lobby .sub { color:#8a93ab; font-size: 13px; letter-spacing: 3px; margin-bottom: 22px; }
+  .room-line { background: #101624; border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 14px 20px; font-size: 15px; color:#8a93ab; display:flex; align-items:center; justify-content:center; gap:10px; }
+  .room-line b { color:#00d2ff; font-size: 26px; letter-spacing: 6px; }
+  .room-line .dot { width:10px; height:10px; border-radius:50%; background:#f6c445; box-shadow:0 0 8px #f6c445; margin-left:6px; }
+  .room-line .dot.ok { background:#2ecc71; box-shadow:0 0 8px #2ecc71; }
+  .room-line .dot.bad { background:#e74c3c; box-shadow:0 0 8px #e74c3c; }
+
+  .players { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; }
+  .player-item { display:flex; align-items:center; gap:12px; background: rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08); border-radius: 12px; padding: 12px 16px; }
+  .player-item .av { width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:16px; color:#0b0f1c; }
+  .player-item .nm { flex:1; text-align:left; font-size:15px; font-weight:600; }
+  .player-item .tag { font-size:12px; padding:3px 10px; border-radius:10px; }
+  .player-item .tag.host { background:rgba(246,196,69,.2); color:#f6c445; }
+  .player-item .tag.you { background:rgba(0,210,255,.2); color:#00d2ff; }
+  .player-item .tag.ready { background:rgba(46,204,113,.2); color:#2ecc71; }
+  .player-item .tag.wait { background:rgba(255,255,255,.1); color:#8a93ab; }
+  .player-item .slot { color:#565d75; font-size:13px; flex:1; text-align:left; }
+
+  .lobby-btns { margin-top: 22px; display: flex; gap: 12px; justify-content: center; }
+  .lobby-btns button { padding: 13px 34px; border:none; border-radius: 14px; font-size: 15px; font-weight:700; cursor:pointer; color:#fff; background: linear-gradient(135deg,#6c5ce7,#00d2ff); transition: transform .15s ease, opacity .2s ease; }
+  .lobby-btns button:active { transform: scale(.96); }
+  .lobby-btns button.ghost { background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); }
+  .lobby-btns button:disabled { opacity:.4; cursor: not-allowed; }
+  .hidden { display:none !important; }
+  .tip { margin-top:16px; color:#565d75; font-size:12px; line-height:1.8; }
+
+  /* ===== 对局 ===== */
+  #game { width: 100%; max-width: 980px; padding: 12px; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .cell { background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.07); border-radius: 14px; padding: 10px; display:flex; flex-direction:column; align-items:center; gap:6px; position: relative; }
+  .cell.mine { border-color: rgba(0,210,255,.6); box-shadow: 0 0 22px rgba(0,210,255,.18); }
+  .cell .phead { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; }
+  .cell .pname { font-size:13px; font-weight:700; }
+  .cell .pscore { font-size:13px; color:#00d2ff; font-weight:800; }
+  .cell canvas { display:block; background:#0c0f18; border-radius:8px; box-shadow:0 0 0 2px #2f354a; width:100%; height:auto; }
+  .cell .pstatus { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:15px; font-weight:800; color:#e8ecf7; background:rgba(11,15,28,.85); padding:8px 18px; border-radius:12px; border:1px solid rgba(255,255,255,.15); display:none; }
+  .cell .pstatus.show { display:block; }
+  .cell .attk { position:absolute; right:8px; top:8px; color:#ff6b6b; font-size:12px; font-weight:800; opacity:0; transition: opacity .2s; }
+  .cell .attk.on { opacity:1; animation: pop .6s ease; }
+  @keyframes pop { 0%{transform:scale(1)} 40%{transform:scale(1.4)} 100%{transform:scale(1)} }
+
+  .controls { margin-top: 12px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:center; }
+  .controls .btn { min-width:56px; height:44px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.06); color:#e8ecf7; font-size:15px; border-radius:10px; cursor:pointer; }
+  .controls .btn:active { background:rgba(108,92,231,.5); }
+  .controls .btn.big { min-width:88px; }
+  .controls .hint { color:#565d75; font-size:12px; width:100%; text-align:center; }
+
+  #overlay { position: fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(5,8,16,.8); z-index:50; }
+  #overlay.show { display:flex; }
+  .card { background:#151a2c; padding:40px 52px; border-radius:20px; text-align:center; border:1px solid rgba(255,255,255,.1); max-width:90vw; }
+  .card h2 { font-size:28px; margin-bottom:14px; }
+  .card .rank { font-size:16px; color:#a29bfe; margin-bottom:22px; }
+  .card button { padding:13px 34px; border:none; border-radius:14px; background:linear-gradient(135deg,#6c5ce7,#00d2ff); color:#fff; font-size:15px; font-weight:700; cursor:pointer; margin:0 6px; }
+
+  @media (max-width: 640px) {
+    .grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .cell { padding: 6px; }
+    .controls .btn { min-width: 48px; height: 40px; font-size: 13px; }
+    .controls .btn.big { min-width: 72px; }
+  }
+  @media (max-width: 380px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<a class="home-btn" href="/">← 返回主页</a>
+
+<!-- 大厅 -->
+<div id="lobby">
+  <h2>🎮 联机对战 · 俄罗斯方块</h2>
+  <div class="sub">MULTIPLAYER TETRIS</div>
+  <div class="room-line">
+    房间号 <b id="roomCode">----</b>
+    <span class="dot" id="dot"></span>
+  </div>
+  <div class="players" id="players"></div>
+  <div class="lobby-btns">
+    <button id="btnReady" class="hidden">准备</button>
+    <button id="btnStart" class="hidden">开始游戏</button>
+    <button id="btnCopy" class="ghost">复制房间号</button>
+  </div>
+  <div class="tip">🎲 消除行数会给所有对手增加垃圾行<br>每名玩家操作自己的棋盘，最后存活的玩家获胜</div>
+</div>
+
+<!-- 对局 -->
+<div id="game" class="hidden">
+  <div class="grid" id="grid"></div>
+  <div class="controls">
+    <button class="btn" data-a="L">◀</button>
+    <button class="btn" data-a="R">▶</button>
+    <button class="btn" data-a="Rot">↻</button>
+    <button class="btn" data-a="Soft">▼</button>
+    <button class="btn big" data-a="Hard">硬降</button>
+    <button class="btn big" data-a="Pause">暂停</button>
+    <div class="hint">键盘：←→ 移动 · ↑ 旋转 · ↓ 软降 · 空格 硬降 · P 暂停</div>
+  </div>
+</div>
+
+<!-- 结算 -->
+<div id="overlay">
+  <div class="card">
+    <h2 id="ovTitle">游戏结束</h2>
+    <div class="rank" id="ovRank"></div>
+    <button id="ovLobby">返回大厅</button>
+    <button id="ovAgain">再来一局</button>
+  </div>
+</div>
+
+<script>
+;(function () {
+  'use strict'
+
+  // ========== 参数解析 ==========
+  var params = new URLSearchParams(location.search)
+  var ROOM = (params.get('room') || '0000').toUpperCase()
+  var GAME = params.get('game') || 'tetris'
+  var MAX = parseInt(params.get('max') || '4', 10)
+  var MY_NAME = (params.get('name') || localStorage.getItem('byzm_name') || '玩家').slice(0, 12)
+  localStorage.setItem('byzm_name', MY_NAME)
+
+  var wsUrl = (window.MULTI_CONFIG && window.MULTI_CONFIG.wsUrl) || ''
+  // 支持 ?ws= 参数临时覆盖服务器地址（测试用）
+  var wsParam = params.get('ws')
+  if (wsParam) wsUrl = wsParam
+  if (!wsUrl) {
+    wsUrl = location.protocol === 'https:' ? 'wss://' : 'ws://'
+    wsUrl += location.host + '/room'
+  }
+  if (!/\/room$/.test(wsUrl)) wsUrl += '/room'
+
+  // ========== DOM ==========
+  var $ = function (id) { return document.getElementById(id) }
+  var lobby = $('lobby'), gameBox = $('game'), overlay = $('overlay')
+  var grid = $('grid'), playersEl = $('players'), dot = $('dot')
+  var btnReady = $('btnReady'), btnStart = $('btnStart'), btnCopy = $('btnCopy')
+
+  // ========== 房间状态 ==========
+  var ws = null
+  var me = null           // { id, name }
+  var hostId = null
+  var players = []        // [{ id, name }]
+  var ready = {}          // id -> bool
+  var alive = {}          // id -> bool（对局中存活）
+  var started = false
+  var games = {}          // id -> game 实例（自己的游戏）
+  var oppGames = {}       // id -> 对手游戏（只显示得分/状态）
+
+  // ========== 颜色 ==========
+  var COLORS = ['#00d2ff', '#ff6b9d', '#ffe066', '#7b68ee']
+  var AV_COLORS = ['#00d2ff', '#ff6b9d', '#ffe066', '#a29bfe']
+
+  // ========== WebSocket ==========
+  function setDot(cls) { dot.className = 'dot ' + cls }
+
+  function connect() {
+    setDot('bad')
+    ws = new WebSocket(wsUrl)
+    ws.onopen = function () {
+      setDot('ok')
+      ws.send(JSON.stringify({ type: 'join', name: MY_NAME }))
+    }
+    ws.onclose = function () {
+      setDot('bad')
+      if (!started) setTimeout(connect, 1500)
+    }
+    ws.onerror = function () { setDot('bad') }
+    ws.onmessage = function (e) {
+      var msg
+      try { msg = JSON.parse(e.data) } catch (err) { return }
+      handleMsg(msg)
+    }
+  }
+
+  function handleMsg(msg) {
+    switch (msg.type) {
+      case 'welcome':
+        me = { id: msg.id, name: MY_NAME }
+        hostId = msg.hostId
+        break
+      case 'players':
+        players = msg.players || []
+        hostId = msg.hostId
+        players.forEach(function (p) { if (!(p.id in ready)) ready[p.id] = false })
+        renderPlayers()
+        break
+      case 'playerLeft':
+        players = msg.players || []
+        hostId = msg.hostId
+        renderPlayers()
+        break
+      case 'peer':
+        onPeer(msg)
+        break
+      case 'error':
+        alert('服务器错误：' + msg.msg)
+        break
+    }
+  }
+
+  function send(obj) { if (ws && ws.readyState === 1) ws.send(JSON.stringify(obj)) }
+
+  // ========== 大厅渲染 ==========
+  function renderPlayers() {
+    $('roomCode').textContent = ROOM
+    var html = ''
+    var slots = Math.max(players.length, 2)
+    for (var i = 0; i < Math.max(slots, 4); i++) {
+      var p = players[i]
+      if (p) {
+        var isHost = p.id === hostId
+        var isMe = me && p.id === me.id
+        var tag = ''
+        if (isHost) tag += '<span class="tag host">房主</span>'
+        if (isMe) tag += '<span class="tag you">我</span>'
+        if (started) {
+          tag += alive[p.id] ? '<span class="tag wait">进行中</span>' : '<span class="tag wait">淘汰</span>'
+        } else if (!isHost) {
+          tag += ready[p.id] ? '<span class="tag ready">已准备</span>' : '<span class="tag wait">未准备</span>'
+        } else {
+          tag += '<span class="tag ready">房主</span>'
+        }
+        html += '<div class="player-item"><div class="av" style="background:' + AV_COLORS[i % 4] + '">' + p.name.slice(0, 1).toUpperCase() + '</div><div class="nm">' + esc(p.name) + '</div>' + tag + '</div>'
+      } else {
+        html += '<div class="player-item"><div class="av" style="background:#2a3044;color:#565d75">?</div><div class="slot">等待玩家加入…</div></div>'
+      }
+    }
+    playersEl.innerHTML = html
+
+    var isHost = me && me.id === hostId
+    if (!started) {
+      if (isHost) {
+        btnStart.classList.remove('hidden')
+        btnReady.classList.add('hidden')
+        var allReady = players.length >= 2 && players.every(function (p) { return p.id === hostId || ready[p.id] })
+        btnStart.disabled = players.length < 2 || !allReady
+        btnStart.textContent = players.length < 2 ? '等待其他玩家 (至少2人)' : (allReady ? '开始游戏' : '等待所有人准备…')
+      } else {
+        btnStart.classList.add('hidden')
+        btnReady.classList.remove('hidden')
+        btnReady.textContent = ready[me.id] ? '取消准备' : '准备'
+      }
+    }
+  }
+
+  function esc(s) {
+    var d = document.createElement('div'); d.textContent = s; return d.innerHTML
+  }
+
+  btnCopy.addEventListener('click', function () {
+    var url = location.origin + '/legacy/multi/index.html?game=' + GAME + '&room=' + ROOM + '&max=' + MAX
+    var ta = document.createElement('textarea')
+    ta.value = url
+    document.body.appendChild(ta); ta.select()
+    try { document.execCommand('copy') } catch (e) {}
+    document.body.removeChild(ta)
+    btnCopy.textContent = '已复制链接 ✓'
+    setTimeout(function () { btnCopy.textContent = '复制房间号' }, 1500)
+  })
+
+  btnReady.addEventListener('click', function () {
+    var v = !ready[me.id]
+    ready[me.id] = v
+    send({ type: 'broadcast', data: { type: 'ready', on: v } })
+    renderPlayers()
+  })
+
+  btnStart.addEventListener('click', function () {
+    send({ type: 'room', data: { type: 'start' } })
+  })
+
+  // ========== 消息处理（对局内） ==========
+  function onPeer(msg) {
+    var d = msg.data
+    if (!d) return
+    if (!started) {
+      if (d.type === 'ready') {
+        ready[msg.from] = !!d.on
+        renderPlayers()
+      } else if (d.type === 'start') {
+        startGame()
+      }
+      return
+    }
+    // 对局中
+    switch (d.type) {
+      case 'start':
+        startGame()
+        break
+      case 'update':
+        if (oppGames[msg.from]) oppGames[msg.from].setInfo(d.score, d.lines)
+        break
+      case 'attack':
+        if (me && msg.from !== me.id && games[me.id]) {
+          games[me.id].addGarbage(d.lines || 0)
+        }
+        break
+      case 'dead':
+        alive[msg.from] = false
+        if (oppGames[msg.from]) oppGames[msg.from].setStatus('淘汰')
+        checkWinner()
+        break
+      case 'again':
+        if (me) alive[me.id] = true
+        Object.keys(oppGames).forEach(function (k) { oppGames[k].setStatus('') })
+        overlay.classList.remove('show')
+        break
+    }
+  }
+
+  function checkWinner() {
+    if (!me || !started) return
+    if (alive[me.id]) {
+      var othersAlive = players.filter(function (p) { return p.id !== me.id && alive[p.id] }).length
+      if (othersAlive === 0) showOver('🎉 你赢了！', '你是最后存活的玩家')
+    }
+  }
+
+  function showOver(title, rank) {
+    $('ovTitle').textContent = title
+    $('ovRank').textContent = rank
+    overlay.classList.add('show')
+  }
+
+  // ========== 游戏初始化 ==========
+  function buildGrid() {
+    grid.innerHTML = ''
+    games = {}
+    oppGames = {}
+    // 以 players 顺序渲染格子（含空位最多 MAX 格）
+    var total = Math.max(players.length, 2)
+    for (var i = 0; i < total; i++) {
+      var p = players[i]
+      var cell = document.createElement('div')
+      cell.className = 'cell' + (p && me && p.id === me.id ? ' mine' : '')
+      var attk = document.createElement('div')
+      attk.className = 'attk'
+      attk.textContent = '⚡'
+      cell.appendChild(attk)
+      var head = document.createElement('div')
+      head.className = 'phead'
+      head.innerHTML = '<span class="pname">' + (p ? esc(p.name) : '等待玩家') + '</span><span class="pscore" id="ps' + (p ? p.id : i) + '">0</span>'
+      cell.appendChild(head)
+      var cv = document.createElement('canvas')
+      cell.appendChild(cv)
+      var st = document.createElement('div')
+      st.className = 'pstatus'
+      cell.appendChild(st)
+      grid.appendChild(cell)
+
+      if (p) {
+        alive[p.id] = true
+        if (me && p.id === me.id) {
+          games[me.id] = createGame(cv, p.id, i, attk)
+        } else {
+          oppGames[p.id] = createOpp(cv, p.id, i, st)
+        }
+      }
+    }
+  }
+
+  function startGame() {
+    started = true
+    lobby.classList.add('hidden')
+    gameBox.classList.remove('hidden')
+    buildGrid()
+    if (games[me.id]) games[me.id].run()
+  }
+
+  // ========== 俄罗斯方块游戏（可实例化） ==========
+  var SHAPES = {
+    I:{color:'#00d2ff',m:[[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]]},
+    O:{color:'#ffe066',m:[[1,1],[1,1]]},
+    T:{color:'#a29bfe',m:[[0,1,0],[1,1,1],[0,0,0]]},
+    S:{color:'#ff6b9d',m:[[0,1,1],[1,1,0],[0,0,0]]},
+    Z:{color:'#ff6b6b',m:[[1,1,0],[0,1,1],[0,0,0]]},
+    J:{color:'#5c7cfa',m:[[1,0,0],[1,1,1],[0,0,0]]},
+    L:{color:'#ffa94d',m:[[0,0,1],[1,1,1],[0,0,0]]}
+  }
+  var KEYS = Object.keys(SHAPES)
+  var COLS = 10, ROWS = 20, CELL = 18
+
+  function createGame(canvas, id, idx, attkEl) {
+    var ctx = canvas.getContext('2d')
+    canvas.width = COLS * CELL; canvas.height = ROWS * CELL
+    var board = [], piece, nextType, score, totalLines, paused, over, timer
+    var me = this
+    function newBoard() {
+      board = []
+      for (var r = 0; r < ROWS; r++) board.push(new Array(COLS).fill(0))
+    }
+    function newPiece(type) {
+      var def = SHAPES[type]
+      return { type: type, color: def.color, m: def.m.map(function (row) { return row.slice() }), x: Math.floor((COLS - def.m[0].length) / 2), y: 0 }
+    }
+    function rnd() { return KEYS[Math.floor(Math.random() * KEYS.length)] }
+    function collide(p, nx, ny, nm) {
+      var m = nm || p.m
+      for (var r = 0; r < m.length; r++)
+        for (var c = 0; c < m[r].length; c++)
+          if (m[r][c]) {
+            var bx = nx + c, by = ny + r
+            if (bx < 0 || bx >= COLS || by >= ROWS) return true
+            if (by >= 0 && board[by][bx]) return true
+          }
+      return false
+    }
+    function rotate(m) {
+      var n = m.length, out = []
+      for (var i = 0; i < n; i++) { out[i] = []; for (var j = 0; j < n; j++) out[i][j] = m[n - 1 - j][i] }
+      return out
+    }
+    function flashAttack(n) {
+      if (!attkEl) return
+      attkEl.classList.remove('on'); void attkEl.offsetWidth
+      attkEl.textContent = '+' + n
+      attkEl.classList.add('on')
+    }
+    function lock() {
+      var m = piece.m
+      for (var r = 0; r < m.length; r++)
+        for (var c = 0; c < m[r].length; c++)
+          if (m[r][c]) {
+            var by = piece.y + r, bx = piece.x + c
+            if (by < 0) { return die() }
+            board[by][bx] = piece.color
+          }
+      clearLines()
+      spawn()
+    }
+    function clearLines() {
+      var cleared = 0
+      for (var r = ROWS - 1; r >= 0; r--)
+        if (board[r].every(function (v) { return v !== 0 })) {
+          board.splice(r, 1); board.unshift(new Array(COLS).fill(0)); cleared++; r++
+        }
+      if (cleared) {
+        totalLines += cleared
+        score += [0, 100, 300, 500, 800][cleared]
+        document.getElementById('ps' + id).textContent = score
+        // 攻击所有对手：消除 n 行 → 每人 n-1 行垃圾行
+        var attack = cleared - 1
+        if (attack > 0) send({ type: 'broadcast', data: { type: 'attack', lines: attack } })
+        // 同步得分
+        send({ type: 'broadcast', data: { type: 'update', score: score, lines: totalLines } })
+      }
+    }
+    function addGarbage(n) {
+      if (n <= 0) return
+      flashAttack(n)
+      for (var i = 0; i < n; i++) {
+        var row = new Array(COLS).fill('rgba(140,140,165,0.85)')
+        row[Math.floor(Math.random() * COLS)] = 0
+        board.push(row)
+        if (board.length > ROWS) {
+          board.shift()
+          // 挤到顶导致新方块无法生成则死亡
+        }
+      }
+      if (collide(piece, piece.x, piece.y)) die()
+      draw()
+    }
+    function spawn() {
+      piece = newPiece(nextType)
+      nextType = rnd()
+      if (collide(piece, piece.x, piece.y)) return die()
+      draw()
+    }
+    function die() {
+      if (over) return
+      over = true
+      clearInterval(timer)
+      send({ type: 'broadcast', data: { type: 'dead' } })
+      var st = piece.parentElement && piece.parentElement.querySelector('.pstatus')
+      if (st) { st.textContent = '你被淘汰了'; st.classList.add('show') }
+      checkWinner()
+    }
+    function move(dx) { if (over || paused) return; if (!collide(piece, piece.x + dx, piece.y)) { piece.x += dx; draw() } }
+    function rot() { if (over || paused) return; var nm = rotate(piece.m); if (!collide(piece, piece.x, piece.y, nm)) { piece.m = nm; draw() } }
+    function soft() { if (over || paused) return; if (!collide(piece, piece.x, piece.y + 1)) { piece.y++; draw() } else lock() }
+    function hard() { if (over || paused) return; while (!collide(piece, piece.x, piece.y + 1)) piece.y++; lock(); draw() }
+    function togglePause() { if (over) return; paused = !paused }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      ctx.strokeStyle = 'rgba(255,255,255,0.04)'
+      for (var i = 0; i <= COLS; i++) { ctx.beginPath(); ctx.moveTo(i * CELL, 0); ctx.lineTo(i * CELL, canvas.height); ctx.stroke() }
+      for (var j = 0; j <= ROWS; j++) { ctx.beginPath(); ctx.moveTo(0, j * CELL); ctx.lineTo(canvas.width, j * CELL); ctx.stroke() }
+      for (var r = 0; r < ROWS; r++)
+        for (var c = 0; c < COLS; c++)
+          if (board[r][c]) cell(c, r, board[r][c])
+      var gy = piece.y
+      while (!collide(piece, piece.x, gy + 1)) gy++
+      if (gy !== piece.y) {
+        var m = piece.m
+        for (var pr = 0; pr < m.length; pr++)
+          for (var pc = 0; pc < m[pr].length; pc++)
+            if (m[pr][pc]) { ctx.globalAlpha = 0.3; cell(piece.x + pc, gy + pr, piece.color); ctx.globalAlpha = 1 }
+      }
+      var pm = piece.m
+      for (var qr = 0; qr < pm.length; qr++)
+        for (var qc = 0; qc < pm[qr].length; qc++)
+          if (pm[qr][qc]) cell(piece.x + qc, piece.y + qr, piece.color)
+    }
+    function cell(x, y, color) {
+      var pad = 1
+      ctx.fillStyle = color
+      ctx.fillRect(x * CELL + pad, y * CELL + pad, CELL - pad * 2, CELL - pad * 2)
+    }
+
+    function run() {
+      newBoard()
+      nextType = rnd()
+      score = 0; totalLines = 0; paused = false; over = false
+      spawn()
+      clearInterval(timer)
+      timer = setInterval(function () { if (!paused && !over) soft() }, 500)
+    }
+
+    return {
+      run: run,
+      addGarbage: addGarbage,
+      move: move, rot: rot, soft: soft, hard: hard, togglePause: togglePause,
+      draw: draw
+    }
+  }
+
+  // 对手格子：只显示得分/状态
+  function createOpp(canvas, id, idx, statusEl) {
+    var ctx = canvas.getContext('2d')
+    canvas.width = COLS * CELL; canvas.height = ROWS * CELL
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)'
+    for (var i = 0; i <= COLS; i++) { ctx.beginPath(); ctx.moveTo(i * CELL, 0); ctx.lineTo(i * CELL, canvas.height); ctx.stroke() }
+    for (var j = 0; j <= ROWS; j++) { ctx.beginPath(); ctx.moveTo(0, j * CELL); ctx.lineTo(canvas.width, j * CELL); ctx.stroke() }
+    return {
+      setInfo: function (s, l) {
+        var el = document.getElementById('ps' + id)
+        if (el) el.textContent = s
+      },
+      setStatus: function (t) {
+        if (t) { statusEl.textContent = t; statusEl.classList.add('show') }
+        else statusEl.classList.remove('show')
+      }
+    }
+  }
+
+  // ========== 控制 ==========
+  document.querySelectorAll('.controls .btn').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var g = games[me.id]; if (!g) return
+      var a = b.getAttribute('data-a')
+      if (a === 'L') g.move(-1)
+      else if (a === 'R') g.move(1)
+      else if (a === 'Rot') g.rot()
+      else if (a === 'Soft') g.soft()
+      else if (a === 'Hard') g.hard()
+      else if (a === 'Pause') g.togglePause()
+    })
+  })
+
+  document.addEventListener('keydown', function (e) {
+    if (!started || !games[me.id]) return
+    var g = games[me.id]
+    if (e.key === 'ArrowLeft') { e.preventDefault(); g.move(-1) }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); g.move(1) }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); g.soft() }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); g.rot() }
+    else if (e.key === ' ') { e.preventDefault(); g.hard() }
+    else if (e.key === 'p' || e.key === 'P') g.togglePause()
+  })
+
+  $('ovLobby').addEventListener('click', function () {
+    location.href = '/#/pages/games/games'
+  })
+  $('ovAgain').addEventListener('click', function () {
+    // 广播再来一局
+    send({ type: 'room', data: { type: 'again' } })
+    if (me) alive[me.id] = true
+    Object.keys(oppGames).forEach(function (k) { oppGames[k].setStatus('') })
+    overlay.classList.remove('show')
+    if (games[me.id]) games[me.id].run()
+  })
+
+  // ========== 启动 ==========
+  $('roomCode').textContent = ROOM
+  connect()
+})()
+</script>
+</body>
+</html>
