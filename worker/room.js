@@ -7,9 +7,11 @@
 export class Room {
   constructor(state, env) {
     this.state = state
+    this.env = env
     this.players = new Map() // id -> { id, name, ws }
     this.maxPlayers = 4
     this.hostId = null
+    this.roomId = null
   }
 
   // 生成 6 位随机玩家 ID
@@ -23,6 +25,10 @@ export class Room {
 
   async fetch(request) {
     try {
+      const url = new URL(request.url)
+      const rm = url.pathname.match(/^\/room\/([A-Za-z0-9]+)/)
+      if (rm) this.roomId = rm[1].toUpperCase()
+
       // 非 WebSocket 请求：用于健康/诊断
       const upgrade = (request.headers.get('Upgrade') || '').toLowerCase()
       if (!upgrade.includes('websocket')) {
@@ -30,6 +36,20 @@ export class Room {
           JSON.stringify({ do: 'alive', players: this.players.size, hostId: this.hostId }),
           { status: 200, headers: { 'Content-Type': 'application/json' } }
         )
+      }
+
+      // 新连接 = 房间又有人了，取消"全部掉线 3 分钟后关闭"的定时器
+      await this.state.storage.deleteAlarm()
+
+      // 满员检查
+      if (this.players.size >= this.maxPlayers) {
+        const pair = new WebSocketPair()
+        const client = pair[0]
+        const server = pair[1]
+        this.state.acceptWebSocket(server)
+        server.send(JSON.stringify({ type: 'error', msg: '房间已满' }))
+        server.close(4000, 'full')
+        return new Response(null, { status: 101, webSocket: client })
       }
 
       const pair = new WebSocketPair()
@@ -43,17 +63,44 @@ export class Room {
       this.players.set(id, player)
       if (!this.hostId) this.hostId = id
 
+      // 记录房间元信息（alarm 触发时用来定位房间号）
+      if (this.roomId) {
+        await this.state.storage.put('meta', { roomId: this.roomId, game: 'tetris' })
+      }
+
       // 给新连接发送欢迎信息
       server.send(
         JSON.stringify({ type: 'welcome', id, hostId: this.hostId, maxPlayers: this.maxPlayers })
       )
       // 广播当前玩家列表（含新加入者）
       this.broadcastAll({ type: 'players', players: this.info(), hostId: this.hostId, maxPlayers: this.maxPlayers })
+      // 通知登记中心更新房间记录
+      this.notifyRegistry()
 
       return new Response(null, { status: 101, webSocket: client })
     } catch (e) {
       return new Response('DO Error: ' + (e && e.stack ? e.stack : e), { status: 500 })
     }
+  }
+
+  // 通知登记中心（REGISTRY DO）更新房间状态
+  async notifyRegistry() {
+    if (!this.roomId || !this.env.REGISTRY) return
+    try {
+      const stub = this.env.REGISTRY.get(this.env.REGISTRY.idFromName('global'))
+      await stub.fetch(
+        new Request('https://internal/rooms', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            roomId: this.roomId,
+            game: 'tetris',
+            players: this.info().map((p) => p.name),
+            maxPlayers: this.maxPlayers
+          })
+        })
+      )
+    } catch (e) { /* registry 更新失败不影响主流程 */ }
   }
 
   info() {
@@ -127,7 +174,28 @@ export class Room {
       const next = this.players.keys().next().value
       this.hostId = next || null
     }
-    // 通知房间内其他玩家该玩家离开
-    this.broadcastAll({ type: 'playerLeft', id: player.id, hostId: this.hostId, players: this.info(), maxPlayers: this.maxPlayers })
+
+    if (this.players.size === 0) {
+      // 全部玩家掉线：3 分钟后自动关闭房间（期间新玩家可加入使房间复活）
+      this.notifyRegistry()
+      await this.state.storage.setAlarm(Date.now() + 3 * 60 * 1000)
+    } else {
+      // 房间还有其他人：更新人数并通知
+      this.notifyRegistry()
+      this.broadcastAll({ type: 'playerLeft', id: player.id, hostId: this.hostId, players: this.info(), maxPlayers: this.maxPlayers })
+    }
+  }
+
+  // 全部掉线 3 分钟后触发：若房间仍无人则关闭房间并移除登记记录
+  async alarm() {
+    if (this.players.size !== 0) return
+    try {
+      const meta = await this.state.storage.get('meta')
+      if (meta && meta.roomId && this.env.REGISTRY) {
+        const stub = this.env.REGISTRY.get(this.env.REGISTRY.idFromName('global'))
+        await stub.fetch(new Request('https://internal/rooms/' + meta.roomId, { method: 'DELETE' }))
+      }
+      await this.state.storage.delete('meta')
+    } catch (e) { /* ignore */ }
   }
 }

@@ -6,7 +6,9 @@
 // ============================================================
 window.MULTI_CONFIG = {
   // ✅ 已部署的 Cloudflare Worker 地址（2026-08-04）
-  wsUrl: 'wss://byzm-multi.byzm.workers.dev/room'
+  wsUrl: 'wss://byzm-multi.byzm.workers.dev/room',
+  // HTTP 接口（查询在线房间列表用）
+  httpUrl: 'https://byzm-multi.byzm.workers.dev'
 
   // 方案四 Node 服务器（本地测试用）：
   // wsUrl: 'ws://localhost:8787/room'

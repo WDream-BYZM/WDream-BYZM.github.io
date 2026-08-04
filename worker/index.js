@@ -3,8 +3,9 @@
 // 部署方式见 worker/README.md
 // ============================================================
 import { Room } from './room.js'
+import { Registry } from './registry.js'
 
-export { Room }
+export { Room, Registry }
 
 export default {
   async fetch(request, env, ctx) {
@@ -36,6 +37,12 @@ export default {
         const id = env.ROOMS.idFromName('DIAG')
         const stub = env.ROOMS.get(id)
         return stub.fetch(new Request('https://internal.test/ping', { method: 'GET' }))
+      }
+
+      // 房间登记中心：查询/更新活跃房间列表
+      if (url.pathname === '/rooms' || url.pathname.startsWith('/rooms/')) {
+        const stub = env.REGISTRY.get(env.REGISTRY.idFromName('global'))
+        return stub.fetch(request)
       }
 
       // 房间 WebSocket：/room/<roomId>（4 位房间号）

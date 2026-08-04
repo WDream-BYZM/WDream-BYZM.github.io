@@ -4,12 +4,20 @@ name = "byzm-multi"
 main = "index.js"
 compatibility_date = "2024-11-01"
 
-# Durable Objects 绑定（房间管理）
+# Durable Objects 绑定（房间管理 + 房间登记中心）
 [[durable_objects.bindings]]
 name = "ROOMS"
 class_name = "Room"
+
+[[durable_objects.bindings]]
+name = "REGISTRY"
+class_name = "Registry"
 
 # DO 数据库迁移
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["Room"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["Registry"]

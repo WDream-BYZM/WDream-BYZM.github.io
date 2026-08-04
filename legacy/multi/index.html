@@ -21,6 +21,9 @@
   .room-line .dot { width:10px; height:10px; border-radius:50%; background:#f6c445; box-shadow:0 0 8px #f6c445; margin-left:6px; }
   .room-line .dot.ok { background:#2ecc71; box-shadow:0 0 8px #2ecc71; }
   .room-line .dot.bad { background:#e74c3c; box-shadow:0 0 8px #e74c3c; }
+  .room-count { margin-top:10px; background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius: 12px; padding: 10px 16px; display:inline-flex; align-items:center; gap:8px; font-size:14px; color:#8a93ab; }
+  .room-count b { color:#00d2ff; font-size:18px; }
+  .room-count span { color:#565d75; }
 
   .players { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; }
   .player-item { display:flex; align-items:center; gap:12px; background: rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08); border-radius: 12px; padding: 12px 16px; }
@@ -91,6 +94,7 @@
     房间号 <b id="roomCode">----</b>
     <span class="dot" id="dot"></span>
   </div>
+  <div class="room-count">👥 当前人数 <b id="count">0</b><span>/</span><span id="maxCount">4</span></div>
   <div class="players" id="players"></div>
   <div class="lobby-btns">
     <button id="btnReady" class="hidden">准备</button>
@@ -220,6 +224,8 @@
   // ========== 大厅渲染 ==========
   function renderPlayers() {
     $('roomCode').textContent = ROOM
+    $('count').textContent = players.length
+    $('maxCount').textContent = MAX
     var html = ''
     var slots = Math.max(players.length, 2)
     for (var i = 0; i < Math.max(slots, 4); i++) {

@@ -64,6 +64,34 @@
         </view>
       </view>
 
+      <!-- 在线房间列表 -->
+      <view class="rooms-panel">
+        <view class="rooms-head">
+          <view class="rooms-title">🛰️ {{ t('games.multi.roomsTitle') }}</view>
+          <view class="rooms-sub">{{ t('games.multi.roomsSub') }}</view>
+        </view>
+        <view v-if="loadingRooms" class="rooms-empty">…</view>
+        <view v-else-if="rooms.length === 0" class="rooms-empty">{{ t('games.multi.roomsEmpty') }}</view>
+        <view v-else class="rooms-list">
+          <view
+            v-for="r in rooms"
+            :key="r.roomId"
+            class="room-row"
+            @click="joinRoomByCode(r.roomId)"
+          >
+            <view class="rr-left">
+              <view class="rr-code">{{ r.roomId }}</view>
+              <view class="rr-game">{{ r.game === 'tetris' ? t('games.multi.gameTetris') : r.game }}</view>
+            </view>
+            <view class="rr-mid">
+              <text class="rr-count">{{ r.players.length }}/{{ r.maxPlayers }}</text>
+              <text class="rr-players">{{ r.players.join('、') }}</text>
+            </view>
+            <view class="btn-join-sm">{{ t('games.multi.join') }} →</view>
+          </view>
+        </view>
+      </view>
+
       <view class="games-sep"></view>
 
       <WdGames />
@@ -74,10 +102,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
+
+// 联机服务器 HTTP 接口地址（与 legacy/multi/config.js 保持一致）
+const MULTI_HTTP = 'https://byzm-multi.byzm.workers.dev'
 
 const gameOptions = [t('games.multi.gameTetris')]
 const playerOptions = ['2 人', '3 人', '4 人']
@@ -85,6 +116,39 @@ const gameIdx = ref(0)
 const playerIdx = ref(2)
 const nickname = ref(localStorage.getItem('byzm_name') || '')
 const roomInput = ref('')
+
+// 在线房间列表
+const rooms = ref([])
+const loadingRooms = ref(true)
+let roomsTimer = null
+
+async function loadRooms() {
+  try {
+    const res = await fetch(MULTI_HTTP + '/rooms', { mode: 'cors' })
+    const data = await res.json()
+    rooms.value = (data.rooms || []).filter((r) => r.players && r.players.length > 0)
+  } catch (e) {
+    rooms.value = []
+  } finally {
+    loadingRooms.value = false
+  }
+}
+
+function joinRoomByCode(room) {
+  if (!checkName()) return
+  const max = [2, 3, 4][playerIdx.value]
+  goMulti(room, max)
+}
+
+onMounted(() => {
+  loadingRooms.value = true
+  loadRooms()
+  roomsTimer = setInterval(loadRooms, 5000)
+})
+
+onUnmounted(() => {
+  if (roomsTimer) clearInterval(roomsTimer)
+})
 
 function onGameChange(e) {
   gameIdx.value = +e.detail.value
@@ -371,5 +435,115 @@ function goBack() {
 
 .games-sep {
   height: 40rpx;
+}
+
+/* 在线房间列表 */
+.rooms-panel {
+  margin-top: 28rpx;
+  padding: 36rpx;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  .rooms-head {
+    display: flex;
+    flex-direction: column;
+
+    .rooms-title {
+      color: #e8ecf7;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .rooms-sub {
+      margin-top: 4rpx;
+      color: #00d2ff;
+      font-size: 11px;
+      letter-spacing: 4px;
+      font-weight: 600;
+    }
+  }
+
+  .rooms-empty {
+    margin-top: 22rpx;
+    padding: 30rpx 0;
+    text-align: center;
+    color: #565d75;
+    font-size: 14px;
+  }
+
+  .rooms-list {
+    margin-top: 18rpx;
+    display: flex;
+    flex-direction: column;
+    gap: 14rpx;
+
+    .room-row {
+      display: flex;
+      align-items: center;
+      gap: 16rpx;
+      padding: 18rpx 22rpx;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      transition: all 0.25s ease;
+
+      &:hover {
+        border-color: rgba(0, 210, 255, 0.5);
+        background: rgba(0, 210, 255, 0.06);
+      }
+
+      .rr-left {
+        display: flex;
+        flex-direction: column;
+        min-width: 150rpx;
+
+        .rr-code {
+          color: #00d2ff;
+          font-size: 24px;
+          font-weight: 800;
+          letter-spacing: 4px;
+        }
+
+        .rr-game {
+          color: #8a93ab;
+          font-size: 12px;
+          margin-top: 2rpx;
+        }
+      }
+
+      .rr-mid {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+
+        .rr-count {
+          color: #e8ecf7;
+          font-size: 14px;
+          font-weight: 700;
+        }
+
+        .rr-players {
+          margin-top: 4rpx;
+          color: #565d75;
+          font-size: 12px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+
+      .btn-join-sm {
+        padding: 12rpx 24rpx;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #6c5ce7, #00d2ff);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+    }
+  }
 }
 </style>

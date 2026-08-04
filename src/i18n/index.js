@@ -73,7 +73,10 @@ const messages = {
         join: '加入',
         roomCreated: '房间创建成功：',
         needName: '请先输入昵称',
-        needRoom: '请输入 4 位房间号'
+        needRoom: '请输入 4 位房间号',
+        roomsTitle: '在线房间',
+        roomsSub: 'LIVE ROOMS',
+        roomsEmpty: '暂无在线房间，创建一个房间开始对战吧'
       }
     },
     features: {
@@ -185,7 +188,10 @@ const messages = {
         join: 'Join',
         roomCreated: 'Room created: ',
         needName: 'Please enter a nickname',
-        needRoom: 'Please enter a 4-digit room code'
+        needRoom: 'Please enter a 4-digit room code',
+        roomsTitle: 'Live Rooms',
+        roomsSub: 'LIVE ROOMS',
+        roomsEmpty: 'No active rooms. Create one to start playing!'
       }
     },
     features: {
