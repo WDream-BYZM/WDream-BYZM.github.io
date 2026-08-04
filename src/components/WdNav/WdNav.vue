@@ -1,7 +1,7 @@
 <template>
-  <view class="wd-nav" :class="{ 'is-scrolled': scrolled }">
+  <view class="wd-nav" :class="{ 'is-scrolled': scrolled || !isHome }">
     <view class="nav-inner">
-      <view class="brand" @click="scrollTo('top')">
+      <view class="brand" @click="goHome">
         <view class="brand-logo"><text>B</text></view>
         <text class="brand-name">BYZM</text>
       </view>
@@ -12,7 +12,7 @@
           :key="item.key"
           class="nav-item"
           :class="{ active: activeKey === item.key }"
-          @click="scrollTo(item.key)"
+          @click="navigateTo(item)"
         >
           <text>{{ item.label }}</text>
         </view>
@@ -29,64 +29,78 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { useI18n } from 'vue-i18n'
 
 const { t, locale } = useI18n()
 
 const scrolled = ref(false)
+const isHome = ref(false)
 const activeKey = ref('home')
 
 const menus = computed(() => [
-  { key: 'home', label: t('nav.home') },
-  { key: 'about', label: t('nav.about') },
-  { key: 'ai', label: t('nav.ai') },
-  { key: 'contact', label: t('nav.contact') }
+  { key: 'home', label: t('nav.home'), path: '/pages/index/index' },
+  { key: 'about', label: t('nav.about'), path: '/pages/about/about' },
+  { key: 'games', label: t('nav.games'), path: '/pages/games/games' },
+  { key: 'ai', label: t('nav.ai'), path: '/pages/ai/ai' },
+  { key: 'contact', label: t('nav.contact'), path: '/pages/contact/contact' }
 ])
+
+function currentRoute() {
+  const pages = getCurrentPages()
+  const cur = pages[pages.length - 1]
+  return cur ? cur.route : ''
+}
+
+function navigateTo(item) {
+  if (currentRoute() === item.path.replace(/^\//, '')) return // 已在当前页
+  activeKey.value = item.key
+  if (item.key === 'home') {
+    uni.reLaunch({ url: item.path })
+  } else {
+    uni.navigateTo({ url: item.path })
+  }
+}
+
+function goHome() {
+  if (currentRoute() !== 'pages/index/index') {
+    uni.reLaunch({ url: '/pages/index/index' })
+  } else {
+    uni.pageScrollTo({ scrollTop: 0, duration: 300 })
+  }
+}
 
 function toggleLang() {
   locale.value = locale.value === 'zh-CN' ? 'en-US' : 'zh-CN'
 }
 
-function scrollTo(key) {
-  activeKey.value = key
-  if (key === 'top') {
-    /* #ifdef H5 */
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-    /* #endif */
-    /* #ifndef H5 */
-    uni.pageScrollTo({ scrollTop: 0, duration: 400 })
-    /* #endif */
-    return
-  }
-  /* #ifdef H5 */
-  const el = document.getElementById(key)
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  /* #endif */
-  /* #ifndef H5 */
-  uni.pageScrollTo({ selector: `#${key}`, duration: 400 })
-  /* #endif */
+function updateActive() {
+  const route = currentRoute()
+  isHome.value = route === 'pages/index/index'
+  const match = menus.value.find((m) => m.path.replace(/^\//, '') === route)
+  if (match) activeKey.value = match.key
 }
 
 let pageScrollHandler = null
 
-// H5 端使用 window 滚动监听，其他端使用 uni.onPageScroll
 function handleScroll(top) {
   scrolled.value = top > 30
-  if (top < 400) activeKey.value = 'home'
 }
 
+onShow(() => {
+  updateActive()
+})
+
 onMounted(() => {
+  updateActive()
   /* #ifdef H5 */
   pageScrollHandler = () => {
     handleScroll(window.pageYOffset || document.documentElement.scrollTop || 0)
   }
   window.addEventListener('scroll', pageScrollHandler, { passive: true })
-  handleScroll(window.pageYOffset || 0)
   /* #endif */
   /* #ifndef H5 */
-  pageScrollHandler = (res) => {
-    handleScroll(res.scrollTop)
-  }
+  pageScrollHandler = (res) => handleScroll(res.scrollTop)
   try {
     uni.onPageScroll(pageScrollHandler)
   } catch (e) {}

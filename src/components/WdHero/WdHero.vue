@@ -26,10 +26,10 @@
       </view>
 
       <view class="hero-actions">
-        <view class="btn btn-primary" @click="scrollTo('projects')">
+        <view class="btn btn-primary" @click="go('/pages/ai/ai')">
           <text>{{ t('hero.viewWork') }}</text>
         </view>
-        <view class="btn btn-ghost" @click="scrollTo('contact')">
+        <view class="btn btn-ghost" @click="go('/pages/contact/contact')">
           <text>{{ t('hero.contactMe') }}</text>
         </view>
       </view>
@@ -57,14 +57,8 @@ const brandLetters = computed(() => (t('hero.name') || 'BYZM').split(''))
 
 const heroRef = ref(null)
 
-function scrollTo(key) {
-  /* #ifdef H5 */
-  const el = document.getElementById(key)
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  /* #endif */
-  /* #ifndef H5 */
-  uni.pageScrollTo({ selector: `#${key}`, duration: 400 })
-  /* #endif */
+function go(path) {
+  uni.navigateTo({ url: path })
 }
 
 // ---------- Three.js 3D 粒子星空（H5） ----------

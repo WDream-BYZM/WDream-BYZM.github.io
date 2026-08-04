@@ -5,7 +5,8 @@ const messages = {
     nav: {
       home: '首页',
       about: '关于我',
-      ai: 'AI',
+      games: '游戏',
+      ai: 'AI 聊天',
       contact: '联系'
     },
     hero: {
@@ -26,8 +27,31 @@ const messages = {
       cups: '杯咖啡',
       stars: '颗星'
     },
+    games: {
+      title: '游戏功能',
+      subtitle: 'MY GAMES',
+      play: '开始游戏',
+      soon: '敬请期待',
+      items: {
+        tetris: {
+          name: '俄罗斯方块',
+          desc: '经典俄罗斯方块小游戏，Canvas 绘制，支持键盘与触屏操作。',
+          tag: '经典'
+        },
+        snake: {
+          name: '贪吃蛇',
+          desc: '经典贪吃蛇小游戏，即将上线。',
+          tag: '经典'
+        },
+        g2048: {
+          name: '2048',
+          desc: '风靡一时的数字合并游戏，即将上线。',
+          tag: '数字'
+        }
+      }
+    },
     ai: {
-      title: 'AI 对话',
+      title: 'AI 聊天',
       subtitle: 'AI CHAT',
       placeholder: '输入你的问题...',
       greeting: '你好！我是 BYZM 的 AI 助手，有什么可以帮你？',
@@ -60,7 +84,8 @@ const messages = {
     nav: {
       home: 'Home',
       about: 'About',
-      ai: 'AI',
+      games: 'Games',
+      ai: 'AI Chat',
       contact: 'Contact'
     },
     hero: {
@@ -80,6 +105,29 @@ const messages = {
       projects: 'Projects',
       cups: 'Cups of Coffee',
       stars: 'Stars'
+    },
+    games: {
+      title: 'Games',
+      subtitle: 'MY GAMES',
+      play: 'Play Now',
+      soon: 'Coming Soon',
+      items: {
+        tetris: {
+          name: 'Tetris',
+          desc: 'Classic Tetris game built with Canvas, supporting keyboard and touch.',
+          tag: 'Classic'
+        },
+        snake: {
+          name: 'Snake',
+          desc: 'Classic Snake game, coming soon.',
+          tag: 'Classic'
+        },
+        g2048: {
+          name: '2048',
+          desc: 'The popular number merging game, coming soon.',
+          tag: 'Numbers'
+        }
+      }
     },
     ai: {
       title: 'AI Chat',

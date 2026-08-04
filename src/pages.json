@@ -12,7 +12,35 @@
       "path": "pages/index/index",
       "style": {
         "navigationStyle": "custom",
-        "navigationBarTitleText": "个人主页"
+        "navigationBarTitleText": "首页"
+      }
+    },
+    {
+      "path": "pages/about/about",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "关于我"
+      }
+    },
+    {
+      "path": "pages/games/games",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "游戏"
+      }
+    },
+    {
+      "path": "pages/ai/ai",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "AI 聊天"
+      }
+    },
+    {
+      "path": "pages/contact/contact",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "联系我"
       }
     }
   ],
