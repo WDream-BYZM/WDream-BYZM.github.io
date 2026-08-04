@@ -22,25 +22,38 @@ export class Room {
   }
 
   async fetch(request) {
-    const pair = new WebSocketPair()
-    const client = pair[0]
-    const server = pair[1]
-    this.state.acceptWebSocket(server)
+    try {
+      // 非 WebSocket 请求：用于健康/诊断
+      const upgrade = (request.headers.get('Upgrade') || '').toLowerCase()
+      if (!upgrade.includes('websocket')) {
+        return new Response(
+          JSON.stringify({ do: 'alive', players: this.players.size, hostId: this.hostId }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        )
+      }
 
-    const id = this.genId()
-    const player = { id, name: '玩家', ws: server }
-    this.players.set(id, player)
-    if (!this.hostId) this.hostId = id
+      const pair = new WebSocketPair()
+      const client = pair[0]
+      const server = pair[1]
+      // acceptWebSocket() 会启用休眠模式并接受连接，无需（也不允许）再调用 server.accept()
+      this.state.acceptWebSocket(server)
 
-    server.accept()
-    // 给新连接发送欢迎信息
-    server.send(
-      JSON.stringify({ type: 'welcome', id, hostId: this.hostId, maxPlayers: this.maxPlayers })
-    )
-    // 广播当前玩家列表（含新加入者）
-    this.broadcastAll({ type: 'players', players: this.info(), hostId: this.hostId, maxPlayers: this.maxPlayers })
+      const id = this.genId()
+      const player = { id, name: '玩家', ws: server }
+      this.players.set(id, player)
+      if (!this.hostId) this.hostId = id
 
-    return new Response(null, { status: 101, webSocket: client })
+      // 给新连接发送欢迎信息
+      server.send(
+        JSON.stringify({ type: 'welcome', id, hostId: this.hostId, maxPlayers: this.maxPlayers })
+      )
+      // 广播当前玩家列表（含新加入者）
+      this.broadcastAll({ type: 'players', players: this.info(), hostId: this.hostId, maxPlayers: this.maxPlayers })
+
+      return new Response(null, { status: 101, webSocket: client })
+    } catch (e) {
+      return new Response('DO Error: ' + (e && e.stack ? e.stack : e), { status: 500 })
+    }
   }
 
   info() {

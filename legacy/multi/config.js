@@ -5,8 +5,8 @@
 // 详见 worker/README.md
 // ============================================================
 window.MULTI_CONFIG = {
-  // ★ 部署 Cloudflare Worker 后替换为你的 workers.dev 地址
-  wsUrl: 'wss://byzm-multi.your-subdomain.workers.dev/room'
+  // ✅ 已部署的 Cloudflare Worker 地址（2026-08-04）
+  wsUrl: 'wss://byzm-multi.byzm.workers.dev/room'
 
   // 方案四 Node 服务器（本地测试用）：
   // wsUrl: 'ws://localhost:8787/room'
