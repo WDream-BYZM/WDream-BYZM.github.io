@@ -99,7 +99,25 @@ let pageScrollHandler = null
 
 function handleScroll(top) {
   scrolled.value = top > 30
-  if (top < 400) activeKey.value = 'home'
+  // 根据各板块位置同步导航高亮
+  const map = [
+    { key: 'about', id: 'about' },
+    { key: 'features', id: 'features' },
+    { key: 'contact', id: 'contact' }
+  ]
+  let current = 'home'
+  for (const item of map) {
+    const el = document.getElementById(item.id)
+    if (el && el.offsetTop <= top + 160) current = item.key
+  }
+  // 滚动到底部时激活最后一个板块
+  if (
+    window.innerHeight + top >=
+    (document.documentElement.scrollHeight || 0) - 10
+  ) {
+    current = 'contact'
+  }
+  activeKey.value = current
 }
 
 onMounted(() => {

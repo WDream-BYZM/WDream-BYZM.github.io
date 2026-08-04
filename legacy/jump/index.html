@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>跳一跳</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #0b0f1c; font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+  #game { display: block; cursor: pointer; }
+  #score { position: fixed; top: 34px; left: 50%; transform: translateX(-50%); color: #fff; font-size: 44px; font-weight: 800; letter-spacing: 2px; text-shadow: 0 4px 14px rgba(0,0,0,.6); z-index: 10; user-select: none; }
+  #hint { position: fixed; bottom: 56px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,.65); font-size: 15px; letter-spacing: 3px; z-index: 10; user-select: none; pointer-events: none; transition: opacity .4s; }
+  #powerbar { position: fixed; left: 50%; bottom: 120px; transform: translateX(-50%); width: 180px; height: 8px; border-radius: 4px; background: rgba(255,255,255,.12); overflow: hidden; z-index: 10; opacity: 0; transition: opacity .2s; }
+  #powerbar.show { opacity: 1; }
+  #powerbar i { display: block; height: 100%; width: 0%; border-radius: 4px; background: linear-gradient(90deg,#6c5ce7,#00d2ff); }
+  #overlay { position: fixed; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; background: rgba(5,8,16,.72); z-index: 20; }
+  #overlay.show { display: flex; }
+  #overlay .title { color: #fff; font-size: 44px; font-weight: 800; letter-spacing: 4px; margin-bottom: 14px; }
+  #overlay .sub { color: #a29bfe; font-size: 22px; margin-bottom: 44px; }
+  #overlay .sub span { color: #00d2ff; font-weight: 700; font-size: 26px; }
+  #restart { padding: 15px 50px; border: none; border-radius: 30px; background: linear-gradient(135deg,#6c5ce7,#00d2ff); color: #fff; font-size: 17px; font-weight: 700; cursor: pointer; letter-spacing: 2px; box-shadow: 0 10px 28px rgba(108,92,231,.4); }
+  #restart:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(0,210,255,.45); }
+  #restart:active { transform: translateY(0); }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="score">0</div>
+<div id="powerbar"><i></i></div>
+<div id="hint">按住蓄力 · 松开跳跃</div>
+<div id="overlay">
+  <div class="title">游戏结束</div>
+  <div class="sub">得分 <span id="final">0</span></div>
+  <button id="restart">再来一局</button>
+</div>
+<script>
+var canvas = document.getElementById('game')
+var ctx = canvas.getContext('2d')
+var W = 0, H = 0
+function resize() { W = window.innerWidth; H = window.innerHeight; canvas.width = W; canvas.height = H }
+window.addEventListener('resize', resize); resize()
+
+// ---- 等距投影 ----
+var SC = 0.82
+function isoX(wx, wy) { return (wx - wy) * 0.866 * SC }
+function isoY(wx, wy, z) { return (wx + wy) * 0.5 * SC - z }
+
+// ---- 方块 ----
+function Block(x, y, size, h) { this.x = x; this.y = y; this.size = size; this.h = h }
+var blocks = []
+var current = 0
+var score = 0
+var player = { x: 0, y: 0, z: 0, state: 'stand', squish: 0 }
+var power = 0, charging = false
+var jump = null
+var MAX_DIST = 155
+var camOX = 0, camOY = 0
+
+function playerStandPos() {
+  var b = blocks[current]
+  return { x: b.x, y: b.y }
+}
+
+function nextBlock() {
+  var last = blocks[blocks.length - 1]
+  var dirX = Math.random() > 0.5 ? 1 : 0
+  var dirY = dirX ? 0 : 1
+  var dist = 68 + Math.random() * 118
+  var size = 52 + Math.random() * 34
+  var h = 42 + Math.random() * 42
+  blocks.push(new Block(last.x + dirX * dist, last.y + dirY * dist, size, h))
+}
+
+function initGame() {
+  blocks = []
+  blocks.push(new Block(0, 0, 64, 50))
+  nextBlock(); nextBlock()
+  current = 0; score = 0
+  player.state = 'stand'; player.z = 0; player.squish = 0
+  var p = playerStandPos(); player.x = p.x; player.y = p.y
+  power = 0; charging = false; jump = null
+  document.getElementById('overlay').classList.remove('show')
+  document.getElementById('hint').style.opacity = '1'
+  updateScore()
+}
+
+function doJump() {
+  var from = playerStandPos()
+  var b = blocks[current + 1]
+  var dirX = Math.sign(b.x - from.x)
+  var dirY = Math.sign(b.y - from.y)
+  var dist = power * MAX_DIST
+  jump = { fx: from.x, fy: from.y, dx: dirX * dist, dy: dirY * dist, t: 0, dur: 620 }
+  player.state = 'jump'
+  charging = false; power = 0; player.squish = 0
+  document.getElementById('powerbar').classList.remove('show')
+}
+
+function land() {
+  var b = blocks[current + 1]
+  var dx = player.x - b.x, dy = player.y - b.y
+  var half = b.size / 2
+  if (Math.abs(dx) <= half && Math.abs(dy) <= half) {
+    current++; score++
+    updateScore()
+    player.state = 'stand'; player.z = 0
+    var p = playerStandPos(); player.x = p.x; player.y = p.y
+    while (blocks.length > current + 3) { blocks.shift(); current-- }
+    nextBlock()
+  } else {
+    player.state = 'fall'
+    setTimeout(function () {
+      document.getElementById('overlay').classList.add('show')
+      document.getElementById('final').textContent = score
+    }, 900)
+  }
+  jump = null
+}
+
+function update(dt) {
+  if (jump) {
+    jump.t += dt
+    var p = Math.min(jump.t / jump.dur, 1)
+    player.x = jump.fx + jump.dx * p
+    player.y = jump.fy + jump.dy * p
+    player.z = Math.sin(p * Math.PI) * 95
+    if (p >= 1) land()
+  } else if (charging) {
+    power = Math.min(power + dt / 550, 1)
+    player.squish = power * 0.35
+    document.getElementById('powerbar').classList.add('show')
+    document.getElementById('powerbar').querySelector('i').style.width = (power * 100) + '%'
+  }
+}
+
+// ---- 输入 ----
+function startCharge(e) {
+  if (e && e.preventDefault) e.preventDefault()
+  if (player.state === 'stand' && !document.getElementById('overlay').classList.contains('show')) {
+    charging = true; power = 0
+  }
+}
+function endCharge(e) {
+  if (e && e.preventDefault) e.preventDefault()
+  if (charging) doJump()
+}
+canvas.addEventListener('mousedown', startCharge)
+canvas.addEventListener('mouseup', endCharge)
+canvas.addEventListener('touchstart', startCharge, { passive: false })
+canvas.addEventListener('touchend', endCharge, { passive: false })
+document.getElementById('restart').addEventListener('click', function () { initGame() })
+
+// ---- 渲染 ----
+function updateCamera() {
+  var c = playerStandPos()
+  // 相机略微看向下一个方块
+  var next = blocks[Math.min(current + 1, blocks.length - 1)]
+  var mx = (c.x + next.x * 0.3) / 1.3
+  var my = (c.y + next.y * 0.3) / 1.3
+  camOX = W / 2 - isoX(mx, my)
+  camOY = H / 2 - isoY(mx, my, 0) - 60
+}
+
+function poly(pts, fill) {
+  ctx.fillStyle = fill
+  ctx.beginPath()
+  ctx.moveTo(pts[0][0], pts[0][1])
+  for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1])
+  ctx.closePath()
+  ctx.fill()
+}
+
+function drawBlock(b) {
+  var s = b.size, x = b.x, y = b.y, h = b.h
+  function P(wx, wy, z) { return [isoX(wx, wy) + camOX, isoY(wx, wy, z) + camOY] }
+  var p1 = P(x - s / 2, y - s / 2, h)
+  var p2 = P(x + s / 2, y - s / 2, h)
+  var p3 = P(x + s / 2, y + s / 2, h)
+  var p4 = P(x - s / 2, y + s / 2, h)
+  var p2b = P(x + s / 2, y - s / 2, 0)
+  var p3b = P(x + s / 2, y + s / 2, 0)
+  var p4b = P(x - s / 2, y + s / 2, 0)
+  // 右侧面
+  poly([p2, p3, p3b, p2b], 'rgba(74,60,184,0.95)')
+  // 前面
+  poly([p3, p4, p4b, p3b], 'rgba(90,75,209,0.95)')
+  // 顶面（渐变）
+  var grad = ctx.createLinearGradient(p1[0], p1[1], p3[0], p3[1])
+  grad.addColorStop(0, '#8f7bf7')
+  grad.addColorStop(1, '#00d2ff')
+  poly([p1, p2, p3, p4], grad)
+  // 顶面描边
+  ctx.strokeStyle = 'rgba(255,255,255,0.28)'
+  ctx.lineWidth = 1.5
+  ctx.beginPath()
+  ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p2[0], p2[1]); ctx.lineTo(p3[0], p3[1]); ctx.lineTo(p4[0], p4[1]); ctx.closePath()
+  ctx.stroke()
+}
+
+function drawPlayer() {
+  var cur = blocks[current]
+  var topZ = cur.h
+  var px = isoX(player.x, player.y) + camOX
+  var py = isoY(player.x, player.y, topZ + player.z) + camOY
+  var hgt = 44 * (1 - player.squish)
+  var wdt = 24
+  // 阴影
+  var sh = isoY(player.x, player.y, topZ) + camOY + 2
+  ctx.fillStyle = 'rgba(0,0,0,0.25)'
+  ctx.beginPath(); ctx.ellipse(px, sh, wdt * 0.8, 10, 0, 0, Math.PI * 2); ctx.fill()
+  // 身体（胶囊）
+  var grad = ctx.createLinearGradient(px - wdt, py - hgt, px + wdt, py)
+  grad.addColorStop(0, '#ffffff')
+  grad.addColorStop(1, '#c3cdea')
+  ctx.fillStyle = grad
+  ctx.beginPath()
+  ctx.arc(px, py - hgt + 16, wdt / 2, Math.PI, 0) // 上半圆
+  ctx.lineTo(px + wdt / 2, py)
+  ctx.arc(px, py, wdt / 2, 0, Math.PI, true) // 下半圆
+  ctx.closePath()
+  ctx.fill()
+  // 眼睛
+  ctx.fillStyle = '#2b3050'
+  ctx.beginPath(); ctx.arc(px + 5, py - hgt + 16, 4, 0, Math.PI * 2); ctx.fill()
+  ctx.beginPath(); ctx.arc(px + 15, py - hgt + 16, 4, 0, Math.PI * 2); ctx.fill()
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H)
+  // 背景渐变
+  var bg = ctx.createLinearGradient(0, 0, 0, H)
+  bg.addColorStop(0, '#0b0f1c')
+  bg.addColorStop(0.6, '#101a33')
+  bg.addColorStop(1, '#0b0f1c')
+  ctx.fillStyle = bg
+  ctx.fillRect(0, 0, W, H)
+  // 网格地面
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)'
+  ctx.lineWidth = 1
+  var gs = 40
+  for (var gx = 0; gx < W; gx += gs) {
+    ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke()
+  }
+  for (var gy = 0; gy < H; gy += gs) {
+    ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke()
+  }
+
+  updateCamera()
+
+  // 排序方块（远→近）
+  var drawable = blocks.map(function (b, i) { return { b: b, sy: isoY(b.x, b.y, b.h), i: i } })
+  drawable.sort(function (a, c) { return a.sy - c.sy })
+  drawable.forEach(function (d) { drawBlock(d.b) })
+
+  drawPlayer()
+}
+
+function updateScore() {
+  document.getElementById('score').textContent = score
+}
+
+// ---- 主循环 ----
+var last = performance.now()
+function loop(now) {
+  var dt = Math.min((now - last) / 1000, 0.05)
+  last = now
+  update(dt * 1000)
+  draw()
+  requestAnimationFrame(loop)
+}
+
+initGame()
+requestAnimationFrame(loop)
+</script>
+</body>
+</html>

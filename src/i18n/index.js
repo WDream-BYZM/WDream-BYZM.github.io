@@ -46,6 +46,11 @@ const messages = {
           name: '2048',
           desc: '风靡一时的数字合并游戏，即将上线。',
           tag: '数字'
+        },
+        jump: {
+          name: '跳一跳',
+          desc: '按住蓄力，松开跳跃的益智小游戏。',
+          tag: '益智'
         }
       }
     },
@@ -131,6 +136,11 @@ const messages = {
           name: '2048',
           desc: 'The popular number merging game, coming soon.',
           tag: 'Numbers'
+        },
+        jump: {
+          name: 'Jump Jump',
+          desc: 'Hold to charge and release to jump. A fun puzzle game.',
+          tag: 'Puzzle'
         }
       }
     },

@@ -60,6 +60,15 @@ const games = computed(() => [
     gradient: 'linear-gradient(135deg, #7b68ee, #ff6b9d)',
     playable: false,
     url: ''
+  },
+  {
+    key: 'jump',
+    emoji: '🦘',
+    name: t('games.items.jump.name'),
+    desc: t('games.items.jump.desc'),
+    gradient: 'linear-gradient(135deg, #00d2ff, #ff6b9d)',
+    playable: true,
+    url: '/legacy/jump/index.html'
   }
 ])
 
