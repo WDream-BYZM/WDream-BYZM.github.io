@@ -40,6 +40,7 @@
   <canvas id="board" width="240" height="480"></canvas>
   <div class="side">
     <div class="score-box"><div class="label">得分</div><div class="num" id="score">0</div></div>
+    <div class="score-box"><div class="label">行数</div><div class="num" id="lines">0</div></div>
     <div class="score-box"><div class="label">下一块</div><canvas id="next" width="80" height="80"></canvas></div>
     <div class="btns">
       <button class="b-up">↻</button>
@@ -65,7 +66,7 @@
   var nextCanvas = document.getElementById('next')
   var ctx = boardCanvas.getContext('2d')
   var nctx = nextCanvas.getContext('2d')
-  var COLS = 14, ROWS = 20, CELL = 24
+  var COLS = 10, ROWS = 20, CELL = 24
   boardCanvas.width = COLS * CELL
   boardCanvas.height = ROWS * CELL
 
@@ -80,7 +81,7 @@
   }
   var KEYS = Object.keys(SHAPES)
 
-  var board, piece, nextType, score, paused, over, timer
+  var board, piece, nextType, score, totalLines, paused, over, timer
 
   function createBoard() {
     board = []
@@ -134,19 +135,21 @@
   }
 
   function clearLines() {
-    var lines = 0
+    var cleared = 0
     for (var r = ROWS - 1; r >= 0; r--) {
       if (board[r].every(function (v) { return v !== 0 })) {
         board.splice(r, 1)
         board.unshift(new Array(COLS).fill(0))
-        lines++
+        cleared++
         r++
       }
     }
-    if (lines) {
-      var pts = [0, 100, 300, 500, 800][lines]
+    if (cleared) {
+      totalLines += cleared
+      var pts = [0, 100, 300, 500, 800][cleared]
       score += pts
       document.getElementById('score').textContent = score
+      document.getElementById('lines').textContent = totalLines
     }
   }
 
@@ -195,9 +198,11 @@
     createBoard()
     nextType = randomType()
     score = 0
+    totalLines = 0
     paused = false
     over = false
     document.getElementById('score').textContent = '0'
+    document.getElementById('lines').textContent = '0'
     document.getElementById('overlay').classList.remove('show')
     document.getElementById('pause').textContent = '暂停（P）'
     spawnNext()

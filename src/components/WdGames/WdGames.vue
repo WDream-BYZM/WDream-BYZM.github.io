@@ -78,7 +78,8 @@ function openGame(game) {
     return
   }
   /* #ifdef H5 */
-  window.open(game.url, '_blank')
+  // 当前页跳转到游戏（避免 window.open 被浏览器弹窗拦截）
+  window.location.href = game.url
   /* #endif */
   /* #ifndef H5 */
   uni.showToast({ title: game.name, icon: 'none' })
