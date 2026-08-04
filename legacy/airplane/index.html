@@ -88,10 +88,10 @@
 ;(function () {
   'use strict'
   // ================= 配置 =================
-  var CELL = 40          // 轨道格尺寸
-  var PAD = 40           // 内边距（环内侧留出终点区）
+  var CELL = 70         // 棋盘格子尺寸（8x8 网格）
   var BOARD = 660
-  var RING = 52          // 外圈总格数
+  var GRID = 8          // 经典 8x8 棋盘
+  var RING = 28         // 外圈轨道总格数（每玩家 7 格）
   var NAMES = ['红方', '黄方', '蓝方', '绿方']
   var COLORS = ['#ff5252', '#ffd740', '#448aff', '#69f0ae']
   var playerCount = 4
@@ -100,25 +100,23 @@
   var rolling = false
 
   // ================= 坐标计算 =================
-  // 52 格外圈：顶边0-12 右13-25 底26-38 左39-51
+  // 经典 8x8 网格外圈 28 格：格0(左上)→顶边→格7(右上)→右边→格14(右下)→底边→格21(左下)→左边
+  var gridOx = (BOARD - GRID * CELL) / 2
+  var gridOy = gridOx
+  function gx(i) { return gridOx + CELL / 2 + i * CELL }
+  function gy(j) { return gridOy + CELL / 2 + j * CELL }
   var ringPts = []
   ;(function buildRing() {
-    var x0 = PAD + CELL / 2, y0 = PAD + CELL / 2
-    var span = RING / 4 - 1  // 每条边内部格数(不含角) = 12
-    // 顶边：格0..12（左→右），格0 在左上角
-    for (var i = 0; i <= 12; i++) ringPts[i] = { x: x0 + i * CELL, y: y0 }
-    // 右边：格13..25（上→下），格13 右上角
-    for (var j = 0; j <= 12; j++) ringPts[13 + j] = { x: BOARD - PAD - CELL / 2, y: y0 + j * CELL }
-    // 底边：格26..38（右→左），格26 右下角
-    for (var k = 0; k <= 12; k++) ringPts[26 + k] = { x: BOARD - PAD - CELL / 2 - k * CELL, y: BOARD - PAD - CELL / 2 }
-    // 左边：格39..51（下→上），格39 左下角
-    for (var m = 0; m <= 12; m++) ringPts[39 + m] = { x: x0, y: BOARD - PAD - CELL / 2 - m * CELL }
+    for (var i = 0; i <= 7; i++) ringPts[i] = { x: gx(i), y: gy(0) }          // 顶边 0..7
+    for (var j = 1; j <= 6; j++) ringPts[7 + j] = { x: gx(7), y: gy(j) }      // 右边 8..13
+    for (var k = 0; k <= 7; k++) ringPts[14 + k] = { x: gx(7 - k), y: gy(7) } // 底边 14..21
+    for (var m = 1; m <= 6; m++) ringPts[21 + m] = { x: gx(0), y: gy(7 - m) } // 左边 22..27
   })()
 
-  // 玩家起点格：红0 黄13 蓝26 绿39（四角）
-  // 终点滑道坐标：从角向中心延伸 4 格
+  // 玩家起点格：红0=左上 黄7=右上 蓝14=右下 绿21=左下（四角）
+  // 终点滑道：从角起点斜向中心，4 格 + 中心终点
   function slidePts(pi) {
-    var start = ringPts[pi * 13]
+    var start = ringPts[pi * 7]
     var cx = BOARD / 2, cy = BOARD / 2
     var dx = (cx - start.x) / 5, dy = (cy - start.y) / 5
     var pts = []
@@ -127,18 +125,17 @@
   }
   var SLIDE = [0, 1, 2, 3].map(slidePts)
 
-  // 基地坐标：四角外侧 2x2 位置
+  // 基地坐标：四角外侧 2x2 飞机位
   function basePts(pi) {
-    var anchor = ringPts[pi * 13]
-    // 角朝外方向
-    var outX = (anchor.x - BOARD / 2) > 0 ? 1 : -1
-    var outY = (anchor.y - BOARD / 2) > 0 ? 1 : -1
-    var off = CELL * 0.9
+    var anchor = ringPts[pi * 7]
+    var outX = anchor.x < BOARD / 2 ? -1 : 1
+    var outY = anchor.y < BOARD / 2 ? -1 : 1
+    var off = CELL * 0.78
     return [
-      { x: anchor.x + outX * off * 0.5 - CELL * 0.28, y: anchor.y + outY * off * 0.5 - CELL * 0.28 },
-      { x: anchor.x + outX * off * 0.5 + CELL * 0.28, y: anchor.y + outY * off * 0.5 - CELL * 0.28 },
-      { x: anchor.x + outX * off * 0.5 - CELL * 0.28, y: anchor.y + outY * off * 0.5 + CELL * 0.28 },
-      { x: anchor.x + outX * off * 0.5 + CELL * 0.28, y: anchor.y + outY * off * 0.5 + CELL * 0.28 }
+      { x: anchor.x + outX * off * 0.5 - CELL * 0.26, y: anchor.y + outY * off * 0.5 - CELL * 0.26 },
+      { x: anchor.x + outX * off * 0.5 + CELL * 0.26, y: anchor.y + outY * off * 0.5 - CELL * 0.26 },
+      { x: anchor.x + outX * off * 0.5 - CELL * 0.26, y: anchor.y + outY * off * 0.5 + CELL * 0.26 },
+      { x: anchor.x + outX * off * 0.5 + CELL * 0.26, y: anchor.y + outY * off * 0.5 + CELL * 0.26 }
     ]
   }
   var BASE = [0, 1, 2, 3].map(basePts)
@@ -171,7 +168,7 @@
 
   // ================= 逻辑 =================
   function distFromStart(pi, pos) {
-    var S = pi * 13
+    var S = pi * 7
     return (pos - S + RING) % RING
   }
 
@@ -193,14 +190,14 @@
   // 尝试移动：返回新状态。d=骰子点数
   function movePlane(p, pi, d) {
     if (p.phase === 'base') {
-      if (d === 6) { p.phase = 'ring'; p.pos = pi * 13; return true }
+      if (d === 6) { p.phase = 'ring'; p.pos = pi * 7; return true }
       return false
     }
     if (p.phase === 'ring') {
       var dist = distFromStart(pi, p.pos)
       var d2 = dist + d
       if (d2 < RING) {
-        p.pos = (pi * 13 + d2) % RING
+        p.pos = (pi * 7 + d2) % RING
         // 吃子检测在外部做
         return true
       } else if (d2 <= RING + 4) {
@@ -398,60 +395,85 @@
 
   function draw() {
     ctx.clearRect(0, 0, BOARD, BOARD)
-    // 棋盘底色 + 中心区
     ctx.fillStyle = '#0c0f18'
     ctx.fillRect(0, 0, BOARD, BOARD)
-    // 中心终点区边框
     var cx = BOARD / 2, cy = BOARD / 2
-    var zone = (RING / 4 - 1) * CELL / 2 + CELL
-    ctx.strokeStyle = 'rgba(255,255,255,0.06)'
-    ctx.lineWidth = 2
-    ctx.strokeRect(cx - zone, cy - zone, zone * 2, zone * 2)
 
-    // 轨道格
+    // 棋盘面板 + 网格
+    ctx.fillStyle = 'rgba(255,255,255,0.02)'
+    ctx.beginPath(); ctx.roundRect(gridOx - 6, gridOy - 6, GRID * CELL + 12, GRID * CELL + 12, 16); ctx.fill()
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)'
+    ctx.lineWidth = 1
+    for (var g = 0; g <= GRID; g++) {
+      ctx.beginPath(); ctx.moveTo(gridOx + g * CELL, gridOy); ctx.lineTo(gridOx + g * CELL, gridOy + GRID * CELL); ctx.stroke()
+      ctx.beginPath(); ctx.moveTo(gridOx, gridOy + g * CELL); ctx.lineTo(gridOx + GRID * CELL, gridOy + g * CELL); ctx.stroke()
+    }
+
+    // 外圈轨道格（起点格用玩家色）
     for (var i = 0; i < RING; i++) {
       var p = ringPts[i]
-      // 角格高亮（起点）
-      var isStart = (i % 13 === 0)
-      ctx.fillStyle = isStart ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.03)'
-      ctx.fillRect(p.x - CELL / 2 + 1, p.y - CELL / 2 + 1, CELL - 2, CELL - 2)
-      ctx.strokeStyle = isStart ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.07)'
-      ctx.lineWidth = 1
-      ctx.strokeRect(p.x - CELL / 2 + 1, p.y - CELL / 2 + 1, CELL - 2, CELL - 2)
+      var isStart = (i % 7 === 0)
+      var piStart = Math.floor(i / 7)
+      if (isStart) {
+        ctx.fillStyle = COLORS[piStart]
+        ctx.strokeStyle = 'rgba(255,255,255,0.5)'
+        ctx.lineWidth = 2
+      } else {
+        ctx.fillStyle = 'rgba(255,255,255,0.06)'
+        ctx.strokeStyle = 'rgba(255,255,255,0.12)'
+        ctx.lineWidth = 1
+      }
+      ctx.beginPath()
+      ctx.roundRect(p.x - CELL / 2 + 2, p.y - CELL / 2 + 2, CELL - 4, CELL - 4, 9)
+      ctx.fill(); ctx.stroke()
     }
-    // 滑道格
+
+    // 终点滑道（玩家色）
     for (var pi = 0; pi < playerCount; pi++) {
       for (var s = 0; s < 4; s++) {
         var sp = SLIDE[pi][s]
-        ctx.fillStyle = hexA(COLORS[pi], 0.18)
-        ctx.fillRect(sp.x - CELL / 2 + 1, sp.y - CELL / 2 + 1, CELL - 2, CELL - 2)
-        ctx.strokeStyle = hexA(COLORS[pi], 0.4)
-        ctx.strokeRect(sp.x - CELL / 2 + 1, sp.y - CELL / 2 + 1, CELL - 2, CELL - 2)
+        ctx.fillStyle = hexA(COLORS[pi], 0.4)
+        ctx.beginPath()
+        ctx.roundRect(sp.x - CELL / 2 + 2, sp.y - CELL / 2 + 2, CELL - 4, CELL - 4, 9)
+        ctx.fill()
       }
     }
-    // 终点中心
-    var ep = SLIDE[0][4]
-    ctx.fillStyle = 'rgba(255,255,255,0.08)'
-    ctx.beginPath(); ctx.arc(ep.x, ep.y, CELL * 0.7, 0, Math.PI * 2); ctx.fill()
-    ctx.strokeStyle = 'rgba(255,255,255,0.2)'
-    ctx.stroke()
 
-    // 基地 + 飞机
+    // 中心终点：4 玩家色扇形
+    var R = CELL * 0.85
+    for (pi = 0; pi < playerCount; pi++) {
+      ctx.fillStyle = hexA(COLORS[pi], 0.55)
+      ctx.beginPath()
+      ctx.moveTo(cx, cy)
+      ctx.arc(cx, cy, R, pi * Math.PI / 2 - Math.PI / 2, (pi + 1) * Math.PI / 2 - Math.PI / 2)
+      ctx.closePath()
+      ctx.fill()
+    }
+    ctx.lineWidth = 2
+    ctx.strokeStyle = 'rgba(255,255,255,0.3)'
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke()
+
+    // 基地（四角彩色圆角区）
+    for (pi = 0; pi < playerCount; pi++) {
+      var an = ringPts[pi * 7]
+      var bx = an.x < cx ? -1 : 1, by = an.y < cy ? -1 : 1
+      var bcx = an.x + bx * CELL * 0.85, bcy = an.y + by * CELL * 0.85
+      ctx.fillStyle = hexA(COLORS[pi], 0.22)
+      ctx.strokeStyle = hexA(COLORS[pi], 0.65)
+      ctx.lineWidth = 2
+      ctx.beginPath()
+      ctx.roundRect(bcx - CELL * 0.62, bcy - CELL * 0.62, CELL * 1.24, CELL * 1.24, 14)
+      ctx.fill(); ctx.stroke()
+    }
+
+    // 飞机
     players.forEach(function (pl, pi) {
       pl.planes.forEach(function (p, idx) {
         var pos = planePos(p, pi)
-        var r = CELL * 0.32
+        var r = CELL * 0.3
         if (currentPlaneXY && p === currentPlane && p.phase !== 'finish') {
           pos = currentPlaneXY
         }
-        // 基地背景
-        if (p.phase === 'base') {
-          ctx.fillStyle = hexA(pl.color, 0.22)
-          ctx.fillRect(BASE[pi][idx].x - r, BASE[pi][idx].y - r, r * 2, r * 2)
-          ctx.strokeStyle = hexA(pl.color, 0.5)
-          ctx.strokeRect(BASE[pi][idx].x - r, BASE[pi][idx].y - r, r * 2, r * 2)
-        }
-        // 飞机圆
         ctx.beginPath()
         ctx.arc(pos.x, pos.y, r, 0, Math.PI * 2)
         ctx.fillStyle = pl.color
@@ -459,15 +481,15 @@
         ctx.lineWidth = 2
         ctx.strokeStyle = '#0b0f1c'
         ctx.stroke()
-        // 是否可点选高亮
+        // 可点选高亮
         if (highlightSelect && selectable.indexOf(idx) !== -1 && pl === players[current]) {
           ctx.beginPath()
-          ctx.arc(pos.x, pos.y, r + 5, 0, Math.PI * 2)
+          ctx.arc(pos.x, pos.y, r + 6, 0, Math.PI * 2)
           ctx.strokeStyle = '#fff'
           ctx.lineWidth = 2
           ctx.stroke()
         }
-        // 机头小三角
+        // 机头白点
         ctx.beginPath()
         ctx.arc(pos.x, pos.y, r * 0.45, 0, Math.PI * 2)
         ctx.fillStyle = 'rgba(255,255,255,0.85)'

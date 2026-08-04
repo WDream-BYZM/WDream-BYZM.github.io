@@ -153,9 +153,12 @@
   if (wsParam) wsUrl = wsParam
   if (!wsUrl) {
     wsUrl = location.protocol === 'https:' ? 'wss://' : 'ws://'
-    wsUrl += location.host + '/room'
+    wsUrl += location.host
   }
-  if (!/\/room$/.test(wsUrl)) wsUrl += '/room'
+  // 规范化基础地址：去掉末尾斜杠和可能已存在的 /room
+  wsUrl = wsUrl.replace(/\/+$/, '').replace(/\/room$/, '')
+  // ★ 关键：必须拼上房间号（Cloudflare Worker 要求 /room/<roomId>）
+  wsUrl += '/room/' + ROOM
 
   // ========== DOM ==========
   var $ = function (id) { return document.getElementById(id) }
