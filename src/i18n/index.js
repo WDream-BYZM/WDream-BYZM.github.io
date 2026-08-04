@@ -39,7 +39,7 @@ const messages = {
         },
         snake: {
           name: '贪吃蛇',
-          desc: '经典贪吃蛇小游戏，即将上线。',
+          desc: '经典贪吃蛇小游戏，方向键控制移动。',
           tag: '经典'
         },
         g2048: {
@@ -129,7 +129,7 @@ const messages = {
         },
         snake: {
           name: 'Snake',
-          desc: 'Classic Snake game, coming soon.',
+          desc: 'Classic Snake game. Use arrow keys to move.',
           tag: 'Classic'
         },
         g2048: {

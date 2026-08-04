@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>跳一跳</title>
 <style>
+  .home-btn { position: fixed; top: 20px; left: 20px; z-index: 30; padding: 10px 22px; border-radius: 20px; background: rgba(21,26,44,.85); border: 1px solid rgba(255,255,255,.15); color: #e8ecf7; text-decoration: none; font-size: 14px; font-weight: 600; font-family: 'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; backdrop-filter: blur(6px); transition: all .25s ease; }
+  .home-btn:hover { border-color: rgba(108,92,231,.6); background: rgba(108,92,231,.25); color: #fff; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { width: 100%; height: 100%; overflow: hidden; background: #0b0f1c; font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; }
   #game { display: block; cursor: pointer; }
@@ -24,6 +26,7 @@
 </style>
 </head>
 <body>
+<a class="home-btn" href="../../">← 返回主页</a>
 <canvas id="game"></canvas>
 <div id="score">0</div>
 <div id="powerbar"><i></i></div>

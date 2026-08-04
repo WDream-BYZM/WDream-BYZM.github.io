@@ -49,8 +49,8 @@ const games = computed(() => [
     name: t('games.items.snake.name'),
     desc: t('games.items.snake.desc'),
     gradient: 'linear-gradient(135deg, #00d2ff, #7b68ee)',
-    playable: false,
-    url: ''
+    playable: true,
+    url: '/legacy/snake/index.html'
   },
   {
     key: 'g2048',

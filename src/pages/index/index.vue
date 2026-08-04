@@ -1,6 +1,7 @@
 <template>
   <view class="page">
     <WdNav />
+    <WdDotNav />
     <WdHero />
     <WdAbout />
 
