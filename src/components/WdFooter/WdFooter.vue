@@ -7,14 +7,17 @@
       </view>
       <text class="copyright">{{ t('footer.copyright') }}❤️</text>
       <text class="powered">{{ t('footer.powered') }}</text>
+      <text class="version">v{{ version }}</text>
     </view>
   </view>
 </template>
 
 <script setup>
 import { useI18n } from 'vue-i18n'
+import pkg from '../../../package.json'
 
 const { t } = useI18n()
+const version = pkg.version
 </script>
 
 <style lang="scss" scoped>
@@ -74,5 +77,12 @@ const { t } = useI18n()
   color: #5b6478;
   font-size: 12px;
   letter-spacing: 1px;
+}
+
+.version {
+  color: #3d445c;
+  font-size: 12px;
+  letter-spacing: 1px;
+  font-family: 'SF Mono', 'Consolas', monospace;
 }
 </style>
