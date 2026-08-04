@@ -14,6 +14,20 @@
         "navigationStyle": "custom",
         "navigationBarTitleText": "个人主页"
       }
+    },
+    {
+      "path": "pages/games/games",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "游戏"
+      }
+    },
+    {
+      "path": "pages/ai/ai",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "AI 聊天"
+      }
     }
   ],
   "globalStyle": {

@@ -39,10 +39,15 @@ const activeKey = ref('home')
 const menus = computed(() => [
   { key: 'home', label: t('nav.home') },
   { key: 'about', label: t('nav.about') },
-  { key: 'games', label: t('nav.games') },
-  { key: 'ai', label: t('nav.ai') },
+  { key: 'features', label: t('nav.features') },
   { key: 'contact', label: t('nav.contact') }
 ])
+
+function currentRoute() {
+  const pages = getCurrentPages()
+  const cur = pages[pages.length - 1]
+  return cur ? cur.route : ''
+}
 
 function toggleLang() {
   locale.value = locale.value === 'zh-CN' ? 'en-US' : 'zh-CN'
@@ -51,20 +56,42 @@ function toggleLang() {
 function scrollTo(key) {
   activeKey.value = key
   if (key === 'top') {
-    /* #ifdef H5 */
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-    /* #endif */
-    /* #ifndef H5 */
-    uni.pageScrollTo({ scrollTop: 0, duration: 400 })
-    /* #endif */
+    if (currentRoute() === 'pages/index/index') {
+      /* #ifdef H5 */
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      /* #endif */
+      /* #ifndef H5 */
+      uni.pageScrollTo({ scrollTop: 0, duration: 400 })
+      /* #endif */
+    } else {
+      uni.reLaunch({ url: '/pages/index/index' })
+    }
     return
   }
   /* #ifdef H5 */
   const el = document.getElementById(key)
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  } else {
+    // 不在首页：先回首页再滚动到目标板块
+    uni.reLaunch({ url: '/pages/index/index' })
+    setTimeout(() => {
+      const target = document.getElementById(key)
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 400)
+  }
   /* #endif */
   /* #ifndef H5 */
-  uni.pageScrollTo({ selector: `#${key}`, duration: 400 })
+  if (currentRoute() === 'pages/index/index') {
+    uni.pageScrollTo({ selector: `#${key}`, duration: 400 })
+  } else {
+    uni.reLaunch({
+      url: '/pages/index/index',
+      success: () => {
+        setTimeout(() => uni.pageScrollTo({ selector: `#${key}`, duration: 400 }), 300)
+      }
+    })
+  }
   /* #endif */
 }
 

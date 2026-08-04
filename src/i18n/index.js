@@ -5,8 +5,7 @@ const messages = {
     nav: {
       home: '首页',
       about: '关于我',
-      games: '游戏',
-      ai: 'AI 聊天',
+      features: '功能',
       contact: '联系'
     },
     hero: {
@@ -50,6 +49,13 @@ const messages = {
         }
       }
     },
+    features: {
+      title: '功能板块',
+      games: '游戏',
+      ai: 'AI 聊天',
+      gamesDesc: '俄罗斯方块、贪吃蛇、2048 小游戏',
+      aiDesc: '文字对话与图片识别智能助手'
+    },
     ai: {
       title: 'AI 聊天',
       subtitle: 'AI CHAT',
@@ -84,8 +90,7 @@ const messages = {
     nav: {
       home: 'Home',
       about: 'About',
-      games: 'Games',
-      ai: 'AI Chat',
+      features: 'Features',
       contact: 'Contact'
     },
     hero: {
@@ -128,6 +133,13 @@ const messages = {
           tag: 'Numbers'
         }
       }
+    },
+    features: {
+      title: 'Features',
+      games: 'Games',
+      ai: 'AI Chat',
+      gamesDesc: 'Tetris, Snake, 2048 mini games',
+      aiDesc: 'Text chat and image recognition AI'
     },
     ai: {
       title: 'AI Chat',

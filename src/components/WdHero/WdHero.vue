@@ -26,7 +26,7 @@
       </view>
 
       <view class="hero-actions">
-        <view class="btn btn-primary" @click="scrollTo('games')">
+        <view class="btn btn-primary" @click="scrollTo('features')">
           <text>{{ t('hero.viewWork') }}</text>
         </view>
         <view class="btn btn-ghost" @click="scrollTo('contact')">
