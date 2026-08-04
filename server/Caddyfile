@@ -1,0 +1,13 @@
+# Caddy 反向代理配置：把 wss://multi.byzmovo.cn 转发到本机 Node 联机服务器
+# Caddy 会自动申请并续期 HTTPS 证书（Let's Encrypt），无需手动配置证书
+#
+# 用法：
+#   1. 先把 multi.byzmovo.cn 解析到服务器 IP（在 DNS 服务商添加 A 记录）
+#   2. 安装 Caddy：sudo apt install caddy
+#   3. 把本文件放到 /etc/caddy/Caddyfile
+#   4. sudo systemctl restart caddy
+
+multi.byzmovo.cn {
+	# 允许 WebSocket 升级
+	reverse_proxy localhost:8787
+}

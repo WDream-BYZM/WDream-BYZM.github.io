@@ -1,0 +1,16 @@
+[Unit]
+Description=BYZM Multiplayer WebSocket Server
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/byzm-multi
+ExecStart=/usr/bin/node index.js
+Restart=always
+RestartSec=3
+# 监听端口（Caddy/nginx 反向代理会转发到这里）
+Environment=PORT=8787
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target
