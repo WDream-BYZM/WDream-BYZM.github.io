@@ -22,6 +22,7 @@
           </view>
         </view>
         <view class="mp-desc">{{ t('games.multi.desc') }}</view>
+        <view v-if="!MULTI_ENABLED" class="mp-maintenance">🔧 {{ t('games.multi.maintenance') }}</view>
 
         <view class="mp-row">
           <view class="mp-field">
@@ -51,7 +52,7 @@
         </view>
 
         <view class="mp-row mp-actions">
-          <view class="btn-create" @click="createRoom">{{ t('games.multi.create') }}</view>
+          <view class="btn-create" :class="{ disabled: !MULTI_ENABLED }" @click="createRoom">{{ t('games.multi.create') }}</view>
           <view class="mp-join-box">
             <input
               class="mp-input join-input"
@@ -59,7 +60,7 @@
               :placeholder="t('games.multi.roomPh')"
               maxlength="4"
             />
-            <view class="btn-join" @click="joinRoom">{{ t('games.multi.join') }}</view>
+            <view class="btn-join" :class="{ disabled: !MULTI_ENABLED }" @click="joinRoom">{{ t('games.multi.join') }}</view>
           </view>
         </view>
       </view>
@@ -70,7 +71,8 @@
           <view class="rooms-title">🛰️ {{ t('games.multi.roomsTitle') }}</view>
           <view class="rooms-sub">{{ t('games.multi.roomsSub') }}</view>
         </view>
-        <view v-if="loadingRooms" class="rooms-empty">…</view>
+        <view v-if="!MULTI_ENABLED" class="rooms-empty">🔧 {{ t('games.multi.maintenance') }}</view>
+        <view v-else-if="loadingRooms" class="rooms-empty">…</view>
         <view v-else-if="rooms.length === 0" class="rooms-empty">{{ t('games.multi.roomsEmpty') }}</view>
         <view v-else class="rooms-list">
           <view
@@ -110,6 +112,9 @@ const { t } = useI18n()
 // 联机服务器 HTTP 接口地址（与 legacy/multi/config.js 保持一致）
 const MULTI_HTTP = 'https://byzm-desktop.tail2a2672.ts.net'
 
+// 联机功能开关：true=启用，false=禁用（保留界面，仅禁用功能）
+const MULTI_ENABLED = false
+
 const gameOptions = [t('games.multi.gameTetris')]
 const playerOptions = ['2 人', '3 人', '4 人']
 const gameIdx = ref(0)
@@ -135,12 +140,20 @@ async function loadRooms() {
 }
 
 function joinRoomByCode(room) {
+  if (!MULTI_ENABLED) {
+    uni.showToast({ title: t('games.multi.maintenance'), icon: 'none' })
+    return
+  }
   if (!checkName()) return
   const max = [2, 3, 4][playerIdx.value]
   goMulti(room, max)
 }
 
 onMounted(() => {
+  if (!MULTI_ENABLED) {
+    loadingRooms.value = false
+    return
+  }
   loadingRooms.value = true
   loadRooms()
   roomsTimer = setInterval(loadRooms, 5000)
@@ -168,6 +181,10 @@ function checkName() {
 }
 
 function createRoom() {
+  if (!MULTI_ENABLED) {
+    uni.showToast({ title: t('games.multi.maintenance'), icon: 'none' })
+    return
+  }
   if (!checkName()) return
   const room = String(Math.floor(1000 + Math.random() * 9000))
   const max = [2, 3, 4][playerIdx.value]
@@ -175,6 +192,10 @@ function createRoom() {
 }
 
 function joinRoom() {
+  if (!MULTI_ENABLED) {
+    uni.showToast({ title: t('games.multi.maintenance'), icon: 'none' })
+    return
+  }
   if (!checkName()) return
   const room = roomInput.value.trim()
   if (!/^\d{4}$/.test(room)) {
@@ -328,6 +349,23 @@ function goBack() {
     color: #8a93ab;
     font-size: 14px;
     line-height: 1.7;
+  }
+
+  .mp-maintenance {
+    margin-top: 16rpx;
+    padding: 14rpx 18rpx;
+    border-radius: 12px;
+    background: rgba(246, 196, 69, 0.1);
+    border: 1px solid rgba(246, 196, 69, 0.3);
+    color: #f6c445;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .btn-create.disabled,
+  .btn-join.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
   }
 
   .mp-row {

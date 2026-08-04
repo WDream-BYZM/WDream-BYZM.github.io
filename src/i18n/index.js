@@ -76,7 +76,8 @@ const messages = {
         needRoom: '请输入 4 位房间号',
         roomsTitle: '在线房间',
         roomsSub: 'LIVE ROOMS',
-        roomsEmpty: '暂无在线房间，创建一个房间开始对战吧'
+        roomsEmpty: '暂无在线房间，创建一个房间开始对战吧',
+        maintenance: '联机功能维护中，敬请期待'
       }
     },
     features: {
@@ -191,7 +192,8 @@ const messages = {
         needRoom: 'Please enter a 4-digit room code',
         roomsTitle: 'Live Rooms',
         roomsSub: 'LIVE ROOMS',
-        roomsEmpty: 'No active rooms. Create one to start playing!'
+        roomsEmpty: 'No active rooms. Create one to start playing!',
+        maintenance: 'Multiplayer is under maintenance, coming soon'
       }
     },
     features: {
