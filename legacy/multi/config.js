@@ -5,15 +5,14 @@
 //   并切换到下面的"国内服务器"配置（详见 server/README.md）
 // ============================================================
 window.MULTI_CONFIG = {
-  // ---------- 配置 1：Cloudflare Worker（默认，需 VPN 才能连）----------
-  wsUrl: 'wss://byzm-multi.byzm.workers.dev/room',
-  httpUrl: 'https://byzm-multi.byzm.workers.dev'
+  // ---------- 当前启用：闲置电脑 + Tailscale Funnel（国内直连，无需 VPN）----------
+  wsUrl: 'wss://byzm-desktop.tail2a2672.ts.net/room',
+  httpUrl: 'https://byzm-desktop.tail2a2672.ts.net'
 
-  // ---------- 配置 2：国内服务器（推荐，别人不用 VPN 也能连）----------
-  // 部署好后取消下面两行注释，并注释掉配置 1 即可
-  // wsUrl: 'wss://multi.byzmovo.cn/room',
-  // httpUrl: 'https://multi.byzmovo.cn'
+  // ---------- 配置 2：Cloudflare Worker（需 VPN）----------
+  // wsUrl: 'wss://byzm-multi.byzm.workers.dev/room',
+  // httpUrl: 'https://byzm-multi.byzm.workers.dev'
 
-  // ---------- 本地 Node 测试服务器 ----------
+  // ---------- 国内服务器 / 本地 Node 测试 ----------
   // wsUrl: 'ws://localhost:8787/room'
 }

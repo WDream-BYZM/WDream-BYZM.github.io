@@ -108,7 +108,7 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 
 // 联机服务器 HTTP 接口地址（与 legacy/multi/config.js 保持一致）
-const MULTI_HTTP = 'https://byzm-multi.byzm.workers.dev'
+const MULTI_HTTP = 'https://byzm-desktop.tail2a2672.ts.net'
 
 const gameOptions = [t('games.multi.gameTetris')]
 const playerOptions = ['2 人', '3 人', '4 人']

@@ -34,12 +34,42 @@ function broadcastAll(room, obj) {
   broadcast(room, obj, null)
 }
 
+// ============ 房间登记（/rooms 在线房间列表） ============
+const registry = new Map() // roomId -> { roomId, game, players, maxPlayers, updated }
+const closeTimers = new Map() // roomId -> 3 分钟清理定时器
+
+function updateRegistry(roomId, room) {
+  registry.set(roomId, {
+    roomId,
+    game: 'tetris',
+    players: info(room).map((p) => p.name),
+    maxPlayers: 4,
+    updated: Date.now()
+  })
+}
+
 const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*')
-  if (req.url === '/' || req.url === '/health') {
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  const url = req.url || ''
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204)
+    res.end()
+    return
+  }
+  if (url === '/' || url === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' })
     res.end(JSON.stringify({ ok: true, service: 'byzm-multi' }))
     return
+  }
+  if (url.startsWith('/rooms')) {
+    if (req.method === 'GET') {
+      const list = [...registry.values()].sort((a, b) => b.updated - a.updated)
+      res.writeHead(200, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify({ rooms: list }))
+      return
+    }
   }
   res.writeHead(404)
   res.end('Not Found')
@@ -56,6 +86,12 @@ wss.on('connection', (ws, req) => {
     room = { players: new Map(), hostId: null }
     rooms.set(roomId, room)
   }
+  // 新玩家加入 = 房间复活，取消 3 分钟关闭定时器
+  if (closeTimers.has(roomId)) {
+    clearTimeout(closeTimers.get(roomId))
+    closeTimers.delete(roomId)
+  }
+  updateRegistry(roomId, room)
   // 房间满员
   if (room.players.size >= 4) {
     ws.send(JSON.stringify({ type: 'error', msg: '房间已满' }))
@@ -77,6 +113,7 @@ wss.on('connection', (ws, req) => {
     switch (msg.type) {
       case 'join':
         player.name = String(msg.name || '玩家').slice(0, 12)
+        updateRegistry(roomId, room)
         broadcastAll(room, { type: 'players', players: info(room), hostId: room.hostId, maxPlayers: 4 })
         break
       case 'relay':
@@ -103,7 +140,21 @@ wss.on('connection', (ws, req) => {
       room.hostId = next || null
     }
     broadcastAll(room, { type: 'playerLeft', id, hostId: room.hostId, players: info(room), maxPlayers: 4 })
-    if (room.players.size === 0) rooms.delete(roomId)
+    if (room.players.size === 0) {
+      // 全部掉线：登记保留 0 人，3 分钟后自动清理房间
+      updateRegistry(roomId, room)
+      clearTimeout(closeTimers.get(roomId))
+      closeTimers.set(roomId, setTimeout(() => {
+        const r = rooms.get(roomId)
+        if (r && r.players.size === 0) {
+          registry.delete(roomId)
+          rooms.delete(roomId)
+          closeTimers.delete(roomId)
+        }
+      }, 3 * 60 * 1000))
+    } else {
+      updateRegistry(roomId, room)
+    }
   })
 })
 
