@@ -49,10 +49,16 @@
   .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
   .cell { background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.07); border-radius: 14px; padding: 10px; display:flex; flex-direction:column; align-items:center; gap:6px; position: relative; }
   .cell.mine { border-color: rgba(0,210,255,.6); box-shadow: 0 0 22px rgba(0,210,255,.18); }
-  .cell .phead { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; }
-  .cell .pname { font-size:13px; font-weight:700; }
-  .cell .pscore { font-size:13px; color:#00d2ff; font-weight:800; }
-  .cell canvas { display:block; background:#0c0f18; border-radius:8px; box-shadow:0 0 0 2px #2f354a; width:100%; height:auto; }
+  .cell .phead { display:flex; align-items:center; justify-content:space-between; gap:8px; width:100%; padding:0 2px; }
+  .cell .pname { font-size:13px; font-weight:700; color:#e8ecf7; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cell .pstats { display:flex; gap:10px; flex-shrink:0; }
+  .cell .pstats .stat { font-size:11px; color:#8a93ab; display:flex; align-items:center; gap:3px; }
+  .cell .pstats .stat b { color:#00d2ff; font-size:13px; font-weight:800; }
+  .cell .pbody { display:flex; gap:10px; align-items:flex-start; justify-content:center; width:100%; }
+  .cell .pbody canvas.board { display:block; background:#0c0f18; border-radius:8px; box-shadow:0 0 0 2px #2f354a; width:auto; max-width:100%; height:auto; }
+  .cell .pinfo { display:flex; flex-direction:column; align-items:center; gap:6px; padding-top:2px; }
+  .cell .pinfo .next-label { color:#8a93ab; font-size:11px; letter-spacing:2px; }
+  .cell .pinfo canvas.next { display:block; background:#0c0f18; border-radius:8px; box-shadow:0 0 0 2px #2f354a; }
   .cell .pstatus { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:15px; font-weight:800; color:#e8ecf7; background:rgba(11,15,28,.85); padding:8px 18px; border-radius:12px; border:1px solid rgba(255,255,255,.15); display:none; }
   .cell .pstatus.show { display:block; }
   .cell .attk { position:absolute; right:8px; top:8px; color:#ff6b6b; font-size:12px; font-weight:800; opacity:0; transition: opacity .2s; }
@@ -75,6 +81,7 @@
   @media (max-width: 640px) {
     .grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
     .cell { padding: 6px; }
+    .cell .pinfo { display:none; }
     .controls .btn { min-width: 48px; height: 40px; font-size: 13px; }
     .controls .btn.big { min-width: 72px; }
   }
@@ -360,12 +367,31 @@
       attk.className = 'attk'
       attk.textContent = '⚡'
       cell.appendChild(attk)
+      // 顶部：名字 + 得分 + 行数
       var head = document.createElement('div')
       head.className = 'phead'
-      head.innerHTML = '<span class="pname">' + (p ? esc(p.name) : '等待玩家') + '</span><span class="pscore" id="ps' + (p ? p.id : i) + '">0</span>'
+      head.innerHTML = '<span class="pname">' + (p ? esc(p.name) : '等待玩家') + '</span>' +
+        '<span class="pstats">' +
+        '<span class="stat">得分 <b id="ps' + (p ? p.id : i) + '">0</b></span>' +
+        '<span class="stat">行数 <b id="pl' + (p ? p.id : i) + '">0</b></span>' +
+        '</span>'
       cell.appendChild(head)
+      // 主体：棋盘 + 下一块
+      var pbody = document.createElement('div')
+      pbody.className = 'pbody'
       var cv = document.createElement('canvas')
-      cell.appendChild(cv)
+      cv.className = 'board'
+      pbody.appendChild(cv)
+      var pinfo = document.createElement('div')
+      pinfo.className = 'pinfo'
+      pinfo.innerHTML = '<div class="next-label">下一块</div>'
+      var ncv = document.createElement('canvas')
+      ncv.className = 'next'
+      ncv.width = 90
+      ncv.height = 90
+      pinfo.appendChild(ncv)
+      pbody.appendChild(pinfo)
+      cell.appendChild(pbody)
       var st = document.createElement('div')
       st.className = 'pstatus'
       cell.appendChild(st)
@@ -374,7 +400,7 @@
       if (p) {
         alive[p.id] = true
         if (me && p.id === me.id) {
-          games[me.id] = createGame(cv, p.id, i, attk)
+          games[me.id] = createGame(cv, ncv, p.id, i, attk)
         } else {
           oppGames[p.id] = createOpp(cv, p.id, i, st)
         }
@@ -403,8 +429,9 @@
   var KEYS = Object.keys(SHAPES)
   var COLS = 10, ROWS = 20, CELL = 18
 
-  function createGame(canvas, id, idx, attkEl) {
+  function createGame(canvas, nextCanvas, id, idx, attkEl) {
     var ctx = canvas.getContext('2d')
+    var nctx = nextCanvas.getContext('2d')
     canvas.width = COLS * CELL; canvas.height = ROWS * CELL
     var board = [], piece, nextType, score, totalLines, paused, over, timer
     var me = this
@@ -461,6 +488,7 @@
         totalLines += cleared
         score += [0, 100, 300, 500, 800][cleared]
         document.getElementById('ps' + id).textContent = score
+        document.getElementById('pl' + id).textContent = totalLines
         // 攻击所有对手：消除 n 行 → 每人 n-1 行垃圾行
         var attack = cleared - 1
         if (attack > 0) send({ type: 'broadcast', data: { type: 'attack', lines: attack } })
@@ -487,6 +515,7 @@
       piece = newPiece(nextType)
       nextType = rnd()
       if (collide(piece, piece.x, piece.y)) return die()
+      drawNext()
       draw()
     }
     function die() {
@@ -525,10 +554,36 @@
         for (var qc = 0; qc < pm[qr].length; qc++)
           if (pm[qr][qc]) cell(piece.x + qc, piece.y + qr, piece.color)
     }
+    function lighten(hex) {
+      var r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16)
+      r = Math.min(255, r + 70); g = Math.min(255, g + 70); b = Math.min(255, b + 70)
+      return 'rgb(' + r + ',' + g + ',' + b + ')'
+    }
     function cell(x, y, color) {
       var pad = 1
-      ctx.fillStyle = color
+      var g = ctx.createLinearGradient(x * CELL, y * CELL, x * CELL + CELL, y * CELL + CELL)
+      g.addColorStop(0, lighten(color))
+      g.addColorStop(1, color)
+      ctx.fillStyle = g
       ctx.fillRect(x * CELL + pad, y * CELL + pad, CELL - pad * 2, CELL - pad * 2)
+      ctx.strokeStyle = 'rgba(255,255,255,0.25)'
+      ctx.lineWidth = 1
+      ctx.strokeRect(x * CELL + pad, y * CELL + pad, CELL - pad * 2, CELL - pad * 2)
+    }
+    // 下一块预览
+    function drawNext() {
+      nctx.clearRect(0, 0, 90, 90)
+      var def = SHAPES[nextType]
+      var m = def.m
+      var size = 22
+      var ox = (90 - m[0].length * size) / 2
+      var oy = (90 - m.length * size) / 2
+      for (var r = 0; r < m.length; r++)
+        for (var c = 0; c < m[r].length; c++)
+          if (m[r][c]) {
+            nctx.fillStyle = def.color
+            nctx.fillRect(ox + c * size + 1, oy + r * size + 1, size - 2, size - 2)
+          }
     }
 
     function run() {
@@ -559,6 +614,8 @@
       setInfo: function (s, l) {
         var el = document.getElementById('ps' + id)
         if (el) el.textContent = s
+        var lel = document.getElementById('pl' + id)
+        if (lel) lel.textContent = l || 0
       },
       setStatus: function (t) {
         if (t) { statusEl.textContent = t; statusEl.classList.add('show') }
