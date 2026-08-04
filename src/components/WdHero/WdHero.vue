@@ -476,8 +476,18 @@ onUnmounted(() => {
 /* 移动端适配 */
 @media (max-width: 600px) {
   .brand-title .b-letter {
-    font-size: 64px;
-    letter-spacing: 4px;
+    font-size: 48px;
+    letter-spacing: 3px;
+  }
+
+  .brand-sub text {
+    font-size: 14px;
+    letter-spacing: 2px;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    gap: 14px;
   }
 }
 </style>

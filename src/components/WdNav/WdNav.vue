@@ -274,4 +274,41 @@ onUnmounted(() => {
   display: none;
 }
 /* #endif */
+
+/* H5 小屏适配 */
+@media (max-width: 768px) {
+  .nav-inner {
+    padding: 0 12px;
+    height: 54px;
+  }
+  .brand-logo {
+    width: 32px;
+    height: 32px;
+    margin-right: 6px;
+
+    text {
+      font-size: 16px;
+    }
+  }
+  .brand-name {
+    font-size: 15px;
+  }
+  .nav-menu {
+    gap: 2px;
+  }
+  .nav-item {
+    padding: 6px 8px;
+
+    text {
+      font-size: 13px;
+    }
+  }
+  .lang-switch {
+    padding: 4px 10px;
+
+    text {
+      font-size: 12px;
+    }
+  }
+}
 </style>

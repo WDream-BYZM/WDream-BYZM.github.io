@@ -32,6 +32,16 @@
   .card p { color: #a29bfe; font-size: 18px; margin-bottom: 26px; }
   .card p b { color: #00d2ff; font-size: 26px; }
   @media (hover: hover) and (min-width: 700px) { .btns { display: none; } }
+  /* 手机适配 */
+  @media (max-width: 560px) {
+    .wrap { flex-direction: column; align-items: center; gap: 12px; }
+    .side { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 10px; }
+    .score-box { padding: 8px 14px; }
+    .score-box .num { font-size: 22px; }
+    canvas#board { max-width: 88vw; height: auto; }
+    .btns { grid-template-columns: repeat(3, 44px); }
+    .btn-ctrl { width: auto; padding: 8px 14px; font-size: 13px; }
+  }
 </style>
 </head>
 <body>
