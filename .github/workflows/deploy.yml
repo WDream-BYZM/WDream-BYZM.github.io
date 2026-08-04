@@ -42,6 +42,9 @@ jobs:
       - name: Build H5
         run: npm run build:h5
 
+      - name: Copy legacy games
+        run: cp -r legacy dist/build/h5/legacy
+
       - name: Copy CNAME (custom domain)
         run: cp CNAME dist/build/h5/CNAME
 
