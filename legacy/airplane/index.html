@@ -9,44 +9,44 @@
 <title>飞行棋</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
-  html, body { height: 100%; background: linear-gradient(145deg,#0b0f1c 0%,#1a1f33 100%); font-family: 'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; color:#e8ecf7; }
+  html, body { height: 100%; background: linear-gradient(160deg,#fff2c9 0%,#ffe2a3 50%,#ffd28a 100%); font-family: 'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; color:#5a4632; }
   body { display: flex; align-items: center; justify-content: center; overflow: hidden; }
-  .home-btn { position: fixed; top: 16px; left: 16px; z-index: 40; padding: 8px 18px; border-radius: 18px; background: rgba(21,26,44,.85); border: 1px solid rgba(255,255,255,.15); color:#e8ecf7; text-decoration:none; font-size:13px; font-weight:600; backdrop-filter: blur(6px); transition:all .25s ease; }
-  .home-btn:hover { border-color: rgba(108,92,231,.6); background: rgba(108,92,231,.25); color:#fff; }
+  .home-btn { position: fixed; top: 16px; left: 16px; z-index: 40; padding: 8px 18px; border-radius: 18px; background: rgba(255,252,240,.92); border: 1px solid rgba(150,110,50,.3); color:#5a4632; text-decoration:none; font-size:13px; font-weight:700; backdrop-filter: blur(6px); transition:all .25s ease; box-shadow: 0 3px 10px rgba(150,110,50,.15); }
+  .home-btn:hover { border-color: #e67e22; background:#fff; color:#e67e22; }
 
   /* 大厅 */
   #lobby { width:min(440px, 92vw); text-align:center; }
-  #lobby h2 { font-size:26px; font-weight:800; margin-bottom:4px; }
-  #lobby .sub { color:#8a93ab; font-size:13px; letter-spacing:3px; margin-bottom:22px; }
-  .lobby-card { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08); border-radius:18px; padding:22px; }
+  #lobby h2 { font-size:26px; font-weight:800; margin-bottom:4px; color:#6b4a1f; }
+  #lobby .sub { color:#a07030; font-size:13px; letter-spacing:3px; margin-bottom:22px; font-weight:700; }
+  .lobby-card { background:rgba(255,252,240,.9); border:2px solid rgba(190,140,60,.35); border-radius:18px; padding:22px; box-shadow: 0 10px 30px rgba(150,110,50,.18); }
   .lobby-card .row { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
-  .lobby-card .row label { color:#8a93ab; font-size:14px; }
+  .lobby-card .row label { color:#8a6a3a; font-size:14px; font-weight:600; }
   .lobby-card .seg { display:flex; gap:8px; }
-  .lobby-card .seg button { width:46px; height:38px; border-radius:10px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:#e8ecf7; font-size:14px; font-weight:700; cursor:pointer; }
-  .lobby-card .seg button.on { background:linear-gradient(135deg,#6c5ce7,#00d2ff); border-color:transparent; }
+  .lobby-card .seg button { width:46px; height:38px; border-radius:10px; border:1px solid rgba(150,110,50,.3); background:#fff; color:#6b4a1f; font-size:14px; font-weight:800; cursor:pointer; }
+  .lobby-card .seg button.on { background:linear-gradient(135deg,#ff9a3c,#ff6b3d); border-color:transparent; color:#fff; }
   .lobby-card .nm-row { display:flex; align-items:center; gap:10px; margin-bottom:20px; }
-  .lobby-card .nm-row input { flex:1; padding:12px 16px; border-radius:12px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); color:#e8ecf7; font-size:14px; }
-  .lobby-card .start { width:100%; padding:14px; border:none; border-radius:14px; background:linear-gradient(135deg,#6c5ce7,#00d2ff); color:#fff; font-size:16px; font-weight:800; cursor:pointer; }
+  .lobby-card .nm-row input { flex:1; padding:12px 16px; border-radius:12px; background:#fff; border:1px solid rgba(150,110,50,.3); color:#5a4632; font-size:14px; }
+  .lobby-card .start { width:100%; padding:14px; border:none; border-radius:14px; background:linear-gradient(135deg,#ff9a3c,#ff6b3d); color:#fff; font-size:16px; font-weight:800; cursor:pointer; box-shadow: 0 6px 18px rgba(255,107,61,.35); }
   .lobby-card .start:active { transform:scale(.98); }
-  .tip { margin-top:16px; color:#565d75; font-size:12px; line-height:1.9; }
+  .tip { margin-top:16px; color:#9a7a4a; font-size:12px; line-height:1.9; font-weight:600; }
 
   /* 对局 */
   #game { display:flex; flex-direction:column; align-items:center; gap:10px; }
   .top-bar { display:flex; align-items:center; gap:14px; width:min(660px, 94vw); }
-  .turn-badge { font-size:15px; font-weight:800; display:flex; align-items:center; gap:8px; }
-  .turn-badge .dot { width:14px; height:14px; border-radius:50%; }
+  .turn-badge { font-size:15px; font-weight:800; display:flex; align-items:center; gap:8px; color:#6b4a1f; }
+  .turn-badge .dot { width:14px; height:14px; border-radius:50%; box-shadow: 0 0 0 2px #fff; }
   .dice-area { display:flex; align-items:center; gap:12px; }
-  #diceBtn { padding:12px 26px; border:none; border-radius:14px; background:linear-gradient(135deg,#6c5ce7,#00d2ff); color:#fff; font-size:15px; font-weight:800; cursor:pointer; }
+  #diceBtn { padding:12px 26px; border:none; border-radius:14px; background:linear-gradient(135deg,#ff9a3c,#ff6b3d); color:#fff; font-size:15px; font-weight:800; cursor:pointer; box-shadow: 0 6px 18px rgba(255,107,61,.35); }
   #diceBtn:disabled { opacity:.4; cursor:not-allowed; }
-  #diceFace { font-size:34px; width:52px; height:52px; background:#101624; border:1px solid rgba(255,255,255,.12); border-radius:14px; display:flex; align-items:center; justify-content:center; }
-  #msg { font-size:13px; color:#00d2ff; font-weight:600; min-height:20px; text-align:center; }
+  #diceFace { font-size:34px; width:52px; height:52px; background:#fff; border:2px solid rgba(150,110,50,.3); border-radius:14px; display:flex; align-items:center; justify-content:center; box-shadow: 0 3px 8px rgba(150,110,50,.15); }
+  #msg { font-size:13px; color:#e67e22; font-weight:700; min-height:20px; text-align:center; }
 
-  #board { width:min(660px, 94vw); height:auto; background:#0c0f18; border-radius:18px; box-shadow:0 14px 34px rgba(0,0,0,.6), 0 0 0 2px #2f354a; touch-action: manipulation; }
+  #board { width:min(660px, 94vw); height:auto; border-radius:18px; box-shadow:0 14px 34px rgba(120,80,20,.35), 0 0 0 4px #d4a84b; touch-action: manipulation; }
 
   .scores { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; width:min(660px,94vw); }
-  .score-chip { display:flex; align-items:center; gap:6px; padding:6px 12px; border-radius:12px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); font-size:12px; font-weight:700; }
+  .score-chip { display:flex; align-items:center; gap:6px; padding:6px 12px; border-radius:12px; background:rgba(255,252,240,.9); border:1px solid rgba(150,110,50,.3); font-size:12px; font-weight:700; color:#5a4632; }
   .score-chip .dot { width:10px; height:10px; border-radius:50%; }
-  .score-chip.on { border-color:rgba(255,255,255,.4); }
+  .score-chip.on { border-color:#e67e22; box-shadow: 0 0 0 2px rgba(230,126,34,.3); }
 </style>
 </head>
 <body>
@@ -96,7 +96,7 @@
   var GRID = 8          // 经典 8x8 棋盘
   var RING = 28         // 外圈轨道总格数（每玩家 7 格）
   var NAMES = ['红方', '黄方', '蓝方', '绿方']
-  var COLORS = ['#ff5252', '#ffd740', '#448aff', '#69f0ae']
+  var COLORS = ['#e74c3c', '#f1c40f', '#3498db', '#2ecc71']
   var playerCount = 4
   var players = []       // {name, color, ai, planes:[...]}
   var current = 0        // 当前玩家索引
@@ -398,14 +398,19 @@
 
   function draw() {
     ctx.clearRect(0, 0, BOARD, BOARD)
-    ctx.fillStyle = '#0c0f18'
+    // 背景：木色纸板
+    ctx.fillStyle = '#f0e2b6'
     ctx.fillRect(0, 0, BOARD, BOARD)
     var cx = BOARD / 2, cy = BOARD / 2
 
-    // 棋盘面板 + 网格
-    ctx.fillStyle = 'rgba(255,255,255,0.02)'
-    ctx.beginPath(); ctx.roundRect(gridOx - 6, gridOy - 6, GRID * CELL + 12, GRID * CELL + 12, 16); ctx.fill()
-    ctx.strokeStyle = 'rgba(255,255,255,0.06)'
+    // 棋盘面板：米白 + 棕色边框（像纸质棋盘）
+    ctx.fillStyle = '#fdf6e3'
+    ctx.beginPath(); ctx.roundRect(gridOx - 8, gridOy - 8, GRID * CELL + 16, GRID * CELL + 16, 18); ctx.fill()
+    ctx.strokeStyle = 'rgba(139,115,85,0.5)'
+    ctx.lineWidth = 3
+    ctx.beginPath(); ctx.roundRect(gridOx - 8, gridOy - 8, GRID * CELL + 16, GRID * CELL + 16, 18); ctx.stroke()
+    // 网格线
+    ctx.strokeStyle = 'rgba(139,115,85,0.22)'
     ctx.lineWidth = 1
     for (var g = 0; g <= GRID; g++) {
       ctx.beginPath(); ctx.moveTo(gridOx + g * CELL, gridOy); ctx.lineTo(gridOx + g * CELL, gridOy + GRID * CELL); ctx.stroke()
@@ -419,11 +424,11 @@
       var piStart = Math.floor(i / 7)
       if (isStart) {
         ctx.fillStyle = COLORS[piStart]
-        ctx.strokeStyle = 'rgba(255,255,255,0.5)'
+        ctx.strokeStyle = 'rgba(255,255,255,0.85)'
         ctx.lineWidth = 2
       } else {
-        ctx.fillStyle = 'rgba(255,255,255,0.06)'
-        ctx.strokeStyle = 'rgba(255,255,255,0.12)'
+        ctx.fillStyle = '#ffffff'
+        ctx.strokeStyle = 'rgba(139,115,85,0.35)'
         ctx.lineWidth = 1
       }
       ctx.beginPath()
@@ -431,38 +436,40 @@
       ctx.fill(); ctx.stroke()
     }
 
-    // 终点滑道（玩家色）
+    // 终点滑道（玩家色，鲜艳）
     for (var pi = 0; pi < playerCount; pi++) {
       for (var s = 0; s < 4; s++) {
         var sp = SLIDE[pi][s]
-        ctx.fillStyle = hexA(COLORS[pi], 0.4)
+        ctx.fillStyle = COLORS[pi]
+        ctx.strokeStyle = 'rgba(255,255,255,0.7)'
+        ctx.lineWidth = 1
         ctx.beginPath()
         ctx.roundRect(sp.x - CELL / 2 + 2, sp.y - CELL / 2 + 2, CELL - 4, CELL - 4, 9)
-        ctx.fill()
+        ctx.fill(); ctx.stroke()
       }
     }
 
     // 中心终点：4 玩家色扇形
     var R = CELL * 0.85
     for (pi = 0; pi < playerCount; pi++) {
-      ctx.fillStyle = hexA(COLORS[pi], 0.55)
+      ctx.fillStyle = COLORS[pi]
       ctx.beginPath()
       ctx.moveTo(cx, cy)
       ctx.arc(cx, cy, R, pi * Math.PI / 2 - Math.PI / 2, (pi + 1) * Math.PI / 2 - Math.PI / 2)
       ctx.closePath()
       ctx.fill()
     }
-    ctx.lineWidth = 2
-    ctx.strokeStyle = 'rgba(255,255,255,0.3)'
+    ctx.lineWidth = 3
+    ctx.strokeStyle = 'rgba(139,115,85,0.5)'
     ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke()
 
-    // 基地（四角彩色圆角区）
+    // 基地（四角鲜艳圆角区）
     for (pi = 0; pi < playerCount; pi++) {
       var an = ringPts[pi * 7]
       var bx = an.x < cx ? -1 : 1, by = an.y < cy ? -1 : 1
       var bcx = an.x + bx * CELL * 0.85, bcy = an.y + by * CELL * 0.85
-      ctx.fillStyle = hexA(COLORS[pi], 0.22)
-      ctx.strokeStyle = hexA(COLORS[pi], 0.65)
+      ctx.fillStyle = hexA(COLORS[pi], 0.8)
+      ctx.strokeStyle = 'rgba(255,255,255,0.7)'
       ctx.lineWidth = 2
       ctx.beginPath()
       ctx.roundRect(bcx - CELL * 0.62, bcy - CELL * 0.62, CELL * 1.24, CELL * 1.24, 14)
@@ -482,20 +489,20 @@
         ctx.fillStyle = pl.color
         ctx.fill()
         ctx.lineWidth = 2
-        ctx.strokeStyle = '#0b0f1c'
+        ctx.strokeStyle = '#5b4a2f'
         ctx.stroke()
         // 可点选高亮
         if (highlightSelect && selectable.indexOf(idx) !== -1 && pl === players[current]) {
           ctx.beginPath()
           ctx.arc(pos.x, pos.y, r + 6, 0, Math.PI * 2)
-          ctx.strokeStyle = '#fff'
-          ctx.lineWidth = 2
+          ctx.strokeStyle = '#e67e22'
+          ctx.lineWidth = 3
           ctx.stroke()
         }
         // 机头白点
         ctx.beginPath()
         ctx.arc(pos.x, pos.y, r * 0.45, 0, Math.PI * 2)
-        ctx.fillStyle = 'rgba(255,255,255,0.85)'
+        ctx.fillStyle = 'rgba(255,255,255,0.9)'
         ctx.fill()
       })
     })
