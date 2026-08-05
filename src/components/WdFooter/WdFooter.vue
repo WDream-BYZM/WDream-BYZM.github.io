@@ -5,7 +5,7 @@
         <view class="brand-logo"><text>B</text></view>
         <text class="brand-name">BYZM</text>
       </view>
-      <text class="copyright">{{ t('footer.copyright') }}❤️</text>
+      <text class="copyright">{{ t('footer.copyright') }}</text>
       <text class="powered">{{ t('footer.powered') }}</text>
       <text class="version">v{{ version }}</text>
     </view>
