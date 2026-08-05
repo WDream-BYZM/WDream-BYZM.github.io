@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#7a5508">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="飞行棋">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>飞行棋·水墨</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation}
+body{background:#e8dcc4;font:14px sans-serif;color:#3a3020;min-height:100vh;min-height:100dvh;-webkit-tap-highlight-color:transparent}
+.pg{display:none}.pg.on{display:flex}
+#menu{flex-direction:column;align-items:center;justify-content:center;min-height:100vh;min-height:100dvh;gap:10px;padding:20px}
+#play{flex-direction:column;align-items:center;gap:10px;padding:10px;padding-top:max(10px,env(safe-area-inset-top));padding-bottom:max(10px,env(safe-area-inset-bottom));min-height:100vh;min-height:100dvh}
+canvas{border-radius:8px;cursor:pointer}
+.btn{padding:14px 20px;border:none;border-radius:8px;font:700 15px inherit;cursor:pointer;min-height:48px;-webkit-appearance:none}
+.bp{background:#7a5508;color:#f0e8d8}.bs{background:0 0;color:#7a5508;border:1px solid rgba(122,85,8,.2)}
+.btn:disabled{opacity:.3;cursor:default}
+.sb{display:flex;flex-wrap:wrap;gap:6px;width:100%;max-width:500px;justify-content:center}
+.bx{background:rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:8px 10px;flex:1;min-width:130px}
+#log{max-height:56px;overflow-y:auto;font:11px/1.6 sans-serif;color:#6a5a40}
+#log div{padding:1px 0}
+.pl{display:flex;align-items:center;gap:6px;padding:3px 6px;font-size:12px;border-radius:4px;margin-bottom:2px}
+.pl.ac{background:rgba(122,85,8,.08)}
+.dt{width:10px;height:10px;border-radius:50%}
+.pp{display:flex;gap:2px}.pd{width:6px;height:6px;border-radius:50%;opacity:.15}.pd.ok{opacity:1}
+#dval{font-size:28px;text-align:center;padding:2px 0}
+#win{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:10}
+#win.on{display:flex}
+.wc{background:#f0e8d8;border:2px solid #7a5508;border-radius:16px;padding:32px;text-align:center;max-width:90vw}
+#net{display:none;margin-top:10px}
+.nerr{color:#c44;font-size:11px;text-align:center;margin-top:6px;min-height:16px}
+.inp{width:100%;padding:12px;background:rgba(0,0,0,.03);border:1px solid rgba(122,85,8,.2);border-radius:6px;color:#7a5508;font-size:20px;text-align:center;letter-spacing:8px;outline:none}
+#wait{flex-direction:column;align-items:center;justify-content:center;min-height:100vh;min-height:100dvh;gap:10px;padding:20px}
+.rc{font-size:36px;color:#7a5508;letter-spacing:10px;font-weight:900;cursor:pointer;user-select:all}
+.slots{display:flex;gap:10px;margin:14px 0}
+.slot{width:48px;height:48px;border-radius:10px;border:2px dashed rgba(122,85,8,.15);display:flex;align-items:center;justify-content:center;font-size:18px}
+.slot.on{border-style:solid}
+#roomtag{position:fixed;top:max(8px,env(safe-area-inset-top));right:8px;background:rgba(0,0,0,.06);border:1px solid rgba(122,85,8,.18);border-radius:8px;padding:4px 10px;font-size:11px;color:#7a5508;display:none;z-index:20;cursor:pointer;user-select:all}
+#chatbtn{display:none;position:fixed;bottom:max(16px,env(safe-area-inset-bottom));left:16px;width:50px;height:50px;border-radius:50%;background:#7a5508;color:#fff;font-size:24px;border:0;box-shadow:0 2px 12px rgba(0,0,0,.18);z-index:60;cursor:pointer;line-height:50px;text-align:center}
+#chatpanel{display:none;position:fixed;bottom:max(76px,calc(60px + env(safe-area-inset-bottom)));left:8px;right:8px;max-width:400px;background:#f0e8d8;border:2px solid rgba(122,85,8,.15);border-radius:12px;padding:10px;z-index:60;flex-direction:column;gap:6px;box-shadow:0 -4px 24px rgba(0,0,0,.15);max-height:45vh;overflow-y:auto}
+#chatpanel.on{display:flex}
+#chatlog{max-height:90px;overflow-y:auto;font:12px/1.5;color:#6a5a40;margin:4px 0}
+#chatlog div{padding:2px 0;word-break:break-all}
+.emojis{display:flex;gap:1px;flex-wrap:wrap}
+.emojis button{font-size:18px;background:0;border:0;cursor:pointer;padding:2px 3px;border-radius:4px;line-height:1}
+.emojis button:active{background:rgba(0,0,0,.08)}
+#ctrl{display:flex;gap:6px;justify-content:center;width:100%;max-width:500px}
+
+/* Toast */
+#tc{position:fixed;top:max(8px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:100;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;max-width:90vw}
+.tst{background:rgba(58,48,32,.92);color:#f0e8d8;padding:8px 16px;border-radius:8px;font-size:12px;animation:tstI .3s ease;pointer-events:auto;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.tst-w{background:rgba(139,112,48,.95)}.tst-e{background:rgba(160,48,48,.95)}.tst-s{background:rgba(48,112,80,.95)}
+.tst-o{animation:tstO .4s ease forwards}
+@keyframes tstI{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes tstO{from{opacity:1}to{opacity:0;transform:translateY(-10px)}}
+
+/* Net indicator */
+#ni{position:fixed;top:max(32px,calc(env(safe-area-inset-top)+22px));right:10px;width:8px;height:8px;border-radius:50%;z-index:25;display:none;transition:all .3s}
+.nok{display:block;background:#307050}.nwn{display:block;background:#8b7030;animation:npls 1s infinite}.ner{display:block;background:#a03030}
+@keyframes npls{0%,100%{opacity:1}50%{opacity:.3}}
+
+@media(min-width:801px){
+  #play{flex-direction:row;align-items:flex-start;justify-content:center}
+  .sb{flex-direction:column;width:220px}.bx{min-width:auto}
+  #ctrl{flex-direction:column;width:auto}
+}
+</style>
+</head>
+<body>
+<div id="tc"></div>
+<div id="ni"></div>
+<div id="roomtag" onclick="navigator.clipboard&&navigator.clipboard.writeText(this.textContent)"></div>
+<div id="menu" class="pg on"><h1 style="font-size:40px;color:#7a5508;font-family:serif">飞行棋</h1><p style="color:#6a5a40;margin-bottom:14px">水墨风</p>
+<button class="btn bp" onclick="SL(4)">四人对弈</button><button class="btn bp" onclick="SL(2)">双人对弈</button>
+<button class="btn bs" onclick="TN()" style="margin-top:14px">联机对战</button>
+<div id="net"><button class="btn bp" onclick="MR()" style="margin-top:10px">创建房间</button><div style="text-align:center;color:#6a5a40;font-size:10px;margin:6px 0">或加入</div><input class="inp" id="ci" placeholder="房间号" maxlength="4"><button class="btn bs" onclick="JR()" style="margin-top:6px">加入</button><div class="nerr" id="nerr"></div></div></div>
+<div id="wait" class="pg"><div style="background:rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.06);border-radius:12px;padding:24px;text-align:center;width:300px;max-width:90vw"><div style="font-size:10px;color:#6a5a40">房间号（点击复制）</div><div class="rc" id="rcc" onclick="navigator.clipboard&&navigator.clipboard.writeText(this.textContent)">----</div><div class="slots" id="sls"></div><div id="ws" style="color:#6a5a40;font-size:13px;margin-bottom:10px">等待加入...</div><button class="btn bp" id="bGo" onclick="GO()" disabled>开始</button><button class="btn bs" onclick="LR()" style="margin-top:6px">离开</button></div></div>
+<div id="play" class="pg"><canvas id="cv"></canvas><div class="sb"><div class="bx"><div style="font-size:9px;color:#6a5a40;letter-spacing:2px">回合</div><div id="tn" style="font-weight:900;font-size:16px;margin:3px 0">-</div><div id="th" style="font-size:11px;color:#6a5a40">-</div></div><div class="bx" style="text-align:center"><div id="dval">🎲</div><button class="btn bp" id="rb" onpointerdown="doRoll()">掷骰子</button></div><div class="bx" id="pls"></div><div class="bx"><div style="font-size:9px;color:#6a5a40;letter-spacing:2px">记录</div><div id="log"></div></div></div><div id="ctrl"><button class="btn bs" onclick="QG()">退出</button></div></div>
+<div id="win"><div class="wc"><div id="wt" style="font-size:24px;font-weight:900;margin-bottom:12px">-</div><p style="color:#6a5a40;margin-bottom:16px">恭喜获胜！</p><button class="btn bp" onclick="RG()" style="margin-bottom:8px">再来一局</button><button class="btn bs" onclick="QG()">返回</button></div></div>
+<button id="chatbtn" onclick="toggleChat()">💬</button>
+<div id="chatpanel"><div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:4px;border-bottom:1px solid rgba(0,0,0,.06)"><span style="font-size:11px;color:#7a5508;font-weight:700;letter-spacing:1px">聊天</span><button onclick="toggleChat()" style="background:0;border:0;font-size:16px;cursor:pointer;color:#6a5a40;padding:0 4px">✕</button></div><div id="chatlog"></div><div class="emojis"><button onclick="SC('👍')">👍</button><button onclick="SC('🎉')">🎉</button><button onclick="SC('😂')">😂</button><button onclick="SC('😱')">😱</button><button onclick="SC('🤔')">🤔</button><button onclick="SC('💪')">💪</button><button onclick="SC('✈')">✈</button><button onclick="SC('🎲')">🎲</button><button onclick="SC('服了')">服了</button><button onclick="SC('牛')">牛</button></div><div style="display:flex;gap:4px"><input id="ci2" maxlength="50" placeholder="说点什么..." style="flex:1;padding:6px;border:1px solid rgba(0,0,0,.1);border-radius:4px;font-size:12px;outline:none" onkeydown="if(event.key==='Enter')SC()"><button class="btn bp" style="padding:6px 10px;min-height:auto;font-size:12px" onclick="SC()">发</button></div></div>
+
+<script>
+/* ============================================================
+   CONSTANTS
+   ============================================================ */
+var CS=36,PA=30,N=56;
+var T=[[0,4],[0,5],[0,6],[0,7],[0,8],[0,9],[0,10],[1,10],[2,10],[3,10],[4,10],[4,11],[4,12],[4,13],[4,14],[5,14],[6,14],[7,14],[8,14],[9,14],[10,14],[10,13],[10,12],[10,11],[10,10],[11,10],[12,10],[13,10],[14,10],[14,9],[14,8],[14,7],[14,6],[14,5],[14,4],[13,4],[12,4],[11,4],[10,4],[10,3],[10,2],[10,1],[10,0],[9,0],[8,0],[7,0],[6,0],[5,0],[4,0],[4,1],[4,2],[4,3],[4,4],[3,4],[2,4],[1,4]];
+var PC={green:{st:0,he:45,nm:'绿',c:'#2e7550'},blue:{st:14,he:3,nm:'蓝',c:'#2e5090'},red:{st:28,he:17,nm:'红',c:'#903030'},yellow:{st:42,he:31,nm:'黄',c:'#907530'}};
+var HS={green:[[7,1],[7,2],[7,3],[7,4],[7,5],[7,6]],blue:[[1,7],[2,7],[3,7],[4,7],[5,7],[6,7]],red:[[7,13],[7,12],[7,11],[7,10],[7,9],[7,8]],yellow:[[13,7],[12,7],[11,7],[10,7],[9,7],[8,7]]};
+var HB={green:[[1,1],[2,1],[1,2],[2,2]],blue:[[1,12],[2,12],[1,13],[2,13]],red:[[12,12],[13,12],[12,13],[13,13]],yellow:[[12,1],[13,1],[12,2],[13,2]]};
+var SF=new Set([0,14,28,42]),TR=new Set([11,25,39,53]),EX=new Set([7,21,35,49]);
+var CM={red:0,yellow:1,blue:2,green:3},C4=['red','green','blue','yellow'],C2=['red','blue'];
+var SCMAP={10:{co:'green',d:24},24:{co:'blue',d:38},38:{co:'red',d:52},52:{co:'yellow',d:10}};
+
+/* ============================================================
+   STATE
+   ============================================================ */
+var G=null,M='local',peer=null,con={},RC='',isH=false,myC=null,pend=[],lastSer='',lastUI='',lastTap=0,destroying=false;
+var mrRetry=0,jrRetry=0,jrReconn=false;
+var bubbles=[];
+var capFx=[],animPiece=null;
+
+/* ============================================================
+   CANVAS
+   ============================================================ */
+var cv=document.getElementById('cv'),X=cv.getContext('2d'),D=devicePixelRatio||1;
+cv.width=600*D;cv.height=600*D;X.setTransform(D,0,0,D,0,0);
+function rCV(){var w=Math.min(window.innerWidth-22,500);cv.style.width=w+'px';cv.style.height=w+'px'}
+rCV();window.addEventListener('resize',rCV);
+
+function c2p(c,r){return{x:PA+c*CS+CS/2,y:PA+r*CS+CS/2}}
+function tpx(i){return c2p(T[i][0],T[i][1])}
+function ppx(co,i){var p=G.pl[co][i];if(p.s==='h')return c2p(HB[co][i][0],HB[co][i][1]);if(p.s==='t')return tpx(p.p);if(p.s==='s')return c2p(HS[co][p.p][0],HS[co][p.p][1]);return{x:300,y:300}}
+var HBC={green:c2p(1.5,1.5),blue:c2p(1.5,12.5),red:c2p(12.5,12.5),yellow:c2p(12.5,1.5)};
+
+/* ============================================================
+   BOARD CACHE — 深化色彩
+   ============================================================ */
+function cacheBoard(){
+  var cv2=document.createElement('canvas');cv2.width=600*D;cv2.height=600*D;
+  var c=cv2.getContext('2d');c.setTransform(D,0,0,D,0,0);
+  /* 棋盘底色加深 */
+  c.fillStyle='#e8dcc4';c.fillRect(0,0,600,600);
+  /* 网格线加深 */
+  c.strokeStyle='rgba(0,0,0,.07)';c.lineWidth=.5;
+  for(var i=0;i<=15;i++){c.beginPath();c.moveTo(PA+i*CS,PA);c.lineTo(PA+i*CS,PA+15*CS);c.stroke();c.beginPath();c.moveTo(PA,PA+i*CS);c.lineTo(PA+15*CS,PA+i*CS);c.stroke()}
+  /* 跑道格子颜色加深 */
+  var cc=['#903030','#907530','#2e5090','#2e7550'];
+  for(var i=0;i<N;i++){var p=T[i];c.fillStyle=cc[i%4];c.globalAlpha=i%2?.1:.14;c.fillRect(PA+p[0]*CS,PA+p[1]*CS,CS,CS);c.globalAlpha=1}
+  /* 终点道颜色加深 */
+  for(var co in HS)for(var j=0;j<6;j++){var p=HS[co][j];c.fillStyle=PC[co].c;c.globalAlpha=.08+j*.06;c.fillRect(PA+p[0]*CS,PA+p[1]*CS,CS,CS);c.globalAlpha=1}
+  /* 基地加深 */
+  for(var co in HB){var b=HB[co],x0=PA+Math.min(b[0][0],b[2][0])*CS,y0=PA+Math.min(b[0][1],b[1][1])*CS;
+    c.fillStyle=PC[co].c;c.globalAlpha=.12;c.fillRect(x0-4,y0-4,2*CS+8,2*CS+8);c.globalAlpha=1;
+    c.strokeStyle=PC[co].c;c.lineWidth=2;c.globalAlpha=.35;c.strokeRect(x0+2,y0+2,2*CS-4,2*CS-4);c.globalAlpha=1;
+    for(var i=0;i<4;i++){var pp=c2p(b[i][0],b[i][1]);c.beginPath();c.arc(pp.x,pp.y,CS/2-5,0,Math.PI*2);c.strokeStyle=PC[co].c;c.lineWidth=1;c.globalAlpha=.25;c.stroke();c.globalAlpha=1}}
+  /* 中心对角线加深 */
+  var sq=[[4,4],[4,10],[10,10],[10,4]],sqc=['#907530','#2e7550','#2e5090','#903030'];
+  c.setLineDash([5,4]);c.lineWidth=3;c.lineJoin='round';
+  for(var i=0;i<4;i++){var p1=c2p(sq[i][0],sq[i][1]),p2=c2p(sq[(i+1)%4][0],sq[(i+1)%4][1]);c.strokeStyle=sqc[i];c.globalAlpha=.5;c.beginPath();c.moveTo(p1.x,p1.y);c.lineTo(p2.x,p2.y);c.stroke()}
+  c.setLineDash([]);c.globalAlpha=1;c.lineJoin='miter';
+  /* 中心「终」字加深 */
+  c.fillStyle='#4a3820';c.font='16px serif';c.textAlign='center';c.textBaseline='middle';c.fillText('终',PA+7.5*CS,PA+7.5*CS);
+  c.beginPath();c.arc(PA+7.5*CS,PA+7.5*CS,CS*.5,0,Math.PI*2);c.strokeStyle='rgba(0,0,0,.12)';c.lineWidth=1;c.stroke();
+  /* 特殊标记加深 */
+  SF.forEach(function(i){var p=tpx(i);c.fillStyle='#7a5508';c.globalAlpha=.65;c.font='12px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText('★',p.x,p.y);c.globalAlpha=1});
+  TR.forEach(function(i){var p=tpx(i);c.fillStyle='#903030';c.globalAlpha=.65;c.font='11px sans-serif';c.textAlign='center';c.fillText('⚠',p.x,p.y);c.globalAlpha=1});
+  EX.forEach(function(i){var p=tpx(i);c.fillStyle='#2e7550';c.globalAlpha=.65;c.font='11px sans-serif';c.textAlign='center';c.fillText('♦',p.x,p.y);c.globalAlpha=1});
+  /* 捷径标记加深 */
+  [{p:10,c:'green'},{p:24,c:'blue'},{p:38,c:'red'},{p:52,c:'yellow'}].forEach(function(s){var pos=tpx(s.p);c.fillStyle=PC[s.c].c;c.globalAlpha=.85;c.font='bold 13px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText('◎',pos.x,pos.y);c.globalAlpha=1});
+  /* 起点飞机标记加深 */
+  for(var pk in PC){var pos=tpx(PC[pk].st);c.fillStyle=PC[pk].c;c.globalAlpha=.65;c.font='14px sans-serif';c.textAlign='center';c.fillText('✈',pos.x,pos.y);c.globalAlpha=1}
+  return cv2;
+}
+var boardCache=cacheBoard();
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+var dirty=true,rAF=null;
+function markDirty(){dirty=true;if(!rAF)rAF=requestAnimationFrame(render)}
+
+function render(ts){
+  rAF=null;if(!dirty)return;dirty=false;var anim=false;
+  X.save();X.setTransform(1,0,0,1,0,0);X.drawImage(boardCache,0,0);X.restore();
+
+  /* 捷径飞行拖尾 */
+  if(G&&G.trail){var el=Date.now()-G.trail.n;if(el<800){anim=true;X.save();X.strokeStyle=G.trail.c;X.lineWidth=4;X.lineCap='round';X.globalAlpha=.7*(1-el/800);X.beginPath();X.moveTo(G.trail.f.x,G.trail.f.y);X.lineTo(G.trail.t.x,G.trail.t.y);X.stroke();X.globalAlpha=.3*(1-el/800);X.lineWidth=8;X.stroke();X.restore()}else G.trail=null}
+
+  /* 棋子绘制 */
+  if(G){var all=[];
+    for(var ci=0;ci<G.cols.length;ci++){var c=G.cols[ci];for(var i=0;i<4;i++){var p=G.pl[c][i];if(p.s==='f')continue;var pos=ppx(c,i),sel=G.ph==='pick'&&c===curC()&&G.vm.indexOf(i)>=0;all.push({c:c,x:pos.x,y:pos.y,sel:sel,i:i})}}
+    var gr={};for(var k=0;k<all.length;k++){var ky=Math.round(all[k].x)+','+Math.round(all[k].y);if(!gr[ky])gr[ky]=[];gr[ky].push(all[k])}
+    for(var ky in gr){var g=gr[ky];for(var k=0;k<g.length;k++){var a=g[k],ox=0,oy=0;if(g.length>1){var ag=(k/g.length)*Math.PI*2-Math.PI/2;ox=Math.cos(ag)*6;oy=Math.sin(ag)*6}var px=a.x+ox,py=a.y+oy;
+      X.save();
+      /* 步进动画中棋子发光 */
+      if(animPiece&&animPiece.co===a.c&&animPiece.idx===a.i){anim=true;X.beginPath();X.arc(px,py,14,0,Math.PI*2);X.strokeStyle='rgba(122,85,8,'+(.4+.3*Math.sin(ts/150))+')';X.lineWidth=2.5;X.stroke()}
+      if(a.sel){anim=true;X.beginPath();X.arc(px,py,14,0,Math.PI*2);X.strokeStyle='rgba(122,85,8,'+(.5+.4*Math.sin(ts/200))+')';X.lineWidth=2;X.stroke()}
+      X.beginPath();X.arc(px,py,CS/2-5,0,Math.PI*2);X.fillStyle=PC[a.c].c;X.fill();X.strokeStyle='rgba(255,255,255,.45)';X.lineWidth=1;X.stroke();X.restore()}}
+    /* 到达计数 */
+    for(var ci=0;ci<G.cols.length;ci++){var c=G.cols[ci],cnt=0;for(var i=0;i<4;i++)if(G.pl[c][i].s==='f')cnt++;if(cnt){var of2={green:[-16,-16],blue:[-16,16],red:[16,16],yellow:[16,-16]}[c];X.fillStyle=PC[c].c;X.font='bold 10px sans-serif';X.textAlign='center';X.fillText(cnt+'✈',300+of2[0],300+of2[1])}}}
+
+  /* 吃子特效绘制 */
+  if(capFx.length){var now=Date.now(),alive=[];
+    for(var ci=0;ci<capFx.length;ci++){var e=capFx[ci],age=now-e.t;
+      if(age<800){alive.push(e);anim=true;var prog=age/800,alpha=1-prog;
+        /* 扩散光环 */
+        X.save();X.beginPath();X.arc(e.x,e.y,10+prog*38,0,Math.PI*2);X.strokeStyle=e.c;X.lineWidth=3*(1-prog);X.globalAlpha=alpha*.8;X.stroke();X.restore();
+        /* 粒子爆散 */
+        for(var pi=0;pi<e.pts.length;pi++){var pt=e.pts[pi],dist=pt.sp*prog;X.save();X.beginPath();X.arc(e.x+Math.cos(pt.a)*dist,e.y+Math.sin(pt.a)*dist,pt.sz*(1-prog*.5),0,Math.PI*2);X.fillStyle=e.c;X.globalAlpha=alpha*.9;X.fill();X.restore()}
+        /* 中心闪光 */
+        if(age<200){X.save();X.beginPath();X.arc(e.x,e.y,18,0,Math.PI*2);X.fillStyle='#fff';X.globalAlpha=(1-age/200)*.55;X.fill();X.restore()}}
+    }
+    capFx=alive}
+
+  /* 聊天气泡 */
+  if(bubbles.length){var now=Date.now(),alive=[];
+    for(var bi=0;bi<bubbles.length;bi++){var b=bubbles[bi],age=now-b.t;
+      if(age<3000){alive.push(b);anim=true;var alpha=age<300?age/300:age>2400?1-(age-2400)/600:1;var rise=age<300?12*(1-age/300):0;
+        X.save();X.globalAlpha=alpha*.95;X.font='bold 14px sans-serif';var tw=X.measureText(b.msg).width,pw=Math.max(tw+28,44),ph=32,px=b.x-pw/2,py=b.y-50-rise;
+        X.fillStyle='rgba(255,255,255,.95)';X.strokeStyle=PC[b.co].c;X.lineWidth=2;X.beginPath();X.roundRect(px,py,pw,ph,10);X.fill();X.stroke();
+        X.fillStyle=PC[b.co].c;X.textAlign='center';X.textBaseline='middle';X.fillText(b.msg,b.x,py+ph/2);X.restore()}}
+    bubbles=alive}
+
+  if(anim){dirty=true;rAF=requestAnimationFrame(render)}
+}
+
+/* ============================================================
+   TOAST 通知系统
+   ============================================================ */
+function showToast(msg,type){
+  var tc=document.getElementById('tc');if(!tc)return;
+  var el=document.createElement('div');el.className='tst'+(type==='warn'?' tst-w':type==='error'?' tst-e':type==='success'?' tst-s':'');
+  el.textContent=msg;tc.appendChild(el);
+  setTimeout(function(){el.classList.add('tst-o');setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el)},400)},3000);
+}
+function setNetInd(s){var el=document.getElementById('ni');if(!el)return;el.className=s==='ok'?'nok':s==='warn'?'nwn':s==='error'?'ner':'';}
+
+/* ============================================================
+   CAPTURE EFFECT 吃子特效
+   ============================================================ */
+function addCapFx(x,y,color){
+  var pts=[];for(var i=0;i<14;i++){var a=(i/14)*Math.PI*2+Math.random()*.3;pts.push({a:a,sp:28+Math.random()*42,sz:2+Math.random()*3})}
+  capFx.push({x:x,y:y,c:color,t:Date.now(),pts:pts});
+}
+
+/* ============================================================
+   DICE
+   ============================================================ */
+function rD(v){document.getElementById('dval').textContent=v||'🎲'}
+function aD(fin,cb){var ct=0,iv=setInterval(function(){rD(Math.floor(Math.random()*6)+1);ct++;if(ct>10){clearInterval(iv);rD(fin);setTimeout(cb,150)}},60)}
+
+/* ============================================================
+   GAME INIT
+   ============================================================ */
+function IG(cols){var pl={};for(var i=0;i<cols.length;i++){var c=cols[i];pl[c]=[];for(var j=0;j<4;j++)pl[c].push({s:'h',p:0})}G={cols:cols,pl:pl,cur:0,dice:0,ph:'roll',vm:[],c6:0,winner:null,lm:-1,n6:{}};lastUI='';lastSer=''}
+function curC(){return G.cols[G.cur]}
+function gM(co,d){var ab=G.pl[co].every(function(p){return p.s==='h'}),mv=[];for(var i=0;i<4;i++){var p=G.pl[co][i];if(p.s==='f')continue;if(p.s==='h'){if(d===6||(ab&&(G.n6[co]||0)>=6))mv.push(i)}else mv.push(i)}return mv}
+
+/* ============================================================
+   ANIMATION PATH 步进动画
+   ============================================================ */
+function animatePath(co,idx,path,cb){
+  if(!path.length){cb();return}
+  var si=0,animPiece_bak=animPiece;animPiece={co:co,idx:idx};
+  function ns(){if(si<path.length){var s=path[si];G.pl[co][idx].s=s.s;G.pl[co][idx].p=s.p;si++;markDirty();setTimeout(ns,180)}else{animPiece=animPiece_bak;cb()}}
+  ns();
+}
+
+/* ============================================================
+   DO MOVE ANIMATED — 步进动画版移动
+   ============================================================ */
+function doMoveAnimated(co,idx,cb){
+  G.lm=idx;var p=G.pl[co][idx],d=G.dice,st=PC[co].st;
+  var path=[],endAct=null;
+
+  if(p.s==='h'){
+    G.n6[co]=0;path.push({s:'t',p:st});
+    endAct=function(){p.s='t';p.p=st;dc(co,p.p);AL(PC[co].nm+'方 起飞！');markDirty();cb()};
+
+  }else if(p.s==='t'){
+    var dist=(p.p-st+N)%N,nd=dist+d,hd=(PC[co].he-st+N)%N;
+
+    if(nd>hd){
+      var ts2=hd-dist,ep=nd-hd-1;
+      for(var i=1;i<=ts2;i++)path.push({s:'t',p:(p.p+i)%N});
+      if(ep<5){for(var i=0;i<ep;i++)path.push({s:'s',p:i});path.push({s:'s',p:ep});
+        endAct=function(){p.s='s';p.p=ep;AL(PC[co].nm+'方 进入终点道第'+(ep+1)+'格');markDirty();cb()}}
+      else if(ep===5){for(var i=0;i<5;i++)path.push({s:'s',p:i});path.push({s:'f',p:0});
+        endAct=function(){p.s='f';AL(PC[co].nm+'方 到达终点！');markDirty();cb()}}
+      else{for(var i=0;i<=4;i++)path.push({s:'s',p:i});for(var i=3;i>=10-ep;i--)path.push({s:'s',p:i});var fp=10-ep;
+        endAct=function(){
+          /* 弹回闪光 */
+          var ep4=c2p(HS[co][4][0],HS[co][4][1]);addCapFx(ep4.x,ep4.y,'rgba(122,85,8,.4)');
+          p.s='s';p.p=fp;AL(PC[co].nm+'方 弹回第'+(fp+1)+'格');markDirty();cb()}}
+
+    }else{
+      for(var i=1;i<=d;i++)path.push({s:'t',p:(p.p+i)%N});var fp2=(p.p+d)%N;
+      endAct=function(){p.s='t';p.p=fp2;dc(co,p.p);efAnimated(co,cb)}}
+
+  }else if(p.s==='s'){
+    var sp0=p.p,np=sp0+d;
+    for(var i=1;i<=d;i++){var pos=sp0+i;if(pos===5)path.push({s:'f',p:0});else if(pos>5)path.push({s:'s',p:10-pos});else path.push({s:'s',p:pos})}
+    if(np===5)endAct=function(){p.s='f';AL(PC[co].nm+'方 到达终点！');markDirty();cb()};
+    else if(np>5){var fp3=10-np;endAct=function(){p.s='s';p.p=fp3;AL(PC[co].nm+'方 弹回第'+(fp3+1)+'格');markDirty();cb()}}
+    else endAct=function(){p.s='s';p.p=np;markDirty();cb()};
+  }
+
+  if(!path.length){if(endAct)endAct();else cb();return}
+  animatePath(co,idx,path,function(){if(endAct)endAct();else cb()});
+}
+
+/* ============================================================
+   EF ANIMATED — 特效步进动画版
+   ============================================================ */
+function efAnimated(co,cb){
+  var p=G.pl[co][G.lm];if(!p||p.s!=='t'){cb();return}
+
+  /* 捷径飞行 */
+  if(SCMAP[p.p]&&SCMAP[p.p].co===co){var fr=p.p;p.p=SCMAP[p.p].d;G.trail={f:tpx(fr),t:tpx(p.p),c:PC[co].c,n:Date.now()};dc(co,p.p);AL(PC[co].nm+'方 ◎ 捷径飞行！');markDirty();setTimeout(cb,600);return}
+
+  /* 同色跳+4（动画） */
+  if(p.p%4===CM[co]&&!SF.has(p.p)){
+    var from=p.p,to=(p.p+4)%N,jp=[];
+    for(var i=1;i<=4;i++)jp.push({s:'t',p:(from+i)%N});
+    animatePath(co,G.lm,jp,function(){p.p=to;dc(co,p.p);AL(PC[co].nm+'方 同色跳+4！');markDirty();
+      if(TR.has(p.p)){p.p=(p.p-4+N)%N;AL(PC[co].nm+'方 ⚠ 陷阱后退4！');markDirty()}cb()});
+    return}
+
+  /* 陷阱后退4（动画） */
+  if(TR.has(p.p)){var from2=p.p,to2=(p.p-4+N)%N,tp=[];
+    for(var i=1;i<=4;i++)tp.push({s:'t',p:(from2-i+N)%N});
+    animatePath(co,G.lm,tp,function(){p.p=to2;AL(PC[co].nm+'方 ⚠ 陷阱后退4！');markDirty();cb()});
+    return}
+
+  cb();
+}
+
+/* ============================================================
+   CAPTURE 吃子（加特效）
+   ============================================================ */
+function dc(co,pos){
+  if(SF.has(pos))return;
+  for(var ci=0;ci<G.cols.length;ci++){var oc=G.cols[ci];if(oc===co)continue;
+    for(var i=0;i<4;i++){if(G.pl[oc][i].s==='t'&&G.pl[oc][i].p===pos){
+      var cp=ppx(oc,i);addCapFx(cp.x,cp.y,PC[oc].c);
+      G.pl[oc][i].s='h';G.pl[oc][i].p=0;
+      AL(PC[co].nm+'方 吃掉 '+PC[oc].nm+'方！')}}}
+}
+
+/* ============================================================
+   AFTER MOVE
+   ============================================================ */
+function aftM(){markDirty();var cc=curC(),won=true;for(var i=0;i<4;i++)if(G.pl[cc][i].s!=='f'){won=false;break}
+  if(won){G.winner=cc;G.ph='done';SW();bcSt();return}
+  var p=G.pl[cc][G.lm];if(p&&p.s==='t'&&EX.has(p.p)&&G.dice!==6){AL(PC[cc].nm+'方 ♦ 额外一掷！');G.ph='roll';G.dice=0;G.vm=[];uUI();bcSt();return}
+  if(G.dice===6){G.c6++;if(G.c6>=3){AL('三个六跳过');G.c6=0;nT();return}AL('掷出六再来！');G.ph='roll';G.dice=0;G.vm=[];uUI();bcSt()}else{G.c6=0;nT()}}
+function nT(){G.cur=(G.cur+1)%G.cols.length;G.dice=0;G.vm=[];G.ph='roll';uUI();bcSt()}
+
+/* ============================================================
+   UI UPDATE
+   ============================================================ */
+function uUI(){if(!G)return;var key=G.cur+'_'+G.ph+'_'+G.dice+'_'+G.vm.join(',')+'_'+G.cols.map(function(c){return G.pl[c].map(function(p){return p.s+p.p}).join('')}).join('');if(key===lastUI)return;lastUI=key;markDirty();
+  var cc=curC(),cf=PC[cc];document.getElementById('tn').textContent=cf.nm+'方';document.getElementById('tn').style.color=cf.c;
+  var myTurn=!M||M!=='online'||!myC||curC()===myC;var ab=G.pl[cc].every(function(p){return p.s==='h'}),n6=G.n6[cc]||0,h;
+  if(!myTurn){h=G.ph==='roll'?'等待对手掷骰子':G.ph==='pick'?'等待对手选择':'对手移动中'}else{h='掷骰子';if(G.ph==='roll'&&ab&&n6>0)h+=' ('+n6+'/6保底)';else if(G.ph==='pick')h='选择棋子';else if(G.ph==='anim')h='移动中'}
+  document.getElementById('th').textContent=h;document.getElementById('rb').disabled=(!G||G.ph!=='roll'||!myTurn);
+  var pp=document.getElementById('pls');pp.innerHTML='';
+  for(var ci=0;ci<G.cols.length;ci++){var c=G.cols[ci],fin=0;for(var i=0;i<4;i++)if(G.pl[c][i].s==='f')fin++;
+    var r=document.createElement('div');r.className='pl'+(c===cc?' ac':'');r.innerHTML='<div class="dt" style="background:'+PC[c].c+'"></div><div style="flex:1;font-weight:700">'+PC[c].nm+'方</div><div class="pp">';
+    for(var j=0;j<4;j++)r.innerHTML+='<div class="pd'+(j<fin?' ok':'')+'" style="background:'+PC[c].c+'"></div>';r.innerHTML+='</div>';pp.appendChild(r)}
+  svG()}
+
+function AL(msg){var l=document.getElementById('log'),d=document.createElement('div');d.textContent=msg;l.appendChild(d);l.scrollTop=l.scrollHeight}
+function sp(id){document.querySelectorAll('.pg').forEach(function(s){s.classList.remove('on')});document.getElementById(id).classList.add('on')}
+function svG(){try{if(G&&!G.winner&&M==='local')localStorage.setItem('fc',JSON.stringify(serS()));else localStorage.removeItem('fc')}catch(e){}}
+
+/* ============================================================
+   ROLL & EXEC
+   ============================================================ */
+function doRoll(){if(!G||G.ph!=='roll')return;if(M==='online'){if(!myC||curC()!==myC)return;if(isH){execRoll()}else{sH({type:'roll'});document.getElementById('rb').disabled=true}}else{execRoll()}}
+function execRoll(){if(!G||G.ph!=='roll')return;G.ph='anim';var v=Math.floor(Math.random()*6)+1;G.dice=v;document.getElementById('rb').disabled=true;markDirty();
+  aD(v,function(){var cc=curC(),ab=G.pl[cc].every(function(p){return p.s==='h'});if(v===6)G.n6[cc]=0;else if(ab)G.n6[cc]=(G.n6[cc]||0)+1;
+    var mv=gM(cc,v);if(!mv.length){AL(PC[cc].nm+'方 无法移动');setTimeout(aftM,300)}
+    else if(mv.length===1){doMoveAnimated(cc,mv[0],aftM)}
+    else{G.vm=mv;G.ph='pick';AL('请选择棋子');uUI();bcSt()}})}
+
+/* ============================================================
+   TAP（选子）
+   ============================================================ */
+function handleTap(ex,ey){var now=Date.now();if(now-lastTap<200)return;lastTap=now;if(!G||G.ph!=='pick')return;if(M==='online'&&curC()!==myC)return;
+  var r=cv.getBoundingClientRect(),mx=(ex-r.left)*600/r.width,my=(ey-r.top)*600/r.height,best=-1,bd=999;
+  for(var k=0;k<G.vm.length;k++){var pos=ppx(curC(),G.vm[k]),d=Math.hypot(pos.x-mx,pos.y-my);if(d<bd){bd=d;best=G.vm[k]}}
+  if(best>=0&&bd<28){if(M==='online'&&!isH){sH({type:'sel',i:best});G.ph='anim';G.vm=[];markDirty()}else{G.ph='anim';G.vm=[];doMoveAnimated(curC(),best,aftM)}}}
+cv.addEventListener('click',function(e){handleTap(e.clientX,e.clientY)});
+cv.addEventListener('touchend',function(e){e.preventDefault();var t=e.changedTouches[0];handleTap(t.clientX,t.clientY)});
+
+/* ============================================================
+   BUBBLE / CHAT
+   ============================================================ */
+function showBubble(co,msg){if(!G||!HBC[co])return;var p=HBC[co];bubbles.push({x:p.x,y:p.y,msg:msg,co:co,t:Date.now()});markDirty()}
+function showChat(show){document.getElementById('chatbtn').style.display=show?'block':'none';if(!show)document.getElementById('chatpanel').classList.remove('on')}
+function toggleChat(){document.getElementById('chatpanel').classList.toggle('on')}
+function SC(msg){if(!msg){var inp=document.getElementById('ci2');msg=inp.value.trim();inp.value=''}if(!msg)return;AC(myC||'red',msg);showBubble(myC||'red',msg);for(var k in con)try{con[k].send({type:'chat',msg:msg,from:myC})}catch(e){}}
+function AC(co,msg){var l=document.getElementById('chatlog'),d=document.createElement('div'),s=document.createElement('span');s.style.color=PC[co].c;s.style.fontWeight='700';s.textContent=PC[co].nm+'：';d.appendChild(s);d.appendChild(document.createTextNode(msg));l.appendChild(d);l.scrollTop=l.scrollHeight}
+
+/* ============================================================
+   WIN / RESTART / QUIT
+   ============================================================ */
+function showRC(show){var el=document.getElementById('roomtag');if(show&&RC){el.textContent='房间:'+RC;el.style.display='block'}else el.style.display='none'}
+function SW(){document.getElementById('win').classList.add('on');document.getElementById('wt').textContent=G.winner?PC[G.winner].nm+'方 获胜！':'结束';document.getElementById('wt').style.color=G.winner?PC[G.winner].c:'#7a5508';localStorage.removeItem('fc')}
+function RG(){document.getElementById('win').classList.remove('on');if(!G)return;if(M==='online'&&!isH){sH({type:'restart'});return}
+  capFx=[];animPiece=null;IG(G.cols);rD(0);document.getElementById('log').innerHTML='';AL('新一局！');uUI();if(M==='online'&&isH)for(var k in con)try{con[k].send({type:'go',st:serS()})}catch(e){}}
+function cleanState(){con={};pend=[];RC='';isH=false;myC=null;M='local';G=null;lastUI='';lastSer='';mrRetry=0;jrRetry=0;jrReconn=false;destroying=false;bubbles=[];capFx=[];animPiece=null;showRC(false);showChat(false);setNetInd('');if(rAF){cancelAnimationFrame(rAF);rAF=null}dirty=true;localStorage.removeItem('fc');sessionStorage.removeItem('fc_rejoin');sp('menu')}
+function QG(){document.getElementById('win').classList.remove('on');destroying=true;try{for(var k in con)con[k].send({type:'leave'})}catch(e){}setTimeout(function(){try{if(peer)peer.destroy()}catch(e){}peer=null;cleanState()},300)}
+function SL(n){var cols=n===4?C4.slice():C2.slice();M='local';isH=false;myC=null;RC='';showRC(false);showChat(false);bubbles=[];capFx=[];animPiece=null;setNetInd('');IG(cols);sp('play');rD(0);document.getElementById('log').innerHTML='';AL(n+'人对弈开始');uUI()}
+
+/* ============================================================
+   NETWORK — 加强版
+   ============================================================ */
+function TN(){var el=document.getElementById('net');el.style.display=el.style.display==='none'?'block':'none'}
+function lPJ(attempt){attempt=attempt||0;return new Promise(function(ok,no){if(window.Peer)return ok();var srcs=['https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js','https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js','https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js'];if(attempt>=srcs.length)return no(new Error('所有CDN失败'));var s=document.createElement('script');s.src=srcs[attempt];s.onload=function(){setTimeout(function(){window.Peer?ok():lPJ(attempt+1).then(ok).catch(no)},500)};s.onerror=function(){showToast('CDN '+(attempt+1)+' 失败，尝试备用...','warn');lPJ(attempt+1).then(ok).catch(no)};document.head.appendChild(s)})}
+function gc(){var s='',ch='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';for(var i=0;i<4;i++)s+=ch[Math.floor(Math.random()*ch.length)];return s}
+
+function MR(){
+  document.getElementById('nerr').textContent='正在加载网络组件...';showToast('正在加载网络组件...','info');
+  if(peer){try{peer.destroy()}catch(e){}peer=null;con={};pend=[]}
+  lPJ().then(function(){
+    document.getElementById('nerr').textContent='正在创建房间...';showToast('正在创建房间...','info');
+    RC=RC||gc();isH=true;myC='red';pend=[{c:'red'}];
+    try{peer=new Peer('fc_'+RC,{debug:0});
+      var to=setTimeout(function(){document.getElementById('nerr').textContent='创建超时';showToast('创建超时，请重试','error');setNetInd('error');try{peer.destroy()}catch(e){}peer=null},15000);
+      peer.on('open',function(){clearTimeout(to);mrRetry=0;setNetInd('ok');showToast('房间创建成功','success');
+        document.getElementById('rcc').textContent=RC;showRC(true);uSL();if(!G){sp('wait');document.getElementById('bGo').disabled=false}});
+      peer.on('connection',function(c){c.on('open',function(){c.on('data',function(msg){
+        if(msg.type==='join'){var av;if(msg.prev&&!pend.some(function(p){return p.c===msg.prev}))av=msg.prev;else av=['green','blue','yellow'].filter(function(x){return!pend.some(function(p){return p.c===x})})[0];if(!av)return c.send({type:'full'});con[av]=c;pend.push({c:av});c.send({type:'wel',c:av,pl:pend.map(function(p){return p.c}),st:G?serS():null});for(var k2 in con)try{con[k2].send({type:'plist',pl:pend.map(function(p){return p.c})})}catch(e){}uSL();AL(PC[av].nm+'方 加入了');showToast(PC[av].nm+'方 加入了','success')}
+        else{var sc;for(var k in con)if(con[k]===c)sc=k;if(sc)hCM(sc,msg)}})});
+        c.on('close',function(){if(destroying)return;for(var k in con)if(con[k]===c){var nm=PC[k]?PC[k].nm:'';pend=pend.filter(function(p){return p.c!==k});delete con[k];uSL();if(nm){AL(nm+'方 离开了');showToast(nm+'方 断线离开','warn')}for(var k2 in con)try{con[k2].send({type:'plist',pl:pend.map(function(p){return p.c})})}catch(e){}}});
+        c.on('error',function(){if(destroying)return;for(var k in con)if(con[k]===c)delete con[k]})});
+      peer.on('error',function(err){clearTimeout(to);
+        if(err.type==='unavailable-id'&&mrRetry<4){mrRetry++;document.getElementById('nerr').textContent='房间重建中('+mrRetry+'/4)...';showToast('房间ID冲突，正在重建...','warn');try{peer.destroy()}catch(e){}peer=null;setTimeout(MR,3000)}
+        else{document.getElementById('nerr').textContent='创建失败，请重试';showToast('创建失败: '+err.type,'error');setNetInd('error');mrRetry=0}})}catch(e){document.getElementById('nerr').textContent='创建异常';showToast('创建异常','error')}
+  }).catch(function(err){document.getElementById('nerr').textContent='网络组件加载失败，请刷新重试';showToast('网络组件加载失败','error')})}
+
+function JR(){
+  document.getElementById('nerr').textContent='';var code=document.getElementById('ci')?document.getElementById('ci').value.trim().toUpperCase():'';if(!code&&RC)code=RC;if(code.length!==4){document.getElementById('nerr').textContent='请输入4位房间号';return}
+  RC=code;isH=false;showRC(true);if(peer){try{peer.destroy()}catch(e){}peer=null;con={}}
+  document.getElementById('nerr').textContent='正在加载网络组件...';showToast('正在连接...','info');
+  lPJ().then(function(){document.getElementById('nerr').textContent='正在连接...';setNetInd('warn');
+    try{peer=new Peer('fj_'+Math.random().toString(36).substr(2,8),{debug:0});
+      var to=setTimeout(function(){if(jrReconn&&jrRetry<5){jrRetry++;var waitMs=Math.min(2000*jrRetry,10000);document.getElementById('nerr').textContent='等待房主重建('+jrRetry+'/5)...';showToast('等待房主重建，'+Math.ceil(waitMs/1000)+'秒后重试...','warn');try{peer.destroy()}catch(e){}peer=null;setTimeout(JR,waitMs)}else{document.getElementById('nerr').textContent='连接超时';showToast('连接超时，请检查房间号','error');setNetInd('error');try{peer.destroy()}catch(e){}peer=null;jrReconn=false;jrRetry=0}},15000);
+      peer.on('open',function(){clearTimeout(to);document.getElementById('nerr').textContent='正在加入房间...';
+        var c=peer.connect('fc_'+RC,{reliable:true});var ct2=setTimeout(function(){document.getElementById('nerr').textContent='加入失败';showToast('加入超时','error');setNetInd('error');try{c.close()}catch(e){}},10000);
+        c.on('open',function(){clearTimeout(ct2);jrRetry=0;jrReconn=false;setNetInd('ok');showToast('已连接到房间','success');
+          con['host']=c;c.send({type:'join',prev:myC});
+          c.on('data',function(msg){hHM(msg)});
+          c.on('close',function(){if(destroying)return;setNetInd('warn');showToast('连接断开，尝试重连...','warn');
+            /* 自动重连 */
+            if(jrRetry<5){jrReconn=true;jrRetry++;var w=Math.min(2000*jrRetry,10000);showToast(Math.ceil(w/1000)+'秒后自动重连 ('+jrRetry+'/5)','warn');setTimeout(function(){if(!destroying)JR()},w)}
+            else{showToast('重连失败，请手动重新加入','error');setNetInd('error');document.getElementById('nerr').textContent='连接已断开';jrRetry=0;jrReconn=false}});
+          c.on('error',function(){setNetInd('error');document.getElementById('nerr').textContent='连接异常';showToast('连接异常','error')})});
+        c.on('error',function(){clearTimeout(ct2);document.getElementById('nerr').textContent='连接失败';showToast('连接失败','error');setNetInd('error')})});
+      peer.on('error',function(){clearTimeout(to);document.getElementById('nerr').textContent='连接失败';showToast('连接失败','error');setNetInd('error');try{peer.destroy()}catch(e){}peer=null})}catch(e){document.getElementById('nerr').textContent='连接异常';showToast('连接异常','error')}
+  }).catch(function(err){document.getElementById('nerr').textContent='网络组件加载失败，请刷新重试';showToast('网络组件加载失败','error')})}
+
+function hHM(m){
+  if(m.type==='wel'){myC=m.c;pend=m.pl.map(function(c){return{c:c}});uSL();document.getElementById('ws').textContent='你是'+PC[myC].nm+'方';
+    if(m.st){ldS(m.st);M='online';sp('play');showRC(true);showChat(true);rD(G.dice);document.getElementById('log').innerHTML='';AL('重新连接！');showToast('重连成功！','success');setNetInd('ok');uUI()}else{sp('wait');showRC(true)}}
+  if(m.type==='plist'){pend=m.pl.map(function(c){return{c:c}});uSL()}
+  if(m.type==='go'){ldS(m.st);M='online';sp('play');showRC(true);showChat(true);rD(G.dice);document.getElementById('log').innerHTML='';AL('在线对弈！');showToast('游戏开始！','success');uUI()}
+  if(m.type==='st'){ldS(m.st)}
+  if(m.type==='chat'){AC(m.from,m.msg);showBubble(m.from,m.msg);var cp=document.getElementById('chatpanel');if(!cp.classList.contains('on'))cp.classList.add('on')}
+  if(m.type==='leave'){document.getElementById('rb').disabled=true;document.getElementById('th').textContent='房主已退出';AL('房主退出了游戏');showToast('房主已退出游戏','error');setNetInd('error');setTimeout(function(){try{if(peer)peer.destroy()}catch(e){}peer=null;cleanState()},1500)}
+  if(m.type==='full'){document.getElementById('nerr').textContent='房间已满';showToast('房间已满','error');LR()}
+}
+
+function hCM(co,m){if(!G||destroying)return;
+  if(m.type==='roll'&&G.ph==='roll'&&curC()===co){execRoll();return}
+  if(m.type==='sel'&&G.ph==='pick'&&curC()===co&&G.vm.indexOf(m.i)>=0){G.ph='anim';G.vm=[];doMoveAnimated(co,m.i,aftM);return}
+  if(m.type==='chat'){AC(co,m.msg);showBubble(co,m.msg);var cp=document.getElementById('chatpanel');if(!cp.classList.contains('on'))cp.classList.add('on');for(var k in con)if(k!==co)try{con[k].send({type:'chat',msg:m.msg,from:co})}catch(e){}return}
+  if(m.type==='leave'){for(var k in con)if(con[k]===co){var nm=PC[k]?PC[k].nm:'';pend=pend.filter(function(p){return p.c!==k});delete con[k];uSL();if(nm){AL(nm+'方 离开了');showToast(nm+'方 离开了','warn')}for(var k2 in con)try{con[k2].send({type:'plist',pl:pend.map(function(p){return p.c})})}catch(e){}}return}
+  if(m.type==='restart'&&G.winner){RG();return}}
+
+function sH(m){if(con['host'])try{con['host'].send(m)}catch(e){}}
+/* 广播状态：本地模式空操作，联机模式同步给所有连接 */
+function bcSt(){if(M==='online'&&G&&!G.winner)for(var k in con)try{con[k].send({type:'st',st:serS()})}catch(e){}}
+
+/* ============================================================
+   SERIALIZE / DESERIALIZE
+   ============================================================ */
+function serS(){var pl={};for(var i=0;i<G.cols.length;i++){var c=G.cols[i];pl[c]=G.pl[c].map(function(p){return[p.s,p.p]})}var tr=G.trail?{f:{x:G.trail.f.x,y:G.trail.f.y},t:{x:G.trail.t.x,y:G.trail.t.y},c:G.trail.c,n:G.trail.n}:null;return{c:G.cols,pl:pl,cr:G.cur,d:G.dice,ph:G.ph,vm:G.vm,c6:G.c6,w:G.winner,lm:G.lm,n6:G.n6,tr:tr}}
+function ldS(st){var pl={};for(var i=0;i<st.c.length;i++){var c=st.c[i];pl[c]=st.pl[c].map(function(a){return{s:a[0],p:a[1]}})}G={cols:st.c,pl:pl,cur:st.cr,dice:st.d,ph:st.ph,vm:st.vm,c6:st.c6,winner:st.w,lm:'lm' in st?st.lm:-1,n6:st.n6||{},trail:st.tr||null};lastUI='';lastSer='';capFx=[];animPiece=null;rD(G.dice);uUI();if(G.winner)SW()}
+
+/* ============================================================
+   SLOTS / GO / LEAVE
+   ============================================================ */
+function uSL(){var el=document.getElementById('sls');el.innerHTML='';for(var i=0;i<pend.length;i++){var d=document.createElement('div');d.className='slot on';d.style.borderColor=PC[pend[i].c].c;d.innerHTML='<span style="color:'+PC[pend[i].c].c+'">✈</span>';el.appendChild(d)}for(var i=pend.length;i<4;i++){var d=document.createElement('div');d.className='slot';d.textContent='+';el.appendChild(d)}document.getElementById('bGo').disabled=pend.length<2}
+function GO(){if(!isH)return;var cols=pend.map(function(p){return p.c});M='online';IG(cols);sp('play');showRC(true);showChat(true);rD(0);document.getElementById('log').innerHTML='';AL('在线对弈！');showToast('游戏开始！','success');uUI();for(var k in con)try{con[k].send({type:'go',st:serS()})}catch(e){}}
+function LR(){destroying=true;sH({type:'leave'});setTimeout(function(){try{if(peer)peer.destroy()}catch(e){}peer=null;cleanState()},300)}
+
+/* ============================================================
+   RECONNECT / INIT
+   ============================================================ */
+function saveRejoin(){if(M==='online'&&RC&&!destroying){try{var d={RC:RC,isH:isH,myC:myC,t:Date.now()};if(isH&&G)d.st=serS();sessionStorage.setItem('fc_rejoin',JSON.stringify(d))}catch(e){}}}
+window.addEventListener('beforeunload',saveRejoin);
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')saveRejoin()});
+
+try{var rj=JSON.parse(sessionStorage.getItem('fc_rejoin'));sessionStorage.removeItem('fc_rejoin');
+  if(rj&&rj.RC&&(Date.now()-rj.t<180000)){myC=rj.myC;
+    if(rj.isH){RC=rj.RC;isH=true;if(rj.st){ldS(rj.st);M='online';sp('play');showRC(true);showChat(true);rD(G.dice);document.getElementById('log').innerHTML='';AL('房间重建中...');showToast('正在重建房间...','info');setNetInd('warn');uUI()}setTimeout(function(){MR()},800)}
+    else{sp('menu');document.getElementById('ci').value=rj.RC;document.getElementById('nerr').textContent='正在重连...';showToast('正在重连...','info');setNetInd('warn');document.getElementById('net').style.display='block';jrReconn=true;setTimeout(function(){JR()},500)}}}catch(e){sessionStorage.removeItem('fc_rejoin')}
+
+try{var sv=JSON.parse(localStorage.getItem('fc'));if(sv&&sv.c&&!sessionStorage.getItem('fc_rejoin')){M='local';ldS(sv);sp('play');rD(G.dice)}else{localStorage.removeItem('fc');if(!document.querySelector('.pg.on'))sp('menu')}}catch(e){localStorage.removeItem('fc');sp('menu')}
+
+if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(function(){})}
+</script>
+</body>
+</html>
