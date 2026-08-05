@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#ff9d2e">
+<meta name="theme-color" content="#0b0f1c">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="飞行棋">
@@ -14,57 +14,56 @@
 <title>✈ 欢乐飞行棋 ✈</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation}
-body{background:linear-gradient(160deg,#fdf6d8,#f7e6b8 60%,#f3d894);font:14px sans-serif;color:#5a4632;min-height:100vh;min-height:100dvh;-webkit-tap-highlight-color:transparent}
+body{background:linear-gradient(145deg,#0b0f1c 0%,#1a1f33 100%);font:14px sans-serif;color:#e8ecf7;min-height:100vh;min-height:100dvh;-webkit-tap-highlight-color:transparent}
 .pg{display:none}.pg.on{display:flex}
-#menu{flex-direction:column;align-items:center;justify-content:center;min-height:100vh;min-height:100dvh;gap:10px;padding:20px}
 #play{flex-direction:column;align-items:center;gap:10px;padding:10px;padding-top:max(10px,env(safe-area-inset-top));padding-bottom:max(10px,env(safe-area-inset-bottom));min-height:100vh;min-height:100dvh}
-canvas{border-radius:8px;cursor:pointer}
+canvas{border-radius:8px;cursor:pointer;box-shadow:0 0 0 2px #2f354a,0 10px 30px rgba(0,0,0,.35)}
 .btn{padding:14px 20px;border:none;border-radius:10px;font:700 15px inherit;cursor:pointer;min-height:48px;-webkit-appearance:none}
-.bp{background:linear-gradient(180deg,#ffb03a,#ff9d2e);color:#fff;box-shadow:0 4px 14px rgba(255,157,46,.45)}
-.bs{background:0 0;color:#a9761f;border:1.5px solid rgba(215,183,106,.8)}
+.bp{background:linear-gradient(135deg,#6c5ce7,#00d2ff);color:#fff;box-shadow:0 4px 16px rgba(108,92,231,.35)}
+.bs{background:rgba(255,255,255,.06);color:#e8ecf7;border:1px solid rgba(255,255,255,.15)}
 .btn:disabled{opacity:.3;cursor:default}
 .sb{display:flex;flex-wrap:wrap;gap:6px;width:100%;max-width:500px;justify-content:center}
-.bx{background:rgba(255,255,255,.72);border:1px solid rgba(215,183,106,.55);border-radius:12px;padding:8px 10px;flex:1;min-width:130px;box-shadow:0 2px 8px rgba(150,105,40,.10)}
-#log{max-height:56px;overflow-y:auto;font:11px/1.6 sans-serif;color:#6a5a40}
+.bx{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:8px 10px;flex:1;min-width:130px}
+#log{max-height:56px;overflow-y:auto;font:11px/1.6 sans-serif;color:#8a93ab}
 #log div{padding:1px 0}
 .pl{display:flex;align-items:center;gap:6px;padding:3px 6px;font-size:12px;border-radius:4px;margin-bottom:2px}
-.pl.ac{background:rgba(255,157,46,.18)}
+.pl.ac{background:rgba(0,210,255,.12)}
 .dt{width:10px;height:10px;border-radius:50%}
 .pp{display:flex;gap:2px}.pd{width:6px;height:6px;border-radius:50%;opacity:.15}.pd.ok{opacity:1}
-#dval{font-size:28px;text-align:center;padding:2px 0}
-#win{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:10}
+#dval{font-size:28px;text-align:center;padding:2px 0;color:#00d2ff}
+#win{position:fixed;inset:0;background:rgba(5,8,16,.82);display:none;align-items:center;justify-content:center;z-index:10}
 #win.on{display:flex}
-.wc{background:#fff8e8;border:2px solid #d7b76a;border-radius:16px;padding:32px;text-align:center;max-width:90vw;box-shadow:0 10px 30px rgba(150,105,40,.3)}
+.wc{background:#151a2c;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:32px;text-align:center;max-width:90vw;box-shadow:0 10px 40px rgba(0,0,0,.5)}
 #net{display:none;margin-top:10px}
-.nerr{color:#c44;font-size:11px;text-align:center;margin-top:6px;min-height:16px}
-.inp{width:100%;padding:12px;background:rgba(255,255,255,.7);border:2px solid rgba(215,183,106,.7);border-radius:8px;color:#a9761f;font-size:20px;text-align:center;letter-spacing:8px;outline:none}
+.nerr{color:#ff6b6b;font-size:11px;text-align:center;margin-top:6px;min-height:16px}
+.inp{width:100%;padding:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:8px;color:#00d2ff;font-size:20px;text-align:center;letter-spacing:8px;outline:none}
 #wait{flex-direction:column;align-items:center;justify-content:center;min-height:100vh;min-height:100dvh;gap:10px;padding:20px}
-.rc{font-size:36px;color:#ff9d2e;letter-spacing:10px;font-weight:900;cursor:pointer;user-select:all;text-shadow:1px 1px 0 #fff}
+.rc{font-size:36px;color:#00d2ff;letter-spacing:10px;font-weight:900;cursor:pointer;user-select:all}
 .slots{display:flex;gap:10px;margin:14px 0}
-.slot{width:48px;height:48px;border-radius:10px;border:2px dashed rgba(215,183,106,.5);background:rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:18px}
+.slot{width:48px;height:48px;border-radius:10px;border:2px dashed rgba(255,255,255,.18);background:rgba(255,255,255,.03);display:flex;align-items:center;justify-content:center;font-size:18px}
 .slot.on{border-style:solid}
-#roomtag{position:fixed;top:max(8px,env(safe-area-inset-top));right:8px;background:rgba(255,255,255,.75);border:1px solid rgba(215,183,106,.6);border-radius:8px;padding:4px 10px;font-size:11px;color:#a9761f;display:none;z-index:20;cursor:pointer;user-select:all}
-#chatbtn{display:none;position:fixed;bottom:max(16px,env(safe-area-inset-bottom));left:16px;width:50px;height:50px;border-radius:50%;background:linear-gradient(180deg,#ffb03a,#ff9d2e);color:#fff;font-size:24px;border:0;box-shadow:0 2px 12px rgba(255,157,46,.4);z-index:60;cursor:pointer;line-height:50px;text-align:center}
-#chatpanel{display:none;position:fixed;bottom:max(76px,calc(60px + env(safe-area-inset-bottom)));left:8px;right:8px;max-width:400px;background:#fff8e8;border:2px solid rgba(215,183,106,.5);border-radius:12px;padding:10px;z-index:60;flex-direction:column;gap:6px;box-shadow:0 -4px 24px rgba(150,105,40,.25);max-height:45vh;overflow-y:auto}
+#roomtag{position:fixed;top:max(8px,env(safe-area-inset-top));right:8px;background:rgba(21,26,44,.85);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:4px 10px;font-size:11px;color:#e8ecf7;display:none;z-index:20;cursor:pointer;user-select:all;backdrop-filter:blur(6px)}
+#chatbtn{display:none;position:fixed;bottom:max(16px,env(safe-area-inset-bottom));left:16px;width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#6c5ce7,#00d2ff);color:#fff;font-size:24px;border:0;box-shadow:0 2px 14px rgba(108,92,231,.4);z-index:60;cursor:pointer;line-height:50px;text-align:center}
+#chatpanel{display:none;position:fixed;bottom:max(76px,calc(60px + env(safe-area-inset-bottom)));left:8px;right:8px;max-width:400px;background:#151a2c;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;z-index:60;flex-direction:column;gap:6px;box-shadow:0 -4px 24px rgba(0,0,0,.4);max-height:45vh;overflow-y:auto}
 #chatpanel.on{display:flex}
-#chatlog{max-height:90px;overflow-y:auto;font:12px/1.5;color:#6a5a40;margin:4px 0}
+#chatlog{max-height:90px;overflow-y:auto;font:12px/1.5;color:#8a93ab;margin:4px 0}
 #chatlog div{padding:2px 0;word-break:break-all}
 .emojis{display:flex;gap:1px;flex-wrap:wrap}
 .emojis button{font-size:18px;background:0;border:0;cursor:pointer;padding:2px 3px;border-radius:4px;line-height:1}
-.emojis button:active{background:rgba(0,0,0,.08)}
+.emojis button:active{background:rgba(255,255,255,.08)}
 #ctrl{display:flex;gap:6px;justify-content:center;width:100%;max-width:500px}
 
 /* Toast */
 #tc{position:fixed;top:max(8px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:100;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;max-width:90vw}
-.tst{background:rgba(90,70,50,.94);color:#fff8e8;padding:8px 16px;border-radius:8px;font-size:12px;animation:tstI .3s ease;pointer-events:auto;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.15)}
-.tst-w{background:rgba(200,150,40,.95)}.tst-e{background:rgba(200,60,60,.95)}.tst-s{background:rgba(60,160,90,.95)}
+.tst{background:rgba(21,26,44,.95);color:#e8ecf7;padding:8px 16px;border-radius:8px;font-size:12px;animation:tstI .3s ease;pointer-events:auto;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+.tst-w{background:rgba(246,196,69,.95)}.tst-e{background:rgba(231,76,60,.95)}.tst-s{background:rgba(46,204,113,.95)}
 .tst-o{animation:tstO .4s ease forwards}
 @keyframes tstI{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes tstO{from{opacity:1}to{opacity:0;transform:translateY(-10px)}}
 
 /* Net indicator */
 #ni{position:fixed;top:max(32px,calc(env(safe-area-inset-top)+22px));right:10px;width:8px;height:8px;border-radius:50%;z-index:25;display:none;transition:all .3s}
-.nok{display:block;background:#307050}.nwn{display:block;background:#8b7030;animation:npls 1s infinite}.ner{display:block;background:#a03030}
+.nok{display:block;background:#2ecc71}.nwn{display:block;background:#f6c445;animation:npls 1s infinite}.ner{display:block;background:#e74c3c}
 @keyframes npls{0%,100%{opacity:1}50%{opacity:.3}}
 
 @media(min-width:801px){
@@ -78,14 +77,12 @@ canvas{border-radius:8px;cursor:pointer}
 <div id="tc"></div>
 <div id="ni"></div>
 <div id="roomtag" onclick="navigator.clipboard&&navigator.clipboard.writeText(this.textContent)"></div>
-<div id="menu" class="pg on"><h1 style="font-size:40px;color:#ff9d2e;font-family:serif;text-shadow:2px 2px 0 #fff">✈ 欢乐飞行棋</h1><p style="color:#a9761f;margin-bottom:14px;letter-spacing:3px">经典 · 欢乐对战</p>
-<button class="btn bp" onclick="home()" style="margin-top:10px">← 返回主页</button>
-<div id="net" style="display:none"><input class="inp" id="ci" placeholder="房间号" maxlength="4"><div class="nerr" id="nerr"></div></div></div>
-<div id="wait" class="pg"><div style="background:rgba(255,255,255,.75);border:1px solid rgba(215,183,106,.6);border-radius:14px;padding:24px;text-align:center;width:300px;max-width:90vw;box-shadow:0 6px 18px rgba(150,105,40,.15)"><div style="font-size:10px;color:#6a5a40">房间号（点击复制）</div><div class="rc" id="rcc" onclick="navigator.clipboard&&navigator.clipboard.writeText(this.textContent)">----</div><div class="slots" id="sls"></div><div id="ws" style="color:#6a5a40;font-size:13px;margin-bottom:10px">等待加入...</div><button class="btn bp" id="bGo" onclick="GO()" disabled>开始</button><button class="btn bs" onclick="LR()" style="margin-top:6px">离开</button></div></div>
-<div id="play" class="pg"><canvas id="cv"></canvas><div class="sb"><div class="bx"><div style="font-size:9px;color:#6a5a40;letter-spacing:2px">回合</div><div id="tn" style="font-weight:900;font-size:16px;margin:3px 0">-</div><div id="th" style="font-size:11px;color:#6a5a40">-</div></div><div class="bx" style="text-align:center"><div id="dval">🎲</div><button class="btn bp" id="rb" onpointerdown="doRoll()">掷骰子</button></div><div class="bx" id="pls"></div><div class="bx"><div style="font-size:9px;color:#6a5a40;letter-spacing:2px">记录</div><div id="log"></div></div></div><div id="ctrl"><button class="btn bs" onclick="QG()">退出</button></div></div>
-<div id="win"><div class="wc"><div id="wt" style="font-size:24px;font-weight:900;margin-bottom:12px">-</div><p style="color:#6a5a40;margin-bottom:16px">恭喜获胜！</p><button class="btn bp" onclick="RG()" style="margin-bottom:8px">再来一局</button><button class="btn bs" onclick="QG()">返回</button></div></div>
+<div id="net" style="display:none"><input class="inp" id="ci" placeholder="房间号" maxlength="4"><div class="nerr" id="nerr"></div></div>
+<div id="wait" class="pg"><div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:24px;text-align:center;width:300px;max-width:90vw;box-shadow:0 10px 30px rgba(0,0,0,.35)"><div style="font-size:10px;color:#8a93ab">房间号（点击复制）</div><div class="rc" id="rcc" onclick="navigator.clipboard&&navigator.clipboard.writeText(this.textContent)">----</div><div class="slots" id="sls"></div><div id="ws" style="color:#8a93ab;font-size:13px;margin-bottom:10px">等待加入...</div><button class="btn bp" id="bGo" onclick="GO()" disabled>开始</button><button class="btn bs" onclick="LR()" style="margin-top:6px">离开</button></div></div>
+<div id="play" class="pg"><canvas id="cv"></canvas><div class="sb"><div class="bx"><div style="font-size:9px;color:#8a93ab;letter-spacing:2px">回合</div><div id="tn" style="font-weight:900;font-size:16px;margin:3px 0">-</div><div id="th" style="font-size:11px;color:#8a93ab">-</div></div><div class="bx" style="text-align:center"><div id="dval">🎲</div><button class="btn bp" id="rb" onpointerdown="doRoll()">掷骰子</button></div><div class="bx" id="pls"></div><div class="bx"><div style="font-size:9px;color:#8a93ab;letter-spacing:2px">记录</div><div id="log"></div></div></div><div id="ctrl"><button class="btn bs" onclick="QG()">退出</button></div></div>
+<div id="win"><div class="wc"><div id="wt" style="font-size:24px;font-weight:900;margin-bottom:12px">-</div><p style="color:#8a93ab;margin-bottom:16px">恭喜获胜！</p><button class="btn bp" onclick="RG()" style="margin-bottom:8px">再来一局</button><button class="btn bs" onclick="QG()">返回</button></div></div>
 <button id="chatbtn" onclick="toggleChat()">💬</button>
-<div id="chatpanel"><div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:4px;border-bottom:1px solid rgba(0,0,0,.06)"><span style="font-size:11px;color:#7a5508;font-weight:700;letter-spacing:1px">聊天</span><button onclick="toggleChat()" style="background:0;border:0;font-size:16px;cursor:pointer;color:#6a5a40;padding:0 4px">✕</button></div><div id="chatlog"></div><div class="emojis"><button onclick="SC('👍')">👍</button><button onclick="SC('🎉')">🎉</button><button onclick="SC('😂')">😂</button><button onclick="SC('😱')">😱</button><button onclick="SC('🤔')">🤔</button><button onclick="SC('💪')">💪</button><button onclick="SC('✈')">✈</button><button onclick="SC('🎲')">🎲</button><button onclick="SC('服了')">服了</button><button onclick="SC('牛')">牛</button></div><div style="display:flex;gap:4px"><input id="ci2" maxlength="50" placeholder="说点什么..." style="flex:1;padding:6px;border:1px solid rgba(0,0,0,.1);border-radius:4px;font-size:12px;outline:none" onkeydown="if(event.key==='Enter')SC()"><button class="btn bp" style="padding:6px 10px;min-height:auto;font-size:12px" onclick="SC()">发</button></div></div>
+<div id="chatpanel"><div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:4px;border-bottom:1px solid rgba(255,255,255,.08)"><span style="font-size:11px;color:#00d2ff;font-weight:700;letter-spacing:1px">聊天</span><button onclick="toggleChat()" style="background:0;border:0;font-size:16px;cursor:pointer;color:#8a93ab;padding:0 4px">✕</button></div><div id="chatlog"></div><div class="emojis"><button onclick="SC('👍')">👍</button><button onclick="SC('🎉')">🎉</button><button onclick="SC('😂')">😂</button><button onclick="SC('😱')">😱</button><button onclick="SC('🤔')">🤔</button><button onclick="SC('💪')">💪</button><button onclick="SC('✈')">✈</button><button onclick="SC('🎲')">🎲</button><button onclick="SC('服了')">服了</button><button onclick="SC('牛')">牛</button></div><div style="display:flex;gap:4px"><input id="ci2" maxlength="50" placeholder="说点什么..." style="flex:1;padding:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:4px;font-size:12px;outline:none;color:#e8ecf7" onkeydown="if(event.key==='Enter')SC()"><button class="btn bp" style="padding:6px 10px;min-height:auto;font-size:12px" onclick="SC()">发</button></div></div>
 
 <script>
 /* ============================================================
@@ -93,7 +90,7 @@ canvas{border-radius:8px;cursor:pointer}
    ============================================================ */
 var CS=36,PA=30,N=56;
 var T=[[0,4],[0,5],[0,6],[0,7],[0,8],[0,9],[0,10],[1,10],[2,10],[3,10],[4,10],[4,11],[4,12],[4,13],[4,14],[5,14],[6,14],[7,14],[8,14],[9,14],[10,14],[10,13],[10,12],[10,11],[10,10],[11,10],[12,10],[13,10],[14,10],[14,9],[14,8],[14,7],[14,6],[14,5],[14,4],[13,4],[12,4],[11,4],[10,4],[10,3],[10,2],[10,1],[10,0],[9,0],[8,0],[7,0],[6,0],[5,0],[4,0],[4,1],[4,2],[4,3],[4,4],[3,4],[2,4],[1,4]];
-var PC={green:{st:0,he:45,nm:'绿',c:'#66C85A'},blue:{st:14,he:3,nm:'蓝',c:'#42A5F5'},red:{st:28,he:17,nm:'红',c:'#F45145'},yellow:{st:42,he:31,nm:'黄',c:'#FFC83D'}};
+var PC={green:{st:0,he:45,nm:'绿',c:'#2ecc71'},blue:{st:14,he:3,nm:'蓝',c:'#00d2ff'},red:{st:28,he:17,nm:'红',c:'#ff6b6b'},yellow:{st:42,he:31,nm:'黄',c:'#ffd93d'}};
 var HS={green:[[7,1],[7,2],[7,3],[7,4],[7,5],[7,6]],blue:[[1,7],[2,7],[3,7],[4,7],[5,7],[6,7]],red:[[7,13],[7,12],[7,11],[7,10],[7,9],[7,8]],yellow:[[13,7],[12,7],[11,7],[10,7],[9,7],[8,7]]};
 var HB={green:[[1,1],[2,1],[1,2],[2,2]],blue:[[1,12],[2,12],[1,13],[2,13]],red:[[12,12],[13,12],[12,13],[13,13]],yellow:[[12,1],[13,1],[12,2],[13,2]]};
 var SF=new Set([0,14,28,42]),TR=new Set([11,25,39,53]),EX=new Set([7,21,35,49]);
@@ -128,58 +125,59 @@ function cacheBoard(){
   var cv2=document.createElement('canvas');cv2.width=600*D;cv2.height=600*D;
   var c=cv2.getContext('2d');c.setTransform(D,0,0,D,0,0);
   var S=600,cx=PA+7.5*CS,cy=PA+7.5*CS,CR=CS*3.6;
-  /* 1. 米色纸板底 */
+  /* 1. 深蓝渐变底 */
   var bg=c.createLinearGradient(0,0,S,S);
-  bg.addColorStop(0,'#FDF6D8');bg.addColorStop(1,'#F3D894');
+  bg.addColorStop(0,'#0b0f1c');bg.addColorStop(1,'#1a1f33');
   c.fillStyle=bg;c.fillRect(0,0,S,S);
-  /* 2. 金色圆角外框 */
-  c.strokeStyle='#D7B76A';c.lineWidth=6;c.strokeRect(9,9,S-18,S-18);
-  /* 3. 网格线 淡金 */
-  c.strokeStyle='rgba(180,140,70,.15)';c.lineWidth=.5;
+  /* 2. 霓虹紫外框 */
+  c.strokeStyle='rgba(108,92,231,.55)';c.lineWidth=4;c.strokeRect(12,12,S-24,S-24);
+  c.strokeStyle='rgba(255,255,255,.06)';c.lineWidth=1;c.strokeRect(9,9,S-18,S-18);
+  /* 3. 网格线 暗色 */
+  c.strokeStyle='rgba(255,255,255,.05)';c.lineWidth=.5;
   for(var i=0;i<=15;i++){c.beginPath();c.moveTo(PA+i*CS,PA);c.lineTo(PA+i*CS,PA+15*CS);c.stroke();c.beginPath();c.moveTo(PA,PA+i*CS);c.lineTo(PA+15*CS,PA+i*CS);c.stroke()}
-  /* 4. 跑道格子：白底 + 细金描边 */
+  /* 4. 跑道格子：深色半透明 */
   for(var i=0;i<N;i++){var p=T[i];
-    c.fillStyle='#FFFFFF';c.fillRect(PA+p[0]*CS+1,PA+p[1]*CS+1,CS-2,CS-2);
-    c.strokeStyle='rgba(190,150,80,.30)';c.lineWidth=1;c.strokeRect(PA+p[0]*CS+1,PA+p[1]*CS+1,CS-2,CS-2)}
-  /* 5. 起点四色高亮格 */
+    c.fillStyle='rgba(255,255,255,.028)';c.fillRect(PA+p[0]*CS+1,PA+p[1]*CS+1,CS-2,CS-2);
+    c.strokeStyle='rgba(255,255,255,.06)';c.lineWidth=1;c.strokeRect(PA+p[0]*CS+1,PA+p[1]*CS+1,CS-2,CS-2)}
+  /* 5. 起点四色霓虹格 */
   for(var pk in PC){var sp=T[PC[pk].st];
-    c.fillStyle=PC[pk].c;c.globalAlpha=.88;c.fillRect(PA+sp[0]*CS+2,PA+sp[1]*CS+2,CS-4,CS-4);c.globalAlpha=1}
-  /* 6. 四角基地：2x2 纯色块 + 白色飞机槽 */
+    c.fillStyle=PC[pk].c;c.globalAlpha=.3;c.fillRect(PA+sp[0]*CS+2,PA+sp[1]*CS+2,CS-4,CS-4);c.globalAlpha=1}
+  /* 6. 四角基地：四色半透明块 + 亮边 + 深色圆槽 */
   for(var co in HB){var b=HB[co],x0=PA+Math.min(b[0][0],b[2][0])*CS,y0=PA+Math.min(b[0][1],b[1][1])*CS;
-    c.fillStyle=PC[co].c;c.globalAlpha=.95;c.fillRect(x0-3,y0-3,2*CS+6,2*CS+6);c.globalAlpha=1;
-    c.strokeStyle='#fff';c.lineWidth=3;c.strokeRect(x0-1,y0-1,2*CS+2,2*CS+2);
+    c.fillStyle=PC[co].c;c.globalAlpha=.16;c.fillRect(x0-3,y0-3,2*CS+6,2*CS+6);c.globalAlpha=1;
+    c.strokeStyle=PC[co].c;c.globalAlpha=.7;c.lineWidth=2;c.strokeRect(x0-1,y0-1,2*CS+2,2*CS+2);c.globalAlpha=1;
     for(var i=0;i<4;i++){var pp=c2p(b[i][0],b[i][1]);
-      c.beginPath();c.arc(pp.x,pp.y,CS/2-4,0,Math.PI*2);c.fillStyle='#fff';c.globalAlpha=.92;c.fill();c.globalAlpha=1;
-      c.beginPath();c.arc(pp.x,pp.y,CS/2-4,0,Math.PI*2);c.strokeStyle=PC[co].c;c.lineWidth=1.5;c.stroke()}}
-  /* 7. 归家通道：纯色由浅到深 */
+      c.beginPath();c.arc(pp.x,pp.y,CS/2-4,0,Math.PI*2);c.fillStyle='rgba(255,255,255,.06)';c.fill();
+      c.beginPath();c.arc(pp.x,pp.y,CS/2-4,0,Math.PI*2);c.strokeStyle=PC[co].c;c.globalAlpha=.75;c.lineWidth=1.5;c.stroke();c.globalAlpha=1}}
+  /* 7. 归家通道：四色霓虹渐变 */
   for(var co in HS)for(var j=0;j<6;j++){var p=HS[co][j];
-    c.fillStyle=PC[co].c;c.globalAlpha=.22+j*.13;c.fillRect(PA+p[0]*CS+2,PA+p[1]*CS+2,CS-4,CS-4);c.globalAlpha=1}
+    c.fillStyle=PC[co].c;c.globalAlpha=.06+j*.05;c.fillRect(PA+p[0]*CS+2,PA+p[1]*CS+2,CS-4,CS-4);c.globalAlpha=1}
   /* 8. 中心四色终点（圆形裁切四象限）*/
   c.save();c.beginPath();c.arc(cx,cy,CR,0,Math.PI*2);c.clip();
-  var qc=[['#42A5F5',0,Math.PI/2],['#66C85A',Math.PI/2,Math.PI],['#FFC83D',Math.PI,Math.PI*1.5],['#F45145',Math.PI*1.5,Math.PI*2]];
-  for(var q=0;q<qc.length;q++){c.fillStyle=qc[q][0];c.beginPath();c.moveTo(cx,cy);c.arc(cx,cy,1400,qc[q][1],qc[q][2]);c.closePath();c.fill()}
+  var qc=[['#00d2ff',0,Math.PI/2],['#2ecc71',Math.PI/2,Math.PI],['#ffd93d',Math.PI,Math.PI*1.5],['#ff6b6b',Math.PI*1.5,Math.PI*2]];
+  for(var q=0;q<qc.length;q++){c.fillStyle=qc[q][0];c.globalAlpha=.32;c.beginPath();c.moveTo(cx,cy);c.arc(cx,cy,1400,qc[q][1],qc[q][2]);c.closePath();c.fill();c.globalAlpha=1}
   c.restore();
-  /* 白色圆环 + 中心蓝色飞机核心 */
-  c.beginPath();c.arc(cx,cy,CR-2,0,Math.PI*2);c.strokeStyle='#fff';c.lineWidth=5;c.stroke();
+  /* 中心圆环 + 青色核心 */
+  c.beginPath();c.arc(cx,cy,CR-2,0,Math.PI*2);c.strokeStyle='rgba(255,255,255,.18)';c.lineWidth=3;c.stroke();
   var core=CS*1.15;
   var g2=c.createRadialGradient(cx-core*.3,cy-core*.3,2,cx,cy,core);
-  g2.addColorStop(0,'#7cc4ff');g2.addColorStop(1,'#2196F3');
+  g2.addColorStop(0,'#7b68ee');g2.addColorStop(1,'#00d2ff');
   c.beginPath();c.arc(cx,cy,core,0,Math.PI*2);c.fillStyle=g2;c.fill();
-  c.beginPath();c.arc(cx,cy,core,0,Math.PI*2);c.strokeStyle='#fff';c.lineWidth=3;c.stroke();
+  c.beginPath();c.arc(cx,cy,core,0,Math.PI*2);c.strokeStyle='rgba(255,255,255,.3)';c.lineWidth=2;c.stroke();
   c.fillStyle='#fff';c.font='bold 15px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText('✈',cx,cy);
-  /* 9. 快捷飞行虚线（4 条彩色对角虚线）*/
-  var fp=[{f:c2p(1.5,1.5),t:{x:cx+CR*.55,y:cy+CR*.55},col:'#66C85A'},{f:c2p(12.5,1.5),t:{x:cx-CR*.55,y:cy+CR*.55},col:'#FFC83D'},{f:c2p(12.5,12.5),t:{x:cx-CR*.55,y:cy-CR*.55},col:'#F45145'},{f:c2p(1.5,12.5),t:{x:cx+CR*.55,y:cy-CR*.55},col:'#42A5F5'}];
-  c.setLineDash([8,6]);c.lineWidth=3;c.lineCap='round';
-  for(var f=0;f<fp.length;f++){c.strokeStyle=fp[f].col;c.globalAlpha=.65;c.beginPath();c.moveTo(fp[f].f.x,fp[f].f.y);c.lineTo(fp[f].t.x,fp[f].t.y);c.stroke();c.globalAlpha=1}
+  /* 9. 快捷飞行虚线（4 条霓虹对角虚线）*/
+  var fp=[{f:c2p(1.5,1.5),t:{x:cx+CR*.55,y:cy+CR*.55},col:'#2ecc71'},{f:c2p(12.5,1.5),t:{x:cx-CR*.55,y:cy+CR*.55},col:'#ffd93d'},{f:c2p(12.5,12.5),t:{x:cx-CR*.55,y:cy-CR*.55},col:'#ff6b6b'},{f:c2p(1.5,12.5),t:{x:cx+CR*.55,y:cy-CR*.55},col:'#00d2ff'}];
+  c.setLineDash([8,6]);c.lineWidth=2.5;c.lineCap='round';
+  for(var f=0;f<fp.length;f++){c.strokeStyle=fp[f].col;c.globalAlpha=.55;c.beginPath();c.moveTo(fp[f].f.x,fp[f].f.y);c.lineTo(fp[f].t.x,fp[f].t.y);c.stroke();c.globalAlpha=1}
   c.setLineDash([]);c.lineCap='butt';
   /* 10. 特殊标记 ★ / ⚠ / ♦ */
-  SF.forEach(function(i){var p=tpx(i);c.fillStyle='#e6a23c';c.globalAlpha=.95;c.font='bold 12px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText('★',p.x,p.y);c.globalAlpha=1});
-  TR.forEach(function(i){var p=tpx(i);c.fillStyle='#F45145';c.globalAlpha=.9;c.font='bold 11px sans-serif';c.textAlign='center';c.fillText('⚠',p.x,p.y);c.globalAlpha=1});
-  EX.forEach(function(i){var p=tpx(i);c.fillStyle='#66C85A';c.globalAlpha=.95;c.font='bold 11px sans-serif';c.textAlign='center';c.fillText('♦',p.x,p.y);c.globalAlpha=1});
+  SF.forEach(function(i){var p=tpx(i);c.fillStyle='#f6c445';c.globalAlpha=.95;c.font='bold 12px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText('★',p.x,p.y);c.globalAlpha=1});
+  TR.forEach(function(i){var p=tpx(i);c.fillStyle='#ff6b6b';c.globalAlpha=.9;c.font='bold 11px sans-serif';c.textAlign='center';c.fillText('⚠',p.x,p.y);c.globalAlpha=1});
+  EX.forEach(function(i){var p=tpx(i);c.fillStyle='#2ecc71';c.globalAlpha=.95;c.font='bold 11px sans-serif';c.textAlign='center';c.fillText('♦',p.x,p.y);c.globalAlpha=1});
   /* 11. 捷径 ◎ 四色 */
   [{p:10,c:'green'},{p:24,c:'blue'},{p:38,c:'red'},{p:52,c:'yellow'}].forEach(function(s){var pos=tpx(s.p);c.fillStyle=PC[s.c].c;c.globalAlpha=.95;c.font='bold 14px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText('◎',pos.x,pos.y);c.globalAlpha=1});
   /* 12. 起点 ✈ 白色小飞机 */
-  for(var pk in PC){var pos=tpx(PC[pk].st);c.fillStyle='#fff';c.globalAlpha=.95;c.font='bold 13px sans-serif';c.textAlign='center';c.fillText('✈',pos.x,pos.y);c.globalAlpha=1}
+  for(var pk in PC){var pos=tpx(PC[pk].st);c.fillStyle='#fff';c.globalAlpha=.85;c.font='bold 13px sans-serif';c.textAlign='center';c.fillText('✈',pos.x,pos.y);c.globalAlpha=1}
   return cv2;
 }
 var boardCache=cacheBoard();
@@ -206,7 +204,7 @@ function render(ts){
       /* 步进动画中棋子发光 */
       if(animPiece&&animPiece.co===a.c&&animPiece.idx===a.i){anim=true;X.beginPath();X.arc(px,py,14,0,Math.PI*2);X.strokeStyle='rgba(122,85,8,'+(.4+.3*Math.sin(ts/150))+')';X.lineWidth=2.5;X.stroke()}
       if(a.sel){anim=true;X.beginPath();X.arc(px,py,14,0,Math.PI*2);X.strokeStyle='rgba(122,85,8,'+(.5+.4*Math.sin(ts/200))+')';X.lineWidth=2;X.stroke()}
-      X.beginPath();X.arc(px,py,CS/2-5,0,Math.PI*2);X.fillStyle=PC[a.c].c;X.fill();X.strokeStyle='rgba(90,70,50,.35)';X.lineWidth=1.5;X.stroke();X.restore()}}
+      X.beginPath();X.arc(px,py,CS/2-5,0,Math.PI*2);X.fillStyle=PC[a.c].c;X.fill();X.strokeStyle='rgba(255,255,255,.4)';X.lineWidth=1.5;X.stroke();X.restore()}}
     /* 到达计数 */
     for(var ci=0;ci<G.cols.length;ci++){var c=G.cols[ci],cnt=0;for(var i=0;i<4;i++)if(G.pl[c][i].s==='f')cnt++;if(cnt){var of2={green:[-16,-16],blue:[-16,16],red:[16,16],yellow:[16,-16]}[c];X.fillStyle=PC[c].c;X.font='bold 10px sans-serif';X.textAlign='center';X.fillText(cnt+'✈',300+of2[0],300+of2[1])}}}
 
@@ -421,7 +419,7 @@ function showRC(show){var el=document.getElementById('roomtag');if(show&&RC){el.
 function SW(){document.getElementById('win').classList.add('on');document.getElementById('wt').textContent=G.winner?PC[G.winner].nm+'方 获胜！':'结束';document.getElementById('wt').style.color=G.winner?PC[G.winner].c:'#7a5508';localStorage.removeItem('fc')}
 function RG(){document.getElementById('win').classList.remove('on');if(!G)return;if(M==='online'&&!isH){sH({type:'restart'});return}
   capFx=[];animPiece=null;IG(G.cols);rD(0);document.getElementById('log').innerHTML='';AL('新一局！');uUI();if(M==='online'&&isH)for(var k in con)try{con[k].send({type:'go',st:serS()})}catch(e){}}
-function cleanState(){con={};pend=[];RC='';isH=false;myC=null;M='local';G=null;lastUI='';lastSer='';mrRetry=0;jrRetry=0;jrReconn=false;destroying=false;bubbles=[];capFx=[];animPiece=null;showRC(false);showChat(false);setNetInd('');if(rAF){cancelAnimationFrame(rAF);rAF=null}dirty=true;localStorage.removeItem('fc');sessionStorage.removeItem('fc_rejoin');sp('menu')}
+function cleanState(){con={};pend=[];RC='';isH=false;myC=null;M='local';G=null;lastUI='';lastSer='';mrRetry=0;jrRetry=0;jrReconn=false;destroying=false;bubbles=[];capFx=[];animPiece=null;showRC(false);showChat(false);setNetInd('');if(rAF){cancelAnimationFrame(rAF);rAF=null}dirty=true;localStorage.removeItem('fc');sessionStorage.removeItem('fc_rejoin');home()}
 function QG(){document.getElementById('win').classList.remove('on');destroying=true;try{for(var k in con)con[k].send({type:'leave'})}catch(e){}setTimeout(function(){try{if(peer)peer.destroy()}catch(e){}peer=null;cleanState()},300)}
 function SL(n){var cols=n===4?C4.slice():C2.slice();M='local';isH=false;myC=null;RC='';showRC(false);showChat(false);bubbles=[];capFx=[];animPiece=null;setNetInd('');IG(cols);sp('play');rD(0);document.getElementById('log').innerHTML='';AL(n+'人对弈开始');uUI()}
 
@@ -518,7 +516,7 @@ document.addEventListener('visibilitychange',function(){if(document.visibilitySt
 try{var rj=JSON.parse(sessionStorage.getItem('fc_rejoin'));sessionStorage.removeItem('fc_rejoin');
   if(rj&&rj.RC&&(Date.now()-rj.t<180000)){myC=rj.myC;
     if(rj.isH){RC=rj.RC;isH=true;if(rj.st){ldS(rj.st);M='online';sp('play');showRC(true);showChat(true);rD(G.dice);document.getElementById('log').innerHTML='';AL('房间重建中...');showToast('正在重建房间...','info');setNetInd('warn');uUI()}setTimeout(function(){MR()},800)}
-    else{sp('menu');document.getElementById('ci').value=rj.RC;document.getElementById('nerr').textContent='正在重连...';showToast('正在重连...','info');setNetInd('warn');document.getElementById('net').style.display='block';jrReconn=true;setTimeout(function(){JR()},500)}}}catch(e){sessionStorage.removeItem('fc_rejoin')}
+    else{document.getElementById('rcc').textContent=rj.RC;showRC(true);sp('wait');document.getElementById('ci').value=rj.RC;document.getElementById('nerr').textContent='正在重连...';showToast('正在重连...','info');setNetInd('warn');jrReconn=true;setTimeout(function(){JR()},500)}}}catch(e){sessionStorage.removeItem('fc_rejoin')}
 
 function home(){try{if(history.length>1)history.back();else window.location.href='/'}catch(e){window.location.href='/'}}
 function bootByURL(){
