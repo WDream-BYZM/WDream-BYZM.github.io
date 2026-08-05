@@ -2,421 +2,541 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#ff9d2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="飞行棋">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>✈ 欢乐飞行棋 ✈</title>
 <style>
-  :root {
-    --red: #F45145;
-    --yellow: #FFC83D;
-    --blue: #42A5F5;
-    --green: #66C85A;
-    --board-bg: #FFF7DC;
-    --border: #D7B76A;
-  }
-  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  html,body { min-height:100%; background: linear-gradient(160deg,#fdf6d8,#f7e6b8 60%,#f3d894); font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; color:#5a4632; }
-  body { padding:16px 12px 30px; overflow-x:hidden; }
+*{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation}
+body{background:linear-gradient(160deg,#fdf6d8,#f7e6b8 60%,#f3d894);font:14px sans-serif;color:#5a4632;min-height:100vh;min-height:100dvh;-webkit-tap-highlight-color:transparent}
+.pg{display:none}.pg.on{display:flex}
+#menu{flex-direction:column;align-items:center;justify-content:center;min-height:100vh;min-height:100dvh;gap:10px;padding:20px}
+#play{flex-direction:column;align-items:center;gap:10px;padding:10px;padding-top:max(10px,env(safe-area-inset-top));padding-bottom:max(10px,env(safe-area-inset-bottom));min-height:100vh;min-height:100dvh}
+canvas{border-radius:8px;cursor:pointer}
+.btn{padding:14px 20px;border:none;border-radius:10px;font:700 15px inherit;cursor:pointer;min-height:48px;-webkit-appearance:none}
+.bp{background:linear-gradient(180deg,#ffb03a,#ff9d2e);color:#fff;box-shadow:0 4px 14px rgba(255,157,46,.45)}
+.bs{background:0 0;color:#a9761f;border:1.5px solid rgba(215,183,106,.8)}
+.btn:disabled{opacity:.3;cursor:default}
+.sb{display:flex;flex-wrap:wrap;gap:6px;width:100%;max-width:500px;justify-content:center}
+.bx{background:rgba(255,255,255,.72);border:1px solid rgba(215,183,106,.55);border-radius:12px;padding:8px 10px;flex:1;min-width:130px;box-shadow:0 2px 8px rgba(150,105,40,.10)}
+#log{max-height:56px;overflow-y:auto;font:11px/1.6 sans-serif;color:#6a5a40}
+#log div{padding:1px 0}
+.pl{display:flex;align-items:center;gap:6px;padding:3px 6px;font-size:12px;border-radius:4px;margin-bottom:2px}
+.pl.ac{background:rgba(255,157,46,.18)}
+.dt{width:10px;height:10px;border-radius:50%}
+.pp{display:flex;gap:2px}.pd{width:6px;height:6px;border-radius:50%;opacity:.15}.pd.ok{opacity:1}
+#dval{font-size:28px;text-align:center;padding:2px 0}
+#win{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:10}
+#win.on{display:flex}
+.wc{background:#fff8e8;border:2px solid #d7b76a;border-radius:16px;padding:32px;text-align:center;max-width:90vw;box-shadow:0 10px 30px rgba(150,105,40,.3)}
+#net{display:none;margin-top:10px}
+.nerr{color:#c44;font-size:11px;text-align:center;margin-top:6px;min-height:16px}
+.inp{width:100%;padding:12px;background:rgba(255,255,255,.7);border:2px solid rgba(215,183,106,.7);border-radius:8px;color:#a9761f;font-size:20px;text-align:center;letter-spacing:8px;outline:none}
+#wait{flex-direction:column;align-items:center;justify-content:center;min-height:100vh;min-height:100dvh;gap:10px;padding:20px}
+.rc{font-size:36px;color:#ff9d2e;letter-spacing:10px;font-weight:900;cursor:pointer;user-select:all;text-shadow:1px 1px 0 #fff}
+.slots{display:flex;gap:10px;margin:14px 0}
+.slot{width:48px;height:48px;border-radius:10px;border:2px dashed rgba(215,183,106,.5);background:rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:18px}
+.slot.on{border-style:solid}
+#roomtag{position:fixed;top:max(8px,env(safe-area-inset-top));right:8px;background:rgba(255,255,255,.75);border:1px solid rgba(215,183,106,.6);border-radius:8px;padding:4px 10px;font-size:11px;color:#a9761f;display:none;z-index:20;cursor:pointer;user-select:all}
+#chatbtn{display:none;position:fixed;bottom:max(16px,env(safe-area-inset-bottom));left:16px;width:50px;height:50px;border-radius:50%;background:linear-gradient(180deg,#ffb03a,#ff9d2e);color:#fff;font-size:24px;border:0;box-shadow:0 2px 12px rgba(255,157,46,.4);z-index:60;cursor:pointer;line-height:50px;text-align:center}
+#chatpanel{display:none;position:fixed;bottom:max(76px,calc(60px + env(safe-area-inset-bottom)));left:8px;right:8px;max-width:400px;background:#fff8e8;border:2px solid rgba(215,183,106,.5);border-radius:12px;padding:10px;z-index:60;flex-direction:column;gap:6px;box-shadow:0 -4px 24px rgba(150,105,40,.25);max-height:45vh;overflow-y:auto}
+#chatpanel.on{display:flex}
+#chatlog{max-height:90px;overflow-y:auto;font:12px/1.5;color:#6a5a40;margin:4px 0}
+#chatlog div{padding:2px 0;word-break:break-all}
+.emojis{display:flex;gap:1px;flex-wrap:wrap}
+.emojis button{font-size:18px;background:0;border:0;cursor:pointer;padding:2px 3px;border-radius:4px;line-height:1}
+.emojis button:active{background:rgba(0,0,0,.08)}
+#ctrl{display:flex;gap:6px;justify-content:center;width:100%;max-width:500px}
 
-  /* ===== 顶部标题 ===== */
-  .game-title {
-    text-align:center;
-    font-size:34px; font-weight:900; letter-spacing:2px;
-    color:#ff9d2e;
-    text-shadow: 2px 2px 0 #fff, 3px 3px 0 rgba(180,110,30,.35);
-    margin-bottom:10px;
-  }
+/* Toast */
+#tc{position:fixed;top:max(8px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:100;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;max-width:90vw}
+.tst{background:rgba(90,70,50,.94);color:#fff8e8;padding:8px 16px;border-radius:8px;font-size:12px;animation:tstI .3s ease;pointer-events:auto;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.tst-w{background:rgba(200,150,40,.95)}.tst-e{background:rgba(200,60,60,.95)}.tst-s{background:rgba(60,160,90,.95)}
+.tst-o{animation:tstO .4s ease forwards}
+@keyframes tstI{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes tstO{from{opacity:1}to{opacity:0;transform:translateY(-10px)}}
 
-  /* ===== 主舞台（棋盘居中 + 四角机场） ===== */
-  .stage {
-    position:relative;
-    max-width:920px; margin:0 auto;
-    padding:116px 20px 116px;
-  }
-  .board-wrap { display:flex; justify-content:center; }
+/* Net indicator */
+#ni{position:fixed;top:max(32px,calc(env(safe-area-inset-top)+22px));right:10px;width:8px;height:8px;border-radius:50%;z-index:25;display:none;transition:all .3s}
+.nok{display:block;background:#307050}.nwn{display:block;background:#8b7030;animation:npls 1s infinite}.ner{display:block;background:#a03030}
+@keyframes npls{0%,100%{opacity:1}50%{opacity:.3}}
 
-  /* 棋盘 */
-  .board {
-    position:relative;
-    width:min(92vw, 620px); aspect-ratio:1/1;
-    background:
-      radial-gradient(circle at 30% 20%, rgba(255,255,255,.55), transparent 60%),
-      var(--board-bg);
-    border:6px solid var(--border);
-    border-radius:24px;
-    box-shadow:
-      0 18px 40px rgba(150,105,40,.35),
-      inset 0 4px 12px rgba(190,150,80,.35),
-      inset 0 -6px 14px rgba(150,105,40,.15);
-    display:grid;
-    grid-template-columns: repeat(13, 1fr);
-    grid-template-rows: repeat(13, 1fr);
-    gap:2px;
-    padding:2px;
-  }
-
-  /* 52 格公共路线 */
-  .flight-cell {
-    position:relative;
-    border-radius:5px;
-    background:#fff;
-    box-shadow: inset 0 1px 3px rgba(150,105,40,.25), 0 1px 0 #fff;
-    display:flex; align-items:center; justify-content:center;
-    font-size:9px; font-weight:700; color:#a88850;
-  }
-  .flight-cell.start-red   { background:#ffe0dd; }
-  .flight-cell.start-yellow{ background:#fff3cf; }
-  .flight-cell.start-blue  { background:#dcecff; }
-  .flight-cell.start-green { background:#e0f5db; }
-  .flight-cell .num { pointer-events:none; }
-
-  /* 归家路线（每色 5 格） */
-  .home-cell {
-    border-radius:5px;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,.15);
-  }
-  .home-red   { background:#F45145; }
-  .home-yellow{ background:#FFC83D; }
-  .home-blue  { background:#42A5F5; }
-  .home-green { background:#66C85A; }
-
-  /* 中央终点 */
-  .finish {
-    grid-column:7; grid-row:7;
-    position:relative;
-    border-radius:50%;
-    overflow:hidden;
-    box-shadow: 0 4px 10px rgba(0,0,0,.25), inset 0 0 0 3px #fff;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .finish .q { position:absolute; inset:0; }
-  .finish .q.red   { clip-path: polygon(50% 50%, 100% 0, 100% 100%); background:#F45145; }
-  .finish .q.yellow{ clip-path: polygon(50% 50%, 0 0, 100% 0); background:#FFC83D; }
-  .finish .q.blue  { clip-path: polygon(50% 50%, 0 100%, 100% 100%); background:#42A5F5; }
-  .finish .q.green { clip-path: polygon(50% 50%, 0 0, 0 100%); background:#66C85A; }
-  .finish .finish-core {
-    position:relative; z-index:2;
-    width:46%; aspect-ratio:1/1;
-    border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, #7cc4ff, #2196F3 70%);
-    box-shadow: 0 2px 6px rgba(0,0,0,.3), inset 0 0 0 2px #fff;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .finish .finish-core svg { width:70%; height:70%; }
-
-  /* 快捷飞行路线（纯视觉虚线箭头） */
-  .flight-path { position:absolute; pointer-events:none; z-index:3; }
-
-  /* ===== 机场 ===== */
-  .airport {
-    position:absolute;
-    width:120px; text-align:center;
-    background:#fff;
-    border:4px solid var(--border);
-    border-radius:18px;
-    padding:6px 4px 8px;
-    box-shadow: 0 8px 18px rgba(150,105,40,.3), inset 0 2px 6px rgba(255,255,255,.7);
-  }
-  .airport .airport-title { font-size:15px; font-weight:900; color:#fff; padding:3px 0; border-radius:8px; }
-  .airport .planes { display:grid; grid-template-columns:1fr 1fr; gap:4px; padding:4px 8px 0; }
-  .airport .planes svg { width:100%; height:auto; filter: drop-shadow(0 1px 2px rgba(0,0,0,.25)); }
-  .airport-red   { top:0; left:0; }
-  .airport-red   .airport-title { background:#F45145; }
-  .airport-yellow{ top:0; right:0; }
-  .airport-yellow.airport-title, .airport-yellow .airport-title { background:#F5A623; }
-  .airport-blue  { bottom:0; right:0; }
-  .airport-blue  .airport-title { background:#42A5F5; }
-  .airport-green { bottom:0; left:0; }
-  .airport-green .airport-title { background:#66C85A; }
-
-  /* ===== 底部玩家状态 ===== */
-  .players { max-width:760px; margin:18px auto 0; display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
-  .player-card {
-    flex:1 1 150px; max-width:180px;
-    border-radius:16px; padding:8px 10px; text-align:center;
-    color:#fff; font-weight:800;
-    box-shadow: 0 6px 14px rgba(150,105,40,.25), inset 0 2px 4px rgba(255,255,255,.35);
-  }
-  .player-card .p-name { font-size:15px; letter-spacing:1px; }
-  .player-card .p-status { font-size:11px; font-weight:600; opacity:.95; margin:2px 0; }
-  .player-card .p-planes { font-size:14px; letter-spacing:3px; }
-  .player-card.red   { background:linear-gradient(160deg,#F45145,#d43f34); }
-  .player-card.yellow{ background:linear-gradient(160deg,#FFC83D,#f5a623); color:#5a3a00; }
-  .player-card.blue  { background:linear-gradient(160deg,#42A5F5,#2f8ee0); }
-  .player-card.green { background:linear-gradient(160deg,#66C85A,#4cae41); }
-
-  /* ===== 骰子区 ===== */
-  .dice-area { text-align:center; margin:20px auto 6px; }
-  .dice {
-    width:92px; height:92px; margin:0 auto;
-    background:radial-gradient(circle at 35% 28%, #fff, #eef3f7 70%);
-    border:5px solid #42A5F5; border-radius:18px;
-    box-shadow: 0 8px 20px rgba(30,80,140,.3), inset 0 3px 6px rgba(0,0,0,.08);
-    display:flex; align-items:center; justify-content:center;
-    font-size:48px; font-weight:900; color:#2b6cb0;
-  }
-  .dice-btn {
-    margin-top:14px;
-    font-size:20px; font-weight:900; letter-spacing:2px; color:#fff;
-    padding:14px 44px;
-    border:none; border-radius:40px;
-    background:linear-gradient(180deg,#ffb347,#ff7a1a);
-    box-shadow: 0 8px 16px rgba(255,122,26,.4), inset 0 2px 4px rgba(255,255,255,.4);
-    cursor:pointer; transition:transform .12s ease, box-shadow .12s ease;
-  }
-  .dice-btn:hover { transform:translateY(-2px); box-shadow:0 10px 20px rgba(255,122,26,.5), inset 0 2px 4px rgba(255,255,255,.4); }
-  .dice-btn:active { transform:translateY(1px) scale(.97); box-shadow:0 4px 8px rgba(255,122,26,.4); }
-
-  /* ===== 底部辅助 ===== */
-  .current-player { text-align:center; margin:10px 0 4px; font-size:16px; font-weight:800; color:#7a5a20; }
-  .controls { max-width:760px; margin:6px auto 0; display:flex; justify-content:space-between; gap:10px; }
-  .ctrl-btn {
-    font-size:14px; font-weight:800; color:#6b4a1f;
-    background:#fff; border:2px solid var(--border); border-radius:30px;
-    padding:9px 18px; cursor:pointer;
-    box-shadow:0 4px 8px rgba(150,105,40,.2);
-    transition:transform .1s ease;
-  }
-  .ctrl-btn:hover { transform:translateY(-1px); }
-  .ctrl-btn:active { transform:scale(.97); }
-
-  /* ===== 响应式 ===== */
-  @media (max-width: 760px) {
-    .stage { padding:0; }
-    .board { width:min(94vw, 520px); }
-    /* 手机：机场上下两行 + 棋盘 */
-    .stage { display:flex; flex-direction:column; align-items:center; gap:10px; }
-    .stage .board-wrap { order:2; }
-    .airport { position:static; width:44%; }
-    .airport-row { display:flex; width:100%; justify-content:space-between; }
-    .airport-row.top { order:1; }
-    .airport-row.bottom { order:3; }
-    .airport-yellow{ margin-left:auto; }
-    .game-title { font-size:26px; }
-  }
-  @media (max-width: 420px) {
-    .board { width:96vw; }
-    .flight-cell { font-size:7px; }
-    .player-card { flex:1 1 45%; max-width:none; }
-  }
+@media(min-width:801px){
+  #play{flex-direction:row;align-items:flex-start;justify-content:center}
+  .sb{flex-direction:column;width:220px}.bx{min-width:auto}
+  #ctrl{flex-direction:column;width:auto}
+}
 </style>
 </head>
 <body>
-
-  <!-- 顶部标题 -->
-  <h1 class="game-title">✈ 欢乐飞行棋 ✈</h1>
-
-  <!-- 主舞台 -->
-  <div class="stage">
-    <!-- 手机端机场行（top） -->
-    <div class="airport-row top">
-      <div class="airport airport-red">
-        <div class="airport-title">红队</div>
-        <div class="planes" data-team="red"></div>
-      </div>
-      <div class="airport airport-yellow">
-        <div class="airport-title">黄队</div>
-        <div class="planes" data-team="yellow"></div>
-      </div>
-    </div>
-
-    <!-- 棋盘 -->
-    <div class="board-wrap">
-      <div class="board" id="board"></div>
-    </div>
-
-    <!-- 手机端机场行（bottom） -->
-    <div class="airport-row bottom">
-      <div class="airport airport-green">
-        <div class="airport-title">绿队</div>
-        <div class="planes" data-team="green"></div>
-      </div>
-      <div class="airport airport-blue">
-        <div class="airport-title">蓝队</div>
-        <div class="planes" data-team="blue"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 底部玩家状态 -->
-  <div class="players" id="players"></div>
-
-  <!-- 骰子区 -->
-  <div class="dice-area">
-    <div class="dice" id="dice">⚄</div>
-    <div><button class="dice-btn" id="diceBtn">掷骰子</button></div>
-  </div>
-
-  <!-- 当前玩家 -->
-  <div class="current-player" id="currentPlayer">当前玩家：红队</div>
-
-  <!-- 底部辅助 -->
-  <div class="controls">
-    <button class="ctrl-btn" id="btnSound">🔊 音效：开</button>
-    <button class="ctrl-btn" id="btnRule">❔ 游戏规则</button>
-  </div>
+<div id="tc"></div>
+<div id="ni"></div>
+<div id="roomtag" onclick="navigator.clipboard&&navigator.clipboard.writeText(this.textContent)"></div>
+<div id="menu" class="pg on"><h1 style="font-size:40px;color:#ff9d2e;font-family:serif;text-shadow:2px 2px 0 #fff">✈ 欢乐飞行棋</h1><p style="color:#a9761f;margin-bottom:14px;letter-spacing:3px">经典 · 欢乐对战</p>
+<button class="btn bp" onclick="home()" style="margin-top:10px">← 返回主页</button>
+<div id="net" style="display:none"><input class="inp" id="ci" placeholder="房间号" maxlength="4"><div class="nerr" id="nerr"></div></div></div>
+<div id="wait" class="pg"><div style="background:rgba(255,255,255,.75);border:1px solid rgba(215,183,106,.6);border-radius:14px;padding:24px;text-align:center;width:300px;max-width:90vw;box-shadow:0 6px 18px rgba(150,105,40,.15)"><div style="font-size:10px;color:#6a5a40">房间号（点击复制）</div><div class="rc" id="rcc" onclick="navigator.clipboard&&navigator.clipboard.writeText(this.textContent)">----</div><div class="slots" id="sls"></div><div id="ws" style="color:#6a5a40;font-size:13px;margin-bottom:10px">等待加入...</div><button class="btn bp" id="bGo" onclick="GO()" disabled>开始</button><button class="btn bs" onclick="LR()" style="margin-top:6px">离开</button></div></div>
+<div id="play" class="pg"><canvas id="cv"></canvas><div class="sb"><div class="bx"><div style="font-size:9px;color:#6a5a40;letter-spacing:2px">回合</div><div id="tn" style="font-weight:900;font-size:16px;margin:3px 0">-</div><div id="th" style="font-size:11px;color:#6a5a40">-</div></div><div class="bx" style="text-align:center"><div id="dval">🎲</div><button class="btn bp" id="rb" onpointerdown="doRoll()">掷骰子</button></div><div class="bx" id="pls"></div><div class="bx"><div style="font-size:9px;color:#6a5a40;letter-spacing:2px">记录</div><div id="log"></div></div></div><div id="ctrl"><button class="btn bs" onclick="QG()">退出</button></div></div>
+<div id="win"><div class="wc"><div id="wt" style="font-size:24px;font-weight:900;margin-bottom:12px">-</div><p style="color:#6a5a40;margin-bottom:16px">恭喜获胜！</p><button class="btn bp" onclick="RG()" style="margin-bottom:8px">再来一局</button><button class="btn bs" onclick="QG()">返回</button></div></div>
+<button id="chatbtn" onclick="toggleChat()">💬</button>
+<div id="chatpanel"><div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:4px;border-bottom:1px solid rgba(0,0,0,.06)"><span style="font-size:11px;color:#7a5508;font-weight:700;letter-spacing:1px">聊天</span><button onclick="toggleChat()" style="background:0;border:0;font-size:16px;cursor:pointer;color:#6a5a40;padding:0 4px">✕</button></div><div id="chatlog"></div><div class="emojis"><button onclick="SC('👍')">👍</button><button onclick="SC('🎉')">🎉</button><button onclick="SC('😂')">😂</button><button onclick="SC('😱')">😱</button><button onclick="SC('🤔')">🤔</button><button onclick="SC('💪')">💪</button><button onclick="SC('✈')">✈</button><button onclick="SC('🎲')">🎲</button><button onclick="SC('服了')">服了</button><button onclick="SC('牛')">牛</button></div><div style="display:flex;gap:4px"><input id="ci2" maxlength="50" placeholder="说点什么..." style="flex:1;padding:6px;border:1px solid rgba(0,0,0,.1);border-radius:4px;font-size:12px;outline:none" onkeydown="if(event.key==='Enter')SC()"><button class="btn bp" style="padding:6px 10px;min-height:auto;font-size:12px" onclick="SC()">发</button></div></div>
 
 <script>
-(function () {
-  'use strict'
+/* ============================================================
+   CONSTANTS
+   ============================================================ */
+var CS=36,PA=30,N=56;
+var T=[[0,4],[0,5],[0,6],[0,7],[0,8],[0,9],[0,10],[1,10],[2,10],[3,10],[4,10],[4,11],[4,12],[4,13],[4,14],[5,14],[6,14],[7,14],[8,14],[9,14],[10,14],[10,13],[10,12],[10,11],[10,10],[11,10],[12,10],[13,10],[14,10],[14,9],[14,8],[14,7],[14,6],[14,5],[14,4],[13,4],[12,4],[11,4],[10,4],[10,3],[10,2],[10,1],[10,0],[9,0],[8,0],[7,0],[6,0],[5,0],[4,0],[4,1],[4,2],[4,3],[4,4],[3,4],[2,4],[1,4]];
+var PC={green:{st:0,he:45,nm:'绿',c:'#66C85A'},blue:{st:14,he:3,nm:'蓝',c:'#42A5F5'},red:{st:28,he:17,nm:'红',c:'#F45145'},yellow:{st:42,he:31,nm:'黄',c:'#FFC83D'}};
+var HS={green:[[7,1],[7,2],[7,3],[7,4],[7,5],[7,6]],blue:[[1,7],[2,7],[3,7],[4,7],[5,7],[6,7]],red:[[7,13],[7,12],[7,11],[7,10],[7,9],[7,8]],yellow:[[13,7],[12,7],[11,7],[10,7],[9,7],[8,7]]};
+var HB={green:[[1,1],[2,1],[1,2],[2,2]],blue:[[1,12],[2,12],[1,13],[2,13]],red:[[12,12],[13,12],[12,13],[13,13]],yellow:[[12,1],[13,1],[12,2],[13,2]]};
+var SF=new Set([0,14,28,42]),TR=new Set([11,25,39,53]),EX=new Set([7,21,35,49]);
+var CM={red:0,yellow:1,blue:2,green:3},C4=['red','green','blue','yellow'],C2=['red','blue'];
+var SCMAP={10:{co:'green',d:24},24:{co:'blue',d:38},38:{co:'red',d:52},52:{co:'yellow',d:10}};
 
-  /* ============================================================
-     经典儿童飞行棋 UI 框架
-     - 只做界面与数据结构，未实现游戏逻辑（掷骰/移动/吃子/胜负）
-     - 数据接口已预留，便于后续接入逻辑
-     ============================================================ */
+/* ============================================================
+   STATE
+   ============================================================ */
+var G=null,M='local',peer=null,con={},RC='',isH=false,myC=null,pend=[],lastSer='',lastUI='',lastTap=0,destroying=false;
+var mrRetry=0,jrRetry=0,jrReconn=false;
+var bubbles=[];
+var capFx=[],animPiece=null;
 
-  // ---------- 游戏数据结构（预留） ----------
-  var GAME = {
-    cellCount: 52,
-    START_INDEX: { red: 0, yellow: 13, blue: 26, green: 39 }, // 四队公共路线起点
-    players: [
-      { id: 'red',    name: '红队', color: '#F45145', homeCells: [], state: 'ready' },
-      { id: 'yellow', name: '黄队', color: '#FFC83D', homeCells: [], state: 'ready' },
-      { id: 'blue',   name: '蓝队', color: '#42A5F5', homeCells: [], state: 'ready' },
-      { id: 'green',  name: '绿队', color: '#66C85A', homeCells: [], state: 'ready' }
-    ],
-    current: 'red'
-  }
+/* ============================================================
+   CANVAS
+   ============================================================ */
+var cv=document.getElementById('cv'),X=cv.getContext('2d'),D=devicePixelRatio||1;
+cv.width=600*D;cv.height=600*D;X.setTransform(D,0,0,D,0,0);
+function rCV(){var w=Math.min(window.innerWidth-22,500);cv.style.width=w+'px';cv.style.height=w+'px'}
+rCV();window.addEventListener('resize',rCV);
 
-  // ---------- 52 格环形路线坐标（13x13 网格，坐标 0-12） ----------
-  // 顶边 0-12(左→右) → 右边 13-25(上→下) → 底边 26-38(右→左) → 左边 39-51(下→上)
-  function cellPos(i) {
-    var p = {}
-    if (i <= 12)      { p.col = i; p.row = 0; }          // 顶边
-    else if (i <= 25) { p.col = 12; p.row = i - 12; }    // 右边
-    else if (i <= 38) { p.col = 38 - i; p.row = 12; }    // 底边
-    else              { p.col = 0; p.row = 51 - i; }     // 左边
-    return p
-  }
+function c2p(c,r){return{x:PA+c*CS+CS/2,y:PA+r*CS+CS/2}}
+function tpx(i){return c2p(T[i][0],T[i][1])}
+function ppx(co,i){var p=G.pl[co][i];if(p.s==='h')return c2p(HB[co][i][0],HB[co][i][1]);if(p.s==='t')return tpx(p.p);if(p.s==='s')return c2p(HS[co][p.p][0],HS[co][p.p][1]);return{x:300,y:300}}
+var HBC={green:c2p(1.5,1.5),blue:c2p(1.5,12.5),red:c2p(12.5,12.5),yellow:c2p(12.5,1.5)};
 
-  // 归家路线：每队 5 格，从角斜向中心 (6,6)
-  function homeCells(team) {
-    // 红(左上) 黄(右上) 蓝(右下) 绿(左下)
-    var map = {
-      red:    [[1,1],[2,2],[3,3],[4,4],[5,5]],
-      yellow: [[11,1],[10,2],[9,3],[8,4],[7,5]],
-      blue:   [[11,11],[10,10],[9,9],[8,8],[7,7]],
-      green:  [[1,11],[2,10],[3,9],[4,8],[5,7]]
+/* ============================================================
+   BOARD CACHE — 深化色彩
+   ============================================================ */
+function cacheBoard(){
+  var cv2=document.createElement('canvas');cv2.width=600*D;cv2.height=600*D;
+  var c=cv2.getContext('2d');c.setTransform(D,0,0,D,0,0);
+  var S=600,cx=PA+7.5*CS,cy=PA+7.5*CS,CR=CS*3.6;
+  /* 1. 米色纸板底 */
+  var bg=c.createLinearGradient(0,0,S,S);
+  bg.addColorStop(0,'#FDF6D8');bg.addColorStop(1,'#F3D894');
+  c.fillStyle=bg;c.fillRect(0,0,S,S);
+  /* 2. 金色圆角外框 */
+  c.strokeStyle='#D7B76A';c.lineWidth=6;c.strokeRect(9,9,S-18,S-18);
+  /* 3. 网格线 淡金 */
+  c.strokeStyle='rgba(180,140,70,.15)';c.lineWidth=.5;
+  for(var i=0;i<=15;i++){c.beginPath();c.moveTo(PA+i*CS,PA);c.lineTo(PA+i*CS,PA+15*CS);c.stroke();c.beginPath();c.moveTo(PA,PA+i*CS);c.lineTo(PA+15*CS,PA+i*CS);c.stroke()}
+  /* 4. 跑道格子：白底 + 细金描边 */
+  for(var i=0;i<N;i++){var p=T[i];
+    c.fillStyle='#FFFFFF';c.fillRect(PA+p[0]*CS+1,PA+p[1]*CS+1,CS-2,CS-2);
+    c.strokeStyle='rgba(190,150,80,.30)';c.lineWidth=1;c.strokeRect(PA+p[0]*CS+1,PA+p[1]*CS+1,CS-2,CS-2)}
+  /* 5. 起点四色高亮格 */
+  for(var pk in PC){var sp=T[PC[pk].st];
+    c.fillStyle=PC[pk].c;c.globalAlpha=.88;c.fillRect(PA+sp[0]*CS+2,PA+sp[1]*CS+2,CS-4,CS-4);c.globalAlpha=1}
+  /* 6. 四角基地：2x2 纯色块 + 白色飞机槽 */
+  for(var co in HB){var b=HB[co],x0=PA+Math.min(b[0][0],b[2][0])*CS,y0=PA+Math.min(b[0][1],b[1][1])*CS;
+    c.fillStyle=PC[co].c;c.globalAlpha=.95;c.fillRect(x0-3,y0-3,2*CS+6,2*CS+6);c.globalAlpha=1;
+    c.strokeStyle='#fff';c.lineWidth=3;c.strokeRect(x0-1,y0-1,2*CS+2,2*CS+2);
+    for(var i=0;i<4;i++){var pp=c2p(b[i][0],b[i][1]);
+      c.beginPath();c.arc(pp.x,pp.y,CS/2-4,0,Math.PI*2);c.fillStyle='#fff';c.globalAlpha=.92;c.fill();c.globalAlpha=1;
+      c.beginPath();c.arc(pp.x,pp.y,CS/2-4,0,Math.PI*2);c.strokeStyle=PC[co].c;c.lineWidth=1.5;c.stroke()}}
+  /* 7. 归家通道：纯色由浅到深 */
+  for(var co in HS)for(var j=0;j<6;j++){var p=HS[co][j];
+    c.fillStyle=PC[co].c;c.globalAlpha=.22+j*.13;c.fillRect(PA+p[0]*CS+2,PA+p[1]*CS+2,CS-4,CS-4);c.globalAlpha=1}
+  /* 8. 中心四色终点（圆形裁切四象限）*/
+  c.save();c.beginPath();c.arc(cx,cy,CR,0,Math.PI*2);c.clip();
+  var qc=[['#42A5F5',0,Math.PI/2],['#66C85A',Math.PI/2,Math.PI],['#FFC83D',Math.PI,Math.PI*1.5],['#F45145',Math.PI*1.5,Math.PI*2]];
+  for(var q=0;q<qc.length;q++){c.fillStyle=qc[q][0];c.beginPath();c.moveTo(cx,cy);c.arc(cx,cy,1400,qc[q][1],qc[q][2]);c.closePath();c.fill()}
+  c.restore();
+  /* 白色圆环 + 中心蓝色飞机核心 */
+  c.beginPath();c.arc(cx,cy,CR-2,0,Math.PI*2);c.strokeStyle='#fff';c.lineWidth=5;c.stroke();
+  var core=CS*1.15;
+  var g2=c.createRadialGradient(cx-core*.3,cy-core*.3,2,cx,cy,core);
+  g2.addColorStop(0,'#7cc4ff');g2.addColorStop(1,'#2196F3');
+  c.beginPath();c.arc(cx,cy,core,0,Math.PI*2);c.fillStyle=g2;c.fill();
+  c.beginPath();c.arc(cx,cy,core,0,Math.PI*2);c.strokeStyle='#fff';c.lineWidth=3;c.stroke();
+  c.fillStyle='#fff';c.font='bold 15px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText('✈',cx,cy);
+  /* 9. 快捷飞行虚线（4 条彩色对角虚线）*/
+  var fp=[{f:c2p(1.5,1.5),t:{x:cx+CR*.55,y:cy+CR*.55},col:'#66C85A'},{f:c2p(12.5,1.5),t:{x:cx-CR*.55,y:cy+CR*.55},col:'#FFC83D'},{f:c2p(12.5,12.5),t:{x:cx-CR*.55,y:cy-CR*.55},col:'#F45145'},{f:c2p(1.5,12.5),t:{x:cx+CR*.55,y:cy-CR*.55},col:'#42A5F5'}];
+  c.setLineDash([8,6]);c.lineWidth=3;c.lineCap='round';
+  for(var f=0;f<fp.length;f++){c.strokeStyle=fp[f].col;c.globalAlpha=.65;c.beginPath();c.moveTo(fp[f].f.x,fp[f].f.y);c.lineTo(fp[f].t.x,fp[f].t.y);c.stroke();c.globalAlpha=1}
+  c.setLineDash([]);c.lineCap='butt';
+  /* 10. 特殊标记 ★ / ⚠ / ♦ */
+  SF.forEach(function(i){var p=tpx(i);c.fillStyle='#e6a23c';c.globalAlpha=.95;c.font='bold 12px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText('★',p.x,p.y);c.globalAlpha=1});
+  TR.forEach(function(i){var p=tpx(i);c.fillStyle='#F45145';c.globalAlpha=.9;c.font='bold 11px sans-serif';c.textAlign='center';c.fillText('⚠',p.x,p.y);c.globalAlpha=1});
+  EX.forEach(function(i){var p=tpx(i);c.fillStyle='#66C85A';c.globalAlpha=.95;c.font='bold 11px sans-serif';c.textAlign='center';c.fillText('♦',p.x,p.y);c.globalAlpha=1});
+  /* 11. 捷径 ◎ 四色 */
+  [{p:10,c:'green'},{p:24,c:'blue'},{p:38,c:'red'},{p:52,c:'yellow'}].forEach(function(s){var pos=tpx(s.p);c.fillStyle=PC[s.c].c;c.globalAlpha=.95;c.font='bold 14px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText('◎',pos.x,pos.y);c.globalAlpha=1});
+  /* 12. 起点 ✈ 白色小飞机 */
+  for(var pk in PC){var pos=tpx(PC[pk].st);c.fillStyle='#fff';c.globalAlpha=.95;c.font='bold 13px sans-serif';c.textAlign='center';c.fillText('✈',pos.x,pos.y);c.globalAlpha=1}
+  return cv2;
+}
+var boardCache=cacheBoard();
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+var dirty=true,rAF=null;
+function markDirty(){dirty=true;if(!rAF)rAF=requestAnimationFrame(render)}
+
+function render(ts){
+  rAF=null;if(!dirty)return;dirty=false;var anim=false;
+  X.save();X.setTransform(1,0,0,1,0,0);X.drawImage(boardCache,0,0);X.restore();
+
+  /* 捷径飞行拖尾 */
+  if(G&&G.trail){var el=Date.now()-G.trail.n;if(el<800){anim=true;X.save();X.strokeStyle=G.trail.c;X.lineWidth=4;X.lineCap='round';X.globalAlpha=.7*(1-el/800);X.beginPath();X.moveTo(G.trail.f.x,G.trail.f.y);X.lineTo(G.trail.t.x,G.trail.t.y);X.stroke();X.globalAlpha=.3*(1-el/800);X.lineWidth=8;X.stroke();X.restore()}else G.trail=null}
+
+  /* 棋子绘制 */
+  if(G){var all=[];
+    for(var ci=0;ci<G.cols.length;ci++){var c=G.cols[ci];for(var i=0;i<4;i++){var p=G.pl[c][i];if(p.s==='f')continue;var pos=ppx(c,i),sel=G.ph==='pick'&&c===curC()&&G.vm.indexOf(i)>=0;all.push({c:c,x:pos.x,y:pos.y,sel:sel,i:i})}}
+    var gr={};for(var k=0;k<all.length;k++){var ky=Math.round(all[k].x)+','+Math.round(all[k].y);if(!gr[ky])gr[ky]=[];gr[ky].push(all[k])}
+    for(var ky in gr){var g=gr[ky];for(var k=0;k<g.length;k++){var a=g[k],ox=0,oy=0;if(g.length>1){var ag=(k/g.length)*Math.PI*2-Math.PI/2;ox=Math.cos(ag)*6;oy=Math.sin(ag)*6}var px=a.x+ox,py=a.y+oy;
+      X.save();
+      /* 步进动画中棋子发光 */
+      if(animPiece&&animPiece.co===a.c&&animPiece.idx===a.i){anim=true;X.beginPath();X.arc(px,py,14,0,Math.PI*2);X.strokeStyle='rgba(122,85,8,'+(.4+.3*Math.sin(ts/150))+')';X.lineWidth=2.5;X.stroke()}
+      if(a.sel){anim=true;X.beginPath();X.arc(px,py,14,0,Math.PI*2);X.strokeStyle='rgba(122,85,8,'+(.5+.4*Math.sin(ts/200))+')';X.lineWidth=2;X.stroke()}
+      X.beginPath();X.arc(px,py,CS/2-5,0,Math.PI*2);X.fillStyle=PC[a.c].c;X.fill();X.strokeStyle='rgba(90,70,50,.35)';X.lineWidth=1.5;X.stroke();X.restore()}}
+    /* 到达计数 */
+    for(var ci=0;ci<G.cols.length;ci++){var c=G.cols[ci],cnt=0;for(var i=0;i<4;i++)if(G.pl[c][i].s==='f')cnt++;if(cnt){var of2={green:[-16,-16],blue:[-16,16],red:[16,16],yellow:[16,-16]}[c];X.fillStyle=PC[c].c;X.font='bold 10px sans-serif';X.textAlign='center';X.fillText(cnt+'✈',300+of2[0],300+of2[1])}}}
+
+  /* 吃子特效绘制 */
+  if(capFx.length){var now=Date.now(),alive=[];
+    for(var ci=0;ci<capFx.length;ci++){var e=capFx[ci],age=now-e.t;
+      if(age<800){alive.push(e);anim=true;var prog=age/800,alpha=1-prog;
+        /* 扩散光环 */
+        X.save();X.beginPath();X.arc(e.x,e.y,10+prog*38,0,Math.PI*2);X.strokeStyle=e.c;X.lineWidth=3*(1-prog);X.globalAlpha=alpha*.8;X.stroke();X.restore();
+        /* 粒子爆散 */
+        for(var pi=0;pi<e.pts.length;pi++){var pt=e.pts[pi],dist=pt.sp*prog;X.save();X.beginPath();X.arc(e.x+Math.cos(pt.a)*dist,e.y+Math.sin(pt.a)*dist,pt.sz*(1-prog*.5),0,Math.PI*2);X.fillStyle=e.c;X.globalAlpha=alpha*.9;X.fill();X.restore()}
+        /* 中心闪光 */
+        if(age<200){X.save();X.beginPath();X.arc(e.x,e.y,18,0,Math.PI*2);X.fillStyle='#fff';X.globalAlpha=(1-age/200)*.55;X.fill();X.restore()}}
     }
-    return map[team] || []
+    capFx=alive}
+
+  /* 聊天气泡 */
+  if(bubbles.length){var now=Date.now(),alive=[];
+    for(var bi=0;bi<bubbles.length;bi++){var b=bubbles[bi],age=now-b.t;
+      if(age<3000){alive.push(b);anim=true;var alpha=age<300?age/300:age>2400?1-(age-2400)/600:1;var rise=age<300?12*(1-age/300):0;
+        X.save();X.globalAlpha=alpha*.95;X.font='bold 14px sans-serif';var tw=X.measureText(b.msg).width,pw=Math.max(tw+28,44),ph=32,px=b.x-pw/2,py=b.y-50-rise;
+        X.fillStyle='rgba(255,255,255,.95)';X.strokeStyle=PC[b.co].c;X.lineWidth=2;X.beginPath();X.roundRect(px,py,pw,ph,10);X.fill();X.stroke();
+        X.fillStyle=PC[b.co].c;X.textAlign='center';X.textBaseline='middle';X.fillText(b.msg,b.x,py+ph/2);X.restore()}}
+    bubbles=alive}
+
+  if(anim){dirty=true;rAF=requestAnimationFrame(render)}
+}
+
+/* ============================================================
+   TOAST 通知系统
+   ============================================================ */
+function showToast(msg,type){
+  var tc=document.getElementById('tc');if(!tc)return;
+  var el=document.createElement('div');el.className='tst'+(type==='warn'?' tst-w':type==='error'?' tst-e':type==='success'?' tst-s':'');
+  el.textContent=msg;tc.appendChild(el);
+  setTimeout(function(){el.classList.add('tst-o');setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el)},400)},3000);
+}
+function setNetInd(s){var el=document.getElementById('ni');if(!el)return;el.className=s==='ok'?'nok':s==='warn'?'nwn':s==='error'?'ner':'';}
+
+/* ============================================================
+   CAPTURE EFFECT 吃子特效
+   ============================================================ */
+function addCapFx(x,y,color){
+  var pts=[];for(var i=0;i<14;i++){var a=(i/14)*Math.PI*2+Math.random()*.3;pts.push({a:a,sp:28+Math.random()*42,sz:2+Math.random()*3})}
+  capFx.push({x:x,y:y,c:color,t:Date.now(),pts:pts});
+}
+
+/* ============================================================
+   DICE
+   ============================================================ */
+function rD(v){document.getElementById('dval').textContent=v||'🎲'}
+function aD(fin,cb){var ct=0,iv=setInterval(function(){rD(Math.floor(Math.random()*6)+1);ct++;if(ct>10){clearInterval(iv);rD(fin);setTimeout(cb,150)}},60)}
+
+/* ============================================================
+   GAME INIT
+   ============================================================ */
+function IG(cols){var pl={};for(var i=0;i<cols.length;i++){var c=cols[i];pl[c]=[];for(var j=0;j<4;j++)pl[c].push({s:'h',p:0})}G={cols:cols,pl:pl,cur:0,dice:0,ph:'roll',vm:[],c6:0,winner:null,lm:-1,n6:{}};lastUI='';lastSer=''}
+function curC(){return G.cols[G.cur]}
+function gM(co,d){var ab=G.pl[co].every(function(p){return p.s==='h'}),mv=[];for(var i=0;i<4;i++){var p=G.pl[co][i];if(p.s==='f')continue;if(p.s==='h'){if(d===6||(ab&&(G.n6[co]||0)>=6))mv.push(i)}else mv.push(i)}return mv}
+
+/* ============================================================
+   ANIMATION PATH 步进动画
+   ============================================================ */
+function animatePath(co,idx,path,cb){
+  if(!path.length){cb();return}
+  var si=0,animPiece_bak=animPiece;animPiece={co:co,idx:idx};
+  function ns(){if(si<path.length){var s=path[si];G.pl[co][idx].s=s.s;G.pl[co][idx].p=s.p;si++;markDirty();setTimeout(ns,180)}else{animPiece=animPiece_bak;cb()}}
+  ns();
+}
+
+/* ============================================================
+   DO MOVE ANIMATED — 步进动画版移动
+   ============================================================ */
+function doMoveAnimated(co,idx,cb){
+  G.lm=idx;var p=G.pl[co][idx],d=G.dice,st=PC[co].st;
+  var path=[],endAct=null;
+
+  if(p.s==='h'){
+    G.n6[co]=0;path.push({s:'t',p:st});
+    endAct=function(){p.s='t';p.p=st;dc(co,p.p);AL(PC[co].nm+'方 起飞！');markDirty();cb()};
+
+  }else if(p.s==='t'){
+    var dist=(p.p-st+N)%N,nd=dist+d,hd=(PC[co].he-st+N)%N;
+
+    if(nd>hd){
+      var ts2=hd-dist,ep=nd-hd-1;
+      for(var i=1;i<=ts2;i++)path.push({s:'t',p:(p.p+i)%N});
+      if(ep<5){for(var i=0;i<ep;i++)path.push({s:'s',p:i});path.push({s:'s',p:ep});
+        endAct=function(){p.s='s';p.p=ep;AL(PC[co].nm+'方 进入终点道第'+(ep+1)+'格');markDirty();cb()}}
+      else if(ep===5){for(var i=0;i<5;i++)path.push({s:'s',p:i});path.push({s:'f',p:0});
+        endAct=function(){p.s='f';AL(PC[co].nm+'方 到达终点！');markDirty();cb()}}
+      else{for(var i=0;i<=4;i++)path.push({s:'s',p:i});for(var i=3;i>=10-ep;i--)path.push({s:'s',p:i});var fp=10-ep;
+        endAct=function(){
+          /* 弹回闪光 */
+          var ep4=c2p(HS[co][4][0],HS[co][4][1]);addCapFx(ep4.x,ep4.y,'rgba(122,85,8,.4)');
+          p.s='s';p.p=fp;AL(PC[co].nm+'方 弹回第'+(fp+1)+'格');markDirty();cb()}}
+
+    }else{
+      for(var i=1;i<=d;i++)path.push({s:'t',p:(p.p+i)%N});var fp2=(p.p+d)%N;
+      endAct=function(){p.s='t';p.p=fp2;dc(co,p.p);efAnimated(co,cb)}}
+
+  }else if(p.s==='s'){
+    var sp0=p.p,np=sp0+d;
+    for(var i=1;i<=d;i++){var pos=sp0+i;if(pos===5)path.push({s:'f',p:0});else if(pos>5)path.push({s:'s',p:10-pos});else path.push({s:'s',p:pos})}
+    if(np===5)endAct=function(){p.s='f';AL(PC[co].nm+'方 到达终点！');markDirty();cb()};
+    else if(np>5){var fp3=10-np;endAct=function(){p.s='s';p.p=fp3;AL(PC[co].nm+'方 弹回第'+(fp3+1)+'格');markDirty();cb()}}
+    else endAct=function(){p.s='s';p.p=np;markDirty();cb()};
   }
 
-  // ---------- 构建棋盘 ----------
-  var board = document.getElementById('board')
+  if(!path.length){if(endAct)endAct();else cb();return}
+  animatePath(co,idx,path,function(){if(endAct)endAct();else cb()});
+}
 
-  // 52 个公共格（DOM data-index 明确编号）
-  for (var i = 0; i < 52; i++) {
-    var p = cellPos(i)
-    var div = document.createElement('div')
-    div.className = 'flight-cell'
-    // 起点格着色（红0 黄13 蓝26 绿39）
-    var teamStart = { 0: 'red', 13: 'yellow', 26: 'blue', 39: 'green' }[i]
-    if (teamStart) div.classList.add('start-' + teamStart)
-    div.setAttribute('data-index', i)
-    div.innerHTML = '<span class="num">' + String(i + 1).padStart(2, '0') + '</span>'
-    div.style.gridColumn = p.col + 1
-    div.style.gridRow = p.row + 1
-    board.appendChild(div)
-  }
+/* ============================================================
+   EF ANIMATED — 特效步进动画版
+   ============================================================ */
+function efAnimated(co,cb){
+  var p=G.pl[co][G.lm];if(!p||p.s!=='t'){cb();return}
 
-  // 归家路线（每队 5 格）
-  GAME.players.forEach(function (pl) {
-    var cells = homeCells(pl.id)
-    pl.homeCells = cells
-    cells.forEach(function (c) {
-      var h = document.createElement('div')
-      h.className = 'home-cell home-' + pl.id
-      h.style.gridColumn = c[0] + 1
-      h.style.gridRow = c[1] + 1
-      board.appendChild(h)
-    })
-  })
+  /* 捷径飞行 */
+  if(SCMAP[p.p]&&SCMAP[p.p].co===co){var fr=p.p;p.p=SCMAP[p.p].d;G.trail={f:tpx(fr),t:tpx(p.p),c:PC[co].c,n:Date.now()};dc(co,p.p);AL(PC[co].nm+'方 ◎ 捷径飞行！');markDirty();setTimeout(cb,600);return}
 
-  // 中央终点（四色圆形 + 中央飞机）
-  var finish = document.createElement('div')
-  finish.className = 'finish'
-  finish.innerHTML =
-    '<div class="q red"></div><div class="q yellow"></div>' +
-    '<div class="q green"></div><div class="q blue"></div>' +
-    '<div class="finish-core">' + planeSVG('#fff') + '</div>'
-  board.appendChild(finish)
+  /* 同色跳+4（动画） */
+  if(p.p%4===CM[co]&&!SF.has(p.p)){
+    var from=p.p,to=(p.p+4)%N,jp=[];
+    for(var i=1;i<=4;i++)jp.push({s:'t',p:(from+i)%N});
+    animatePath(co,G.lm,jp,function(){p.p=to;dc(co,p.p);AL(PC[co].nm+'方 同色跳+4！');markDirty();
+      if(TR.has(p.p)){p.p=(p.p-4+N)%N;AL(PC[co].nm+'方 ⚠ 陷阱后退4！');markDirty()}cb()});
+    return}
 
-  // 快捷飞行路线（4 条彩色虚线箭头，纯视觉）
-  addFlightPath(board, 'red',    '0% 8%',   '42% 42%')
-  addFlightPath(board, 'yellow', '100% 8%', '58% 42%')
-  addFlightPath(board, 'blue',   '100% 92%','58% 58%')
-  addFlightPath(board, 'green',  '0% 92%',  '42% 58%')
+  /* 陷阱后退4（动画） */
+  if(TR.has(p.p)){var from2=p.p,to2=(p.p-4+N)%N,tp=[];
+    for(var i=1;i<=4;i++)tp.push({s:'t',p:(from2-i+N)%N});
+    animatePath(co,G.lm,tp,function(){p.p=to2;AL(PC[co].nm+'方 ⚠ 陷阱后退4！');markDirty();cb()});
+    return}
 
-  // ---------- 机场飞机（SVG） ----------
-  var teams = { red: '#F45145', yellow: '#F5A623', blue: '#42A5F5', green: '#66C85A' }
-  Object.keys(teams).forEach(function (t) {
-    var box = document.querySelector('.planes[data-team="' + t + '"]')
-    for (var k = 0; k < 4; k++) {
-      var wrap = document.createElement('div')
-      wrap.innerHTML = planeSVG(teams[t])
-      box.appendChild(wrap.firstElementChild)
-    }
-  })
+  cb();
+}
 
-  // ---------- 底部玩家状态卡 ----------
-  var playersEl = document.getElementById('players')
-  GAME.players.forEach(function (pl) {
-    var card = document.createElement('div')
-    card.className = 'player-card ' + pl.id
-    card.innerHTML =
-      '<div class="p-name">' + ({red:'🔴',yellow:'🟡',blue:'🔵',green:'🟢'}[pl.id]) + ' ' + pl.name + '</div>' +
-      '<div class="p-status">准备中</div>' +
-      '<div class="p-planes">✈ ✈ ✈ ✈</div>'
-    playersEl.appendChild(card)
-  })
+/* ============================================================
+   CAPTURE 吃子（加特效）
+   ============================================================ */
+function dc(co,pos){
+  if(SF.has(pos))return;
+  for(var ci=0;ci<G.cols.length;ci++){var oc=G.cols[ci];if(oc===co)continue;
+    for(var i=0;i<4;i++){if(G.pl[oc][i].s==='t'&&G.pl[oc][i].p===pos){
+      var cp=ppx(oc,i);addCapFx(cp.x,cp.y,PC[oc].c);
+      G.pl[oc][i].s='h';G.pl[oc][i].p=0;
+      AL(PC[co].nm+'方 吃掉 '+PC[oc].nm+'方！')}}}
+}
 
-  /* ============================================================
-     工具：简单卡通飞机 SVG（机身 + 机翼 + 尾翼）
-     ============================================================ */
-  function planeSVG(color) {
-    return '<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">' +
-      '<path d="M24 6 L31 20 L45 26 L45 30 L31 28 L27 34 L27 40 L32 42 L32 45 L24 43 L16 45 L16 42 L21 40 L21 34 L17 28 L3 30 L3 26 L17 20 Z" fill="' + color + '" stroke="#5a4632" stroke-width="1.6" stroke-linejoin="round"/>' +
-      '<circle cx="24" cy="16" r="2.4" fill="#fff" opacity=".9"/>' +
-      '</svg>'
-  }
+/* ============================================================
+   AFTER MOVE
+   ============================================================ */
+function aftM(){markDirty();var cc=curC(),won=true;for(var i=0;i<4;i++)if(G.pl[cc][i].s!=='f'){won=false;break}
+  if(won){G.winner=cc;G.ph='done';SW();bcSt();return}
+  var p=G.pl[cc][G.lm];if(p&&p.s==='t'&&EX.has(p.p)&&G.dice!==6){AL(PC[cc].nm+'方 ♦ 额外一掷！');G.ph='roll';G.dice=0;G.vm=[];uUI();bcSt();return}
+  if(G.dice===6){G.c6++;if(G.c6>=3){AL('三个六跳过');G.c6=0;nT();return}AL('掷出六再来！');G.ph='roll';G.dice=0;G.vm=[];uUI();bcSt()}else{G.c6=0;nT()}}
+function nT(){G.cur=(G.cur+1)%G.cols.length;G.dice=0;G.vm=[];G.ph='roll';uUI();bcSt()}
 
-  /* 快捷飞行虚线箭头 */
-  function addFlightPath(container, color, from, to) {
-    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-    svg.setAttribute('class', 'flight-path')
-    svg.setAttribute('viewBox', '0 0 100 100')
-    svg.setAttribute('preserveAspectRatio', 'none')
-    svg.style.cssText = 'left:0;top:0;width:100%;height:100%'
-    var line = document.createElementNS('http://www.w3.org/2000/svg', 'line')
-    line.setAttribute('x1', from.split(' ')[0].replace('%','') )
-    line.setAttribute('y1', from.split(' ')[1].replace('%','') )
-    line.setAttribute('x2', to.split(' ')[0].replace('%','') )
-    line.setAttribute('y2', to.split(' ')[1].replace('%','') )
-    line.setAttribute('stroke', color)
-    line.setAttribute('stroke-width', '1.4')
-    line.setAttribute('stroke-dasharray', '3 3')
-    line.setAttribute('stroke-linecap', 'round')
-    svg.appendChild(line)
-    container.appendChild(svg)
-  }
+/* ============================================================
+   UI UPDATE
+   ============================================================ */
+function uUI(){if(!G)return;var key=G.cur+'_'+G.ph+'_'+G.dice+'_'+G.vm.join(',')+'_'+G.cols.map(function(c){return G.pl[c].map(function(p){return p.s+p.p}).join('')}).join('');if(key===lastUI)return;lastUI=key;markDirty();
+  var cc=curC(),cf=PC[cc];document.getElementById('tn').textContent=cf.nm+'方';document.getElementById('tn').style.color=cf.c;
+  var myTurn=!M||M!=='online'||!myC||curC()===myC;var ab=G.pl[cc].every(function(p){return p.s==='h'}),n6=G.n6[cc]||0,h;
+  if(!myTurn){h=G.ph==='roll'?'等待对手掷骰子':G.ph==='pick'?'等待对手选择':'对手移动中'}else{h='掷骰子';if(G.ph==='roll'&&ab&&n6>0)h+=' ('+n6+'/6保底)';else if(G.ph==='pick')h='选择棋子';else if(G.ph==='anim')h='移动中'}
+  document.getElementById('th').textContent=h;document.getElementById('rb').disabled=(!G||G.ph!=='roll'||!myTurn);
+  var pp=document.getElementById('pls');pp.innerHTML='';
+  for(var ci=0;ci<G.cols.length;ci++){var c=G.cols[ci],fin=0;for(var i=0;i<4;i++)if(G.pl[c][i].s==='f')fin++;
+    var r=document.createElement('div');r.className='pl'+(c===cc?' ac':'');r.innerHTML='<div class="dt" style="background:'+PC[c].c+'"></div><div style="flex:1;font-weight:700">'+PC[c].nm+'方</div><div class="pp">';
+    for(var j=0;j<4;j++)r.innerHTML+='<div class="pd'+(j<fin?' ok':'')+'" style="background:'+PC[c].c+'"></div>';r.innerHTML+='</div>';pp.appendChild(r)}
+  svG()}
 
-  // ---------- UI 预留接口（暂不实现逻辑） ----------
-  document.getElementById('diceBtn').addEventListener('click', function () {
-    // TODO: 掷骰子逻辑（当前仅 UI）
-  })
-  document.getElementById('btnSound').addEventListener('click', function (e) {
-    var on = e.currentTarget.textContent.indexOf('开') !== -1
-    e.currentTarget.textContent = '🔊 音效：' + (on ? '关' : '开')
-  })
-  document.getElementById('btnRule').addEventListener('click', function () {
-    // TODO: 游戏规则弹窗
-    alert('🎲 掷出 6 可起飞并再掷一次\n踩到对方飞机可将其送回基地\n率先将 4 架飞机飞入中央终点者获胜！')
-  })
+function AL(msg){var l=document.getElementById('log'),d=document.createElement('div');d.textContent=msg;l.appendChild(d);l.scrollTop=l.scrollHeight}
+function sp(id){document.querySelectorAll('.pg').forEach(function(s){s.classList.remove('on')});document.getElementById(id).classList.add('on')}
+function svG(){try{if(G&&!G.winner&&M==='local')localStorage.setItem('fc',JSON.stringify(serS()));else localStorage.removeItem('fc')}catch(e){}}
 
-  // 暴露数据接口，便于后续接入逻辑
-  window.FLIGHT_CHESS = GAME
-})()
+/* ============================================================
+   ROLL & EXEC
+   ============================================================ */
+function doRoll(){if(!G||G.ph!=='roll')return;if(M==='online'){if(!myC||curC()!==myC)return;if(isH){execRoll()}else{sH({type:'roll'});document.getElementById('rb').disabled=true}}else{execRoll()}}
+function execRoll(){if(!G||G.ph!=='roll')return;G.ph='anim';var v=Math.floor(Math.random()*6)+1;G.dice=v;document.getElementById('rb').disabled=true;markDirty();
+  aD(v,function(){var cc=curC(),ab=G.pl[cc].every(function(p){return p.s==='h'});if(v===6)G.n6[cc]=0;else if(ab)G.n6[cc]=(G.n6[cc]||0)+1;
+    var mv=gM(cc,v);if(!mv.length){AL(PC[cc].nm+'方 无法移动');setTimeout(aftM,300)}
+    else if(mv.length===1){doMoveAnimated(cc,mv[0],aftM)}
+    else{G.vm=mv;G.ph='pick';AL('请选择棋子');uUI();bcSt()}})}
+
+/* ============================================================
+   TAP（选子）
+   ============================================================ */
+function handleTap(ex,ey){var now=Date.now();if(now-lastTap<200)return;lastTap=now;if(!G||G.ph!=='pick')return;if(M==='online'&&curC()!==myC)return;
+  var r=cv.getBoundingClientRect(),mx=(ex-r.left)*600/r.width,my=(ey-r.top)*600/r.height,best=-1,bd=999;
+  for(var k=0;k<G.vm.length;k++){var pos=ppx(curC(),G.vm[k]),d=Math.hypot(pos.x-mx,pos.y-my);if(d<bd){bd=d;best=G.vm[k]}}
+  if(best>=0&&bd<28){if(M==='online'&&!isH){sH({type:'sel',i:best});G.ph='anim';G.vm=[];markDirty()}else{G.ph='anim';G.vm=[];doMoveAnimated(curC(),best,aftM)}}}
+cv.addEventListener('click',function(e){handleTap(e.clientX,e.clientY)});
+cv.addEventListener('touchend',function(e){e.preventDefault();var t=e.changedTouches[0];handleTap(t.clientX,t.clientY)});
+
+/* ============================================================
+   BUBBLE / CHAT
+   ============================================================ */
+function showBubble(co,msg){if(!G||!HBC[co])return;var p=HBC[co];bubbles.push({x:p.x,y:p.y,msg:msg,co:co,t:Date.now()});markDirty()}
+function showChat(show){document.getElementById('chatbtn').style.display=show?'block':'none';if(!show)document.getElementById('chatpanel').classList.remove('on')}
+function toggleChat(){document.getElementById('chatpanel').classList.toggle('on')}
+function SC(msg){if(!msg){var inp=document.getElementById('ci2');msg=inp.value.trim();inp.value=''}if(!msg)return;AC(myC||'red',msg);showBubble(myC||'red',msg);for(var k in con)try{con[k].send({type:'chat',msg:msg,from:myC})}catch(e){}}
+function AC(co,msg){var l=document.getElementById('chatlog'),d=document.createElement('div'),s=document.createElement('span');s.style.color=PC[co].c;s.style.fontWeight='700';s.textContent=PC[co].nm+'：';d.appendChild(s);d.appendChild(document.createTextNode(msg));l.appendChild(d);l.scrollTop=l.scrollHeight}
+
+/* ============================================================
+   WIN / RESTART / QUIT
+   ============================================================ */
+function showRC(show){var el=document.getElementById('roomtag');if(show&&RC){el.textContent='房间:'+RC;el.style.display='block'}else el.style.display='none'}
+function SW(){document.getElementById('win').classList.add('on');document.getElementById('wt').textContent=G.winner?PC[G.winner].nm+'方 获胜！':'结束';document.getElementById('wt').style.color=G.winner?PC[G.winner].c:'#7a5508';localStorage.removeItem('fc')}
+function RG(){document.getElementById('win').classList.remove('on');if(!G)return;if(M==='online'&&!isH){sH({type:'restart'});return}
+  capFx=[];animPiece=null;IG(G.cols);rD(0);document.getElementById('log').innerHTML='';AL('新一局！');uUI();if(M==='online'&&isH)for(var k in con)try{con[k].send({type:'go',st:serS()})}catch(e){}}
+function cleanState(){con={};pend=[];RC='';isH=false;myC=null;M='local';G=null;lastUI='';lastSer='';mrRetry=0;jrRetry=0;jrReconn=false;destroying=false;bubbles=[];capFx=[];animPiece=null;showRC(false);showChat(false);setNetInd('');if(rAF){cancelAnimationFrame(rAF);rAF=null}dirty=true;localStorage.removeItem('fc');sessionStorage.removeItem('fc_rejoin');sp('menu')}
+function QG(){document.getElementById('win').classList.remove('on');destroying=true;try{for(var k in con)con[k].send({type:'leave'})}catch(e){}setTimeout(function(){try{if(peer)peer.destroy()}catch(e){}peer=null;cleanState()},300)}
+function SL(n){var cols=n===4?C4.slice():C2.slice();M='local';isH=false;myC=null;RC='';showRC(false);showChat(false);bubbles=[];capFx=[];animPiece=null;setNetInd('');IG(cols);sp('play');rD(0);document.getElementById('log').innerHTML='';AL(n+'人对弈开始');uUI()}
+
+/* ============================================================
+   NETWORK — 加强版
+   ============================================================ */
+function TN(){var el=document.getElementById('net');el.style.display=el.style.display==='none'?'block':'none'}
+function lPJ(attempt){attempt=attempt||0;return new Promise(function(ok,no){if(window.Peer)return ok();var srcs=['https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js','https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js','https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js'];if(attempt>=srcs.length)return no(new Error('所有CDN失败'));var s=document.createElement('script');s.src=srcs[attempt];s.onload=function(){setTimeout(function(){window.Peer?ok():lPJ(attempt+1).then(ok).catch(no)},500)};s.onerror=function(){showToast('CDN '+(attempt+1)+' 失败，尝试备用...','warn');lPJ(attempt+1).then(ok).catch(no)};document.head.appendChild(s)})}
+function gc(){var s='',ch='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';for(var i=0;i<4;i++)s+=ch[Math.floor(Math.random()*ch.length)];return s}
+
+function MR(){
+  document.getElementById('nerr').textContent='正在加载网络组件...';showToast('正在加载网络组件...','info');
+  if(peer){try{peer.destroy()}catch(e){}peer=null;con={};pend=[]}
+  lPJ().then(function(){
+    document.getElementById('nerr').textContent='正在创建房间...';showToast('正在创建房间...','info');
+    RC=RC||gc();isH=true;myC='red';pend=[{c:'red'}];
+    try{peer=new Peer('fc_'+RC,{debug:0});
+      var to=setTimeout(function(){document.getElementById('nerr').textContent='创建超时';showToast('创建超时，请重试','error');setNetInd('error');try{peer.destroy()}catch(e){}peer=null},15000);
+      peer.on('open',function(){clearTimeout(to);mrRetry=0;setNetInd('ok');showToast('房间创建成功','success');
+        document.getElementById('rcc').textContent=RC;showRC(true);uSL();if(!G){sp('wait');document.getElementById('bGo').disabled=false}});
+      peer.on('connection',function(c){c.on('open',function(){c.on('data',function(msg){
+        if(msg.type==='join'){var av;if(msg.prev&&!pend.some(function(p){return p.c===msg.prev}))av=msg.prev;else av=['green','blue','yellow'].filter(function(x){return!pend.some(function(p){return p.c===x})})[0];if(!av)return c.send({type:'full'});con[av]=c;pend.push({c:av});c.send({type:'wel',c:av,pl:pend.map(function(p){return p.c}),st:G?serS():null});for(var k2 in con)try{con[k2].send({type:'plist',pl:pend.map(function(p){return p.c})})}catch(e){}uSL();AL(PC[av].nm+'方 加入了');showToast(PC[av].nm+'方 加入了','success')}
+        else{var sc;for(var k in con)if(con[k]===c)sc=k;if(sc)hCM(sc,msg)}})});
+        c.on('close',function(){if(destroying)return;for(var k in con)if(con[k]===c){var nm=PC[k]?PC[k].nm:'';pend=pend.filter(function(p){return p.c!==k});delete con[k];uSL();if(nm){AL(nm+'方 离开了');showToast(nm+'方 断线离开','warn')}for(var k2 in con)try{con[k2].send({type:'plist',pl:pend.map(function(p){return p.c})})}catch(e){}}});
+        c.on('error',function(){if(destroying)return;for(var k in con)if(con[k]===c)delete con[k]})});
+      peer.on('error',function(err){clearTimeout(to);
+        if(err.type==='unavailable-id'&&mrRetry<4){mrRetry++;document.getElementById('nerr').textContent='房间重建中('+mrRetry+'/4)...';showToast('房间ID冲突，正在重建...','warn');try{peer.destroy()}catch(e){}peer=null;setTimeout(MR,3000)}
+        else{document.getElementById('nerr').textContent='创建失败，请重试';showToast('创建失败: '+err.type,'error');setNetInd('error');mrRetry=0}})}catch(e){document.getElementById('nerr').textContent='创建异常';showToast('创建异常','error')}
+  }).catch(function(err){document.getElementById('nerr').textContent='网络组件加载失败，请刷新重试';showToast('网络组件加载失败','error')})}
+
+function JR(){
+  document.getElementById('nerr').textContent='';var code=document.getElementById('ci')?document.getElementById('ci').value.trim().toUpperCase():'';if(!code&&RC)code=RC;if(code.length!==4){document.getElementById('nerr').textContent='请输入4位房间号';return}
+  RC=code;isH=false;showRC(true);if(peer){try{peer.destroy()}catch(e){}peer=null;con={}}
+  document.getElementById('nerr').textContent='正在加载网络组件...';showToast('正在连接...','info');
+  lPJ().then(function(){document.getElementById('nerr').textContent='正在连接...';setNetInd('warn');
+    try{peer=new Peer('fj_'+Math.random().toString(36).substr(2,8),{debug:0});
+      var to=setTimeout(function(){if(jrReconn&&jrRetry<5){jrRetry++;var waitMs=Math.min(2000*jrRetry,10000);document.getElementById('nerr').textContent='等待房主重建('+jrRetry+'/5)...';showToast('等待房主重建，'+Math.ceil(waitMs/1000)+'秒后重试...','warn');try{peer.destroy()}catch(e){}peer=null;setTimeout(JR,waitMs)}else{document.getElementById('nerr').textContent='连接超时';showToast('连接超时，请检查房间号','error');setNetInd('error');try{peer.destroy()}catch(e){}peer=null;jrReconn=false;jrRetry=0}},15000);
+      peer.on('open',function(){clearTimeout(to);document.getElementById('nerr').textContent='正在加入房间...';
+        var c=peer.connect('fc_'+RC,{reliable:true});var ct2=setTimeout(function(){document.getElementById('nerr').textContent='加入失败';showToast('加入超时','error');setNetInd('error');try{c.close()}catch(e){}},10000);
+        c.on('open',function(){clearTimeout(ct2);jrRetry=0;jrReconn=false;setNetInd('ok');showToast('已连接到房间','success');
+          con['host']=c;c.send({type:'join',prev:myC});
+          c.on('data',function(msg){hHM(msg)});
+          c.on('close',function(){if(destroying)return;setNetInd('warn');showToast('连接断开，尝试重连...','warn');
+            /* 自动重连 */
+            if(jrRetry<5){jrReconn=true;jrRetry++;var w=Math.min(2000*jrRetry,10000);showToast(Math.ceil(w/1000)+'秒后自动重连 ('+jrRetry+'/5)','warn');setTimeout(function(){if(!destroying)JR()},w)}
+            else{showToast('重连失败，请手动重新加入','error');setNetInd('error');document.getElementById('nerr').textContent='连接已断开';jrRetry=0;jrReconn=false}});
+          c.on('error',function(){setNetInd('error');document.getElementById('nerr').textContent='连接异常';showToast('连接异常','error')})});
+        c.on('error',function(){clearTimeout(ct2);document.getElementById('nerr').textContent='连接失败';showToast('连接失败','error');setNetInd('error')})});
+      peer.on('error',function(){clearTimeout(to);document.getElementById('nerr').textContent='连接失败';showToast('连接失败','error');setNetInd('error');try{peer.destroy()}catch(e){}peer=null})}catch(e){document.getElementById('nerr').textContent='连接异常';showToast('连接异常','error')}
+  }).catch(function(err){document.getElementById('nerr').textContent='网络组件加载失败，请刷新重试';showToast('网络组件加载失败','error')})}
+
+function hHM(m){
+  if(m.type==='wel'){myC=m.c;pend=m.pl.map(function(c){return{c:c}});uSL();document.getElementById('ws').textContent='你是'+PC[myC].nm+'方';
+    if(m.st){ldS(m.st);M='online';sp('play');showRC(true);showChat(true);rD(G.dice);document.getElementById('log').innerHTML='';AL('重新连接！');showToast('重连成功！','success');setNetInd('ok');uUI()}else{sp('wait');showRC(true)}}
+  if(m.type==='plist'){pend=m.pl.map(function(c){return{c:c}});uSL()}
+  if(m.type==='go'){ldS(m.st);M='online';sp('play');showRC(true);showChat(true);rD(G.dice);document.getElementById('log').innerHTML='';AL('在线对弈！');showToast('游戏开始！','success');uUI()}
+  if(m.type==='st'){ldS(m.st)}
+  if(m.type==='chat'){AC(m.from,m.msg);showBubble(m.from,m.msg);var cp=document.getElementById('chatpanel');if(!cp.classList.contains('on'))cp.classList.add('on')}
+  if(m.type==='leave'){document.getElementById('rb').disabled=true;document.getElementById('th').textContent='房主已退出';AL('房主退出了游戏');showToast('房主已退出游戏','error');setNetInd('error');setTimeout(function(){try{if(peer)peer.destroy()}catch(e){}peer=null;cleanState()},1500)}
+  if(m.type==='full'){document.getElementById('nerr').textContent='房间已满';showToast('房间已满','error');LR()}
+}
+
+function hCM(co,m){if(!G||destroying)return;
+  if(m.type==='roll'&&G.ph==='roll'&&curC()===co){execRoll();return}
+  if(m.type==='sel'&&G.ph==='pick'&&curC()===co&&G.vm.indexOf(m.i)>=0){G.ph='anim';G.vm=[];doMoveAnimated(co,m.i,aftM);return}
+  if(m.type==='chat'){AC(co,m.msg);showBubble(co,m.msg);var cp=document.getElementById('chatpanel');if(!cp.classList.contains('on'))cp.classList.add('on');for(var k in con)if(k!==co)try{con[k].send({type:'chat',msg:m.msg,from:co})}catch(e){}return}
+  if(m.type==='leave'){for(var k in con)if(con[k]===co){var nm=PC[k]?PC[k].nm:'';pend=pend.filter(function(p){return p.c!==k});delete con[k];uSL();if(nm){AL(nm+'方 离开了');showToast(nm+'方 离开了','warn')}for(var k2 in con)try{con[k2].send({type:'plist',pl:pend.map(function(p){return p.c})})}catch(e){}}return}
+  if(m.type==='restart'&&G.winner){RG();return}}
+
+function sH(m){if(con['host'])try{con['host'].send(m)}catch(e){}}
+/* 广播状态：本地模式空操作，联机模式同步给所有连接 */
+function bcSt(){if(M==='online'&&G&&!G.winner)for(var k in con)try{con[k].send({type:'st',st:serS()})}catch(e){}}
+
+/* ============================================================
+   SERIALIZE / DESERIALIZE
+   ============================================================ */
+function serS(){var pl={};for(var i=0;i<G.cols.length;i++){var c=G.cols[i];pl[c]=G.pl[c].map(function(p){return[p.s,p.p]})}var tr=G.trail?{f:{x:G.trail.f.x,y:G.trail.f.y},t:{x:G.trail.t.x,y:G.trail.t.y},c:G.trail.c,n:G.trail.n}:null;return{c:G.cols,pl:pl,cr:G.cur,d:G.dice,ph:G.ph,vm:G.vm,c6:G.c6,w:G.winner,lm:G.lm,n6:G.n6,tr:tr}}
+function ldS(st){var pl={};for(var i=0;i<st.c.length;i++){var c=st.c[i];pl[c]=st.pl[c].map(function(a){return{s:a[0],p:a[1]}})}G={cols:st.c,pl:pl,cur:st.cr,dice:st.d,ph:st.ph,vm:st.vm,c6:st.c6,winner:st.w,lm:'lm' in st?st.lm:-1,n6:st.n6||{},trail:st.tr||null};lastUI='';lastSer='';capFx=[];animPiece=null;rD(G.dice);uUI();if(G.winner)SW()}
+
+/* ============================================================
+   SLOTS / GO / LEAVE
+   ============================================================ */
+function uSL(){var el=document.getElementById('sls');el.innerHTML='';for(var i=0;i<pend.length;i++){var d=document.createElement('div');d.className='slot on';d.style.borderColor=PC[pend[i].c].c;d.innerHTML='<span style="color:'+PC[pend[i].c].c+'">✈</span>';el.appendChild(d)}for(var i=pend.length;i<4;i++){var d=document.createElement('div');d.className='slot';d.textContent='+';el.appendChild(d)}document.getElementById('bGo').disabled=pend.length<2}
+function GO(){if(!isH)return;var cols=pend.map(function(p){return p.c});M='online';IG(cols);sp('play');showRC(true);showChat(true);rD(0);document.getElementById('log').innerHTML='';AL('在线对弈！');showToast('游戏开始！','success');uUI();for(var k in con)try{con[k].send({type:'go',st:serS()})}catch(e){}}
+function LR(){destroying=true;sH({type:'leave'});setTimeout(function(){try{if(peer)peer.destroy()}catch(e){}peer=null;cleanState()},300)}
+
+/* ============================================================
+   RECONNECT / INIT
+   ============================================================ */
+function saveRejoin(){if(M==='online'&&RC&&!destroying){try{var d={RC:RC,isH:isH,myC:myC,t:Date.now()};if(isH&&G)d.st=serS();sessionStorage.setItem('fc_rejoin',JSON.stringify(d))}catch(e){}}}
+window.addEventListener('beforeunload',saveRejoin);
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')saveRejoin()});
+
+try{var rj=JSON.parse(sessionStorage.getItem('fc_rejoin'));sessionStorage.removeItem('fc_rejoin');
+  if(rj&&rj.RC&&(Date.now()-rj.t<180000)){myC=rj.myC;
+    if(rj.isH){RC=rj.RC;isH=true;if(rj.st){ldS(rj.st);M='online';sp('play');showRC(true);showChat(true);rD(G.dice);document.getElementById('log').innerHTML='';AL('房间重建中...');showToast('正在重建房间...','info');setNetInd('warn');uUI()}setTimeout(function(){MR()},800)}
+    else{sp('menu');document.getElementById('ci').value=rj.RC;document.getElementById('nerr').textContent='正在重连...';showToast('正在重连...','info');setNetInd('warn');document.getElementById('net').style.display='block';jrReconn=true;setTimeout(function(){JR()},500)}}}catch(e){sessionStorage.removeItem('fc_rejoin')}
+
+function home(){try{if(history.length>1)history.back();else window.location.href='/'}catch(e){window.location.href='/'}}
+function bootByURL(){
+  var p=new URLSearchParams(location.search);
+  var mode=p.get('mode'),room=(p.get('room')||'').toUpperCase(),nm=p.get('name')||'玩家';
+  try{if(nm)localStorage.setItem('byzm_name',nm)}catch(e){}
+  if(mode==='create'&&room){RC=room;isH=true;myC='red';document.getElementById('rcc').textContent=room;showRC(true);sp('wait');document.getElementById('bGo').disabled=false;setTimeout(function(){MR()},400);return true}
+  else if(mode==='join'&&room){RC=room;isH=false;var ci=document.getElementById('ci');if(ci)ci.value=room;document.getElementById('rcc').textContent=room;showRC(true);sp('wait');setTimeout(function(){JR()},400);return true}
+  return false
+}
+try{
+  var p2=new URLSearchParams(location.search),hasMode=(p2.get('mode')==='create'||p2.get('mode')==='join');
+  var sv=JSON.parse(localStorage.getItem('fc'));
+  if(!hasMode&&sv&&sv.c&&!sessionStorage.getItem('fc_rejoin')){M='local';ldS(sv);sp('play');rD(G.dice)}
+  else{localStorage.removeItem('fc');if(!bootByURL())SL(4)}
+}catch(e){localStorage.removeItem('fc');if(!bootByURL())SL(4)}
+
+if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(function(){})}
 </script>
 </body>
 </html>

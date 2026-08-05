@@ -64,6 +64,7 @@ const messages = {
         desc: '创建房间或输入房间号，与好友实时对战。消除行数会攻击对手！',
         game: '选择游戏',
         gameTetris: '俄罗斯方块（2-4 人）',
+        gameAirplane: '飞行棋（2-4 人）',
         players: '人数',
         nickname: '昵称',
         nicknamePh: '输入昵称',
@@ -77,6 +78,9 @@ const messages = {
         roomsTitle: '在线房间',
         roomsSub: 'LIVE ROOMS',
         roomsEmpty: '暂无在线房间，创建一个房间开始对战吧',
+        roomsAirplaneTitle: '飞行棋 · P2P 房间',
+        roomsAirplaneSub: 'PEER-TO-PEER',
+        peerDesc: '浏览器直连对战：点击「创建房间」生成 4 位房间号发给好友，或输入房间号加入。无需服务器，免费可用。',
         maintenance: '联机功能维护中，敬请期待'
       }
     },
@@ -180,6 +184,7 @@ const messages = {
         desc: 'Create a room or join with a room code to battle in real time. Clearing lines attacks your rivals!',
         game: 'Select Game',
         gameTetris: 'Tetris (2-4 players)',
+        gameAirplane: 'Flying Chess (2-4 players)',
         players: 'Players',
         nickname: 'Nickname',
         nicknamePh: 'Enter nickname',
@@ -193,6 +198,9 @@ const messages = {
         roomsTitle: 'Live Rooms',
         roomsSub: 'LIVE ROOMS',
         roomsEmpty: 'No active rooms. Create one to start playing!',
+        roomsAirplaneTitle: 'Flying Chess · P2P Rooms',
+        roomsAirplaneSub: 'PEER-TO-PEER',
+        peerDesc: 'Browser peer-to-peer: create a room and share the 4-digit code, or join with a code. No server needed, free to use.',
         maintenance: 'Multiplayer is under maintenance, coming soon'
       }
     },

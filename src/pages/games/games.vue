@@ -22,7 +22,7 @@
           </view>
         </view>
         <view class="mp-desc">{{ t('games.multi.desc') }}</view>
-        <view v-if="!MULTI_ENABLED" class="mp-maintenance">🔧 {{ t('games.multi.maintenance') }}</view>
+        <view v-if="isDisabled" class="mp-maintenance">🔧 {{ t('games.multi.maintenance') }}</view>
 
         <view class="mp-row">
           <view class="mp-field">
@@ -52,7 +52,7 @@
         </view>
 
         <view class="mp-row mp-actions">
-          <view class="btn-create" :class="{ disabled: !MULTI_ENABLED }" @click="createRoom">{{ t('games.multi.create') }}</view>
+          <view class="btn-create" :class="{ disabled: isDisabled }" @click="createRoom">{{ t('games.multi.create') }}</view>
           <view class="mp-join-box">
             <input
               class="mp-input join-input"
@@ -60,13 +60,13 @@
               :placeholder="t('games.multi.roomPh')"
               maxlength="4"
             />
-            <view class="btn-join" :class="{ disabled: !MULTI_ENABLED }" @click="joinRoom">{{ t('games.multi.join') }}</view>
+            <view class="btn-join" :class="{ disabled: isDisabled }" @click="joinRoom">{{ t('games.multi.join') }}</view>
           </view>
         </view>
       </view>
 
       <!-- 在线房间列表 -->
-      <view class="rooms-panel">
+      <view v-if="gameIdx === 0" class="rooms-panel">
         <view class="rooms-head">
           <view class="rooms-title">🛰️ {{ t('games.multi.roomsTitle') }}</view>
           <view class="rooms-sub">{{ t('games.multi.roomsSub') }}</view>
@@ -94,6 +94,15 @@
         </view>
       </view>
 
+      <!-- 飞行棋：PeerJS P2P 说明 -->
+      <view v-else class="rooms-panel">
+        <view class="rooms-head">
+          <view class="rooms-title">🛰️ {{ t('games.multi.roomsAirplaneTitle') }}</view>
+          <view class="rooms-sub">{{ t('games.multi.roomsAirplaneSub') }}</view>
+        </view>
+        <view class="rooms-empty">{{ t('games.multi.peerDesc') }}</view>
+      </view>
+
       <view class="games-sep"></view>
 
       <WdGames />
@@ -104,21 +113,27 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
-// 联机服务器 HTTP 接口地址（与 legacy/multi/config.js 保持一致）
+// 联机服务器 HTTP 接口地址（俄罗斯方块 WebSocket 方案，与 legacy/multi/config.js 保持一致）
 const MULTI_HTTP = 'https://byzm-desktop.tail2a2672.ts.net'
 
-// 联机功能开关：true=启用，false=禁用（保留界面，仅禁用功能）
+// 俄罗斯方块联机（WebSocket 服务器方案）：服务器未部署，禁用
 const MULTI_ENABLED = false
 
-const gameOptions = [t('games.multi.gameTetris')]
+// 飞行棋联机（PeerJS P2P 直连）：浏览器点对点，无需服务器，启用
+const FLIGHT_ENABLED = true
+
+const gameOptions = [t('games.multi.gameTetris'), t('games.multi.gameAirplane')]
 const playerOptions = ['2 人', '3 人', '4 人']
-const gameIdx = ref(0)
+const gameIdx = ref(1)
 const playerIdx = ref(2)
+
+// 当前所选游戏联机是否可用（不可用则禁用按钮并提示维护）
+const isDisabled = computed(() => (gameIdx.value === 0 ? !MULTI_ENABLED : !FLIGHT_ENABLED))
 const nickname = ref(localStorage.getItem('byzm_name') || '')
 const roomInput = ref('')
 
@@ -140,13 +155,13 @@ async function loadRooms() {
 }
 
 function joinRoomByCode(room) {
-  if (!MULTI_ENABLED) {
+  if (isDisabled.value) {
     uni.showToast({ title: t('games.multi.maintenance'), icon: 'none' })
     return
   }
   if (!checkName()) return
   const max = [2, 3, 4][playerIdx.value]
-  goMulti(room, max)
+  goMulti(room, max, 'join')
 }
 
 onMounted(() => {
@@ -181,18 +196,18 @@ function checkName() {
 }
 
 function createRoom() {
-  if (!MULTI_ENABLED) {
+  if (isDisabled.value) {
     uni.showToast({ title: t('games.multi.maintenance'), icon: 'none' })
     return
   }
   if (!checkName()) return
   const room = String(Math.floor(1000 + Math.random() * 9000))
   const max = [2, 3, 4][playerIdx.value]
-  goMulti(room, max)
+  goMulti(room, max, 'create')
 }
 
 function joinRoom() {
-  if (!MULTI_ENABLED) {
+  if (isDisabled.value) {
     uni.showToast({ title: t('games.multi.maintenance'), icon: 'none' })
     return
   }
@@ -203,13 +218,19 @@ function joinRoom() {
     return
   }
   const max = [2, 3, 4][playerIdx.value]
-  goMulti(room, max)
+  goMulti(room, max, 'join')
 }
 
-function goMulti(room, max) {
+function goMulti(room, max, mode) {
   const name = encodeURIComponent(nickname.value.trim())
   /* #ifdef H5 */
-  window.location.href = `/legacy/multi/index.html?game=tetris&room=${room}&max=${max}&name=${name}`
+  if (gameIdx.value === 1) {
+    // 飞行棋：PeerJS P2P 联机（mode=create 房主 / mode=join 加入）
+    window.location.href = `/legacy/airplane/index.html?mode=${mode}&room=${room}&max=${max}&name=${name}`
+  } else {
+    // 俄罗斯方块：WebSocket 服务器方案
+    window.location.href = `/legacy/multi/index.html?game=tetris&room=${room}&max=${max}&name=${name}`
+  }
   /* #endif */
 }
 
