@@ -6,6 +6,7 @@
       <view class="back-btn" @click="goBack">
         <text>← 返回</text>
       </view>
+      <text class="ph-sub">{{ t('games.subtitle') }}</text>
       <text class="ph-title">{{ t('games.title') }}</text>
     </view>
 
@@ -275,8 +276,8 @@ function goBack() {
     }
 
     &:hover {
-      border-color: rgba(249, 168, 212, 0.5);
-      background: rgba(249, 168, 212, 0.15);
+      border-color: rgba(108, 92, 231, 0.5);
+      background: rgba(108, 92, 231, 0.15);
 
       text {
         color: #fff;
@@ -285,7 +286,7 @@ function goBack() {
   }
 
   .ph-sub {
-    color: #fda4af;
+    color: #00d2ff;
     font-size: 13px;
     letter-spacing: 4px;
     font-weight: 600;
@@ -321,7 +322,7 @@ function goBack() {
     width: 200px;
     height: 200px;
     border-radius: 50%;
-    background: linear-gradient(135deg, rgba(249, 168, 212, 0.4), rgba(253, 164, 175, 0.4));
+    background: linear-gradient(135deg, rgba(108, 92, 231, 0.4), rgba(0, 210, 255, 0.4));
     filter: blur(34px);
     opacity: 0.55;
     pointer-events: none;
@@ -336,12 +337,12 @@ function goBack() {
       width: 68rpx;
       height: 68rpx;
       border-radius: 18rpx;
-      background: linear-gradient(135deg, #ec4899, #db2777);
+      background: linear-gradient(135deg, #6c5ce7, #00d2ff);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 34rpx;
-      box-shadow: 0 8px 20px rgba(249, 168, 212, 0.35);
+      box-shadow: 0 8px 20px rgba(108, 92, 231, 0.35);
     }
 
     .mp-head-text {
@@ -356,7 +357,7 @@ function goBack() {
 
       .mp-sub {
         margin-top: 2rpx;
-        color: #fda4af;
+        color: #00d2ff;
         font-size: 11px;
         letter-spacing: 4px;
         font-weight: 600;
@@ -422,7 +423,7 @@ function goBack() {
         transition: border-color 0.25s ease;
 
         &:hover {
-          border-color: rgba(253, 164, 175, 0.5);
+          border-color: rgba(0, 210, 255, 0.5);
         }
       }
 
@@ -443,21 +444,21 @@ function goBack() {
     .btn-create {
       padding: 18rpx 44rpx;
       border-radius: 14px;
-      background: linear-gradient(135deg, #ec4899, #db2777);
+      background: linear-gradient(135deg, #6c5ce7, #00d2ff);
       color: #fff;
       font-size: 16px;
       font-weight: 700;
       cursor: pointer;
       text-align: center;
       transition: transform 0.15s ease, box-shadow 0.25s ease;
-      box-shadow: 0 10px 24px rgba(249, 168, 212, 0.3);
+      box-shadow: 0 10px 24px rgba(108, 92, 231, 0.3);
 
       &:active {
         transform: scale(0.96);
       }
 
       &:hover {
-        box-shadow: 0 14px 30px rgba(253, 164, 175, 0.35);
+        box-shadow: 0 14px 30px rgba(0, 210, 255, 0.35);
       }
     }
 
@@ -476,15 +477,15 @@ function goBack() {
         border-radius: 14px;
         background: rgba(255, 255, 255, 0.07);
         border: 1px solid rgba(255, 255, 255, 0.14);
-        color: #fda4af;
+        color: #00d2ff;
         font-size: 16px;
         font-weight: 700;
         cursor: pointer;
         transition: all 0.25s ease;
 
         &:hover {
-          border-color: rgba(253, 164, 175, 0.6);
-          background: rgba(253, 164, 175, 0.12);
+          border-color: rgba(0, 210, 255, 0.6);
+          background: rgba(0, 210, 255, 0.12);
         }
       }
     }
@@ -515,7 +516,7 @@ function goBack() {
 
     .rooms-sub {
       margin-top: 4rpx;
-      color: #fda4af;
+      color: #00d2ff;
       font-size: 11px;
       letter-spacing: 4px;
       font-weight: 600;
@@ -548,8 +549,8 @@ function goBack() {
       transition: all 0.25s ease;
 
       &:hover {
-        border-color: rgba(253, 164, 175, 0.5);
-        background: rgba(253, 164, 175, 0.06);
+        border-color: rgba(0, 210, 255, 0.5);
+        background: rgba(0, 210, 255, 0.06);
       }
 
       .rr-left {
@@ -558,7 +559,7 @@ function goBack() {
         min-width: 150rpx;
 
         .rr-code {
-          color: #fda4af;
+          color: #00d2ff;
           font-size: 24px;
           font-weight: 800;
           letter-spacing: 4px;
@@ -595,7 +596,7 @@ function goBack() {
       .btn-join-sm {
         padding: 12rpx 24rpx;
         border-radius: 12px;
-        background: linear-gradient(135deg, #ec4899, #db2777);
+        background: linear-gradient(135deg, #6c5ce7, #00d2ff);
         color: #fff;
         font-size: 13px;
         font-weight: 700;

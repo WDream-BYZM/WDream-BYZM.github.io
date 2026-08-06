@@ -189,12 +189,12 @@ onUnmounted(() => {
     width: 40px;
     height: 40px;
     border-radius: 12px;
-    background: linear-gradient(135deg, #ec4899, #db2777);
+    background: linear-gradient(135deg, #6c5ce7, #00d2ff);
     display: flex;
     align-items: center;
     justify-content: center;
     margin-right: 10px;
-    box-shadow: 0 4px 14px rgba(249, 168, 212, 0.5);
+    box-shadow: 0 4px 14px rgba(108, 92, 231, 0.5);
 
     text {
       color: #fff;
@@ -233,7 +233,7 @@ onUnmounted(() => {
     }
 
     &.active {
-      background: linear-gradient(135deg, rgba(249, 168, 212, 0.25), rgba(253, 164, 175, 0.25));
+      background: linear-gradient(135deg, rgba(108, 92, 231, 0.25), rgba(0, 210, 255, 0.25));
 
       text {
         color: #fff;
@@ -258,11 +258,11 @@ onUnmounted(() => {
     }
 
     &:hover {
-      border-color: #fda4af;
-      background: rgba(253, 164, 175, 0.1);
+      border-color: #00d2ff;
+      background: rgba(0, 210, 255, 0.1);
 
       text {
-        color: #fda4af;
+        color: #00d2ff;
       }
     }
   }

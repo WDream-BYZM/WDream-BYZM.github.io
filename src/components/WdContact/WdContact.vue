@@ -2,6 +2,7 @@
   <view class="wd-section" id="contact">
     <view class="section-inner">
       <view class="section-head">
+        <text class="section-sub">{{ t('contact.subtitle') }}</text>
         <text class="section-title">{{ t('contact.title') }}</text>
         <view class="section-line"></view>
       </view>
@@ -106,7 +107,7 @@ function sendMail() {
   margin-bottom: 60rpx;
 
   .section-sub {
-    color: #fda4af;
+    color: #00d2ff;
     font-size: 13px;
     letter-spacing: 4px;
     font-weight: 600;
@@ -124,7 +125,7 @@ function sendMail() {
     width: 60px;
     height: 4px;
     border-radius: 2px;
-    background: linear-gradient(90deg, #f9a8d4, #fda4af);
+    background: linear-gradient(90deg, #6c5ce7, #00d2ff);
   }
 }
 
@@ -160,8 +161,8 @@ function sendMail() {
       transition: all 0.3s ease;
 
       &:hover {
-        border-color: rgba(249, 168, 212, 0.55);
-        box-shadow: 0 12px 32px rgba(249, 168, 212, 0.15);
+        border-color: rgba(108, 92, 231, 0.55);
+        box-shadow: 0 12px 32px rgba(108, 92, 231, 0.15);
         transform: translateY(-3px);
       }
 
@@ -176,11 +177,11 @@ function sendMail() {
         margin-right: 24rpx;
 
         &.mail {
-          background: rgba(249, 168, 212, 0.18);
+          background: rgba(108, 92, 231, 0.18);
         }
 
         &.github {
-          background: rgba(253, 164, 175, 0.15);
+          background: rgba(0, 210, 255, 0.15);
         }
       }
 
@@ -204,7 +205,7 @@ function sendMail() {
 
       .cc-action {
         text {
-          color: #fbcfe8;
+          color: #a29bfe;
           font-size: 22px;
         }
       }
@@ -215,8 +216,8 @@ function sendMail() {
     margin-top: 50rpx;
     padding: 15px 44px;
     border-radius: 30px;
-    background: linear-gradient(135deg, #ec4899, #db2777);
-    box-shadow: 0 8px 24px rgba(249, 168, 212, 0.4);
+    background: linear-gradient(135deg, #6c5ce7, #00d2ff);
+    box-shadow: 0 8px 24px rgba(108, 92, 231, 0.4);
     cursor: pointer;
     transition: all 0.25s ease;
 
@@ -229,7 +230,7 @@ function sendMail() {
 
     &:hover {
       transform: translateY(-3px);
-      box-shadow: 0 12px 30px rgba(253, 164, 175, 0.45);
+      box-shadow: 0 12px 30px rgba(0, 210, 255, 0.45);
     }
   }
 }

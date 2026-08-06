@@ -2,6 +2,7 @@
   <view class="wd-section" id="ai">
     <view class="section-inner">
       <view class="section-head">
+        <text class="section-sub">{{ t('ai.subtitle') }}</text>
         <text class="section-title">{{ t('ai.title') }}</text>
         <view class="section-line"></view>
       </view>
@@ -230,7 +231,7 @@ function requestDeepSeek(msgs) {
   margin-bottom: 60rpx;
 
   .section-sub {
-    color: #fda4af;
+    color: #00d2ff;
     font-size: 13px;
     letter-spacing: 4px;
     font-weight: 600;
@@ -248,7 +249,7 @@ function requestDeepSeek(msgs) {
     width: 60px;
     height: 4px;
     border-radius: 2px;
-    background: linear-gradient(90deg, #f9a8d4, #fda4af);
+    background: linear-gradient(90deg, #6c5ce7, #00d2ff);
   }
 }
 
@@ -281,14 +282,14 @@ function requestDeepSeek(msgs) {
         letter-spacing: 0.5px;
 
         &.assistant {
-          background: linear-gradient(135deg, #ec4899, #db2777);
+          background: linear-gradient(135deg, #6c5ce7, #00d2ff);
           color: #fff;
           margin-right: 14rpx;
         }
 
         &.user {
-          background: rgba(253, 164, 175, 0.15);
-          color: #fda4af;
+          background: rgba(0, 210, 255, 0.15);
+          color: #00d2ff;
           margin-left: 14rpx;
         }
       }
@@ -323,7 +324,7 @@ function requestDeepSeek(msgs) {
             width: 6px;
             height: 6px;
             border-radius: 50%;
-            background: #fbcfe8;
+            background: #a29bfe;
             animation: blink 1.2s ease infinite;
 
             &:nth-child(2) {
@@ -339,8 +340,8 @@ function requestDeepSeek(msgs) {
 
       &.assistant {
         .msg-bubble {
-          background: rgba(249, 168, 212, 0.12);
-          border: 1px solid rgba(249, 168, 212, 0.25);
+          background: rgba(108, 92, 231, 0.12);
+          border: 1px solid rgba(108, 92, 231, 0.25);
         }
       }
 
@@ -348,8 +349,8 @@ function requestDeepSeek(msgs) {
         flex-direction: row-reverse;
 
         .msg-bubble {
-          background: rgba(253, 164, 175, 0.12);
-          border: 1px solid rgba(253, 164, 175, 0.3);
+          background: rgba(0, 210, 255, 0.12);
+          border: 1px solid rgba(0, 210, 255, 0.3);
         }
       }
     }
@@ -380,8 +381,8 @@ function requestDeepSeek(msgs) {
       }
 
       &:hover {
-        border-color: rgba(249, 168, 212, 0.5);
-        background: rgba(249, 168, 212, 0.15);
+        border-color: rgba(108, 92, 231, 0.5);
+        background: rgba(108, 92, 231, 0.15);
         transform: translateY(-2px);
       }
 
@@ -403,7 +404,7 @@ function requestDeepSeek(msgs) {
       font-size: 14px;
 
       &:focus {
-        border-color: rgba(253, 164, 175, 0.5);
+        border-color: rgba(0, 210, 255, 0.5);
       }
     }
 
@@ -411,13 +412,13 @@ function requestDeepSeek(msgs) {
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #ec4899, #db2777);
+      background: linear-gradient(135deg, #6c5ce7, #00d2ff);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       transition: all 0.25s ease;
-      box-shadow: 0 6px 18px rgba(249, 168, 212, 0.4);
+      box-shadow: 0 6px 18px rgba(108, 92, 231, 0.4);
 
       text {
         color: #fff;
@@ -427,7 +428,7 @@ function requestDeepSeek(msgs) {
 
       &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 10px 24px rgba(253, 164, 175, 0.45);
+        box-shadow: 0 10px 24px rgba(0, 210, 255, 0.45);
       }
 
       &.disabled {

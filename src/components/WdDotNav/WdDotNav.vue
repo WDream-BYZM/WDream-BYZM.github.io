@@ -141,9 +141,9 @@ onUnmounted(() => {
       right: 32px;
       padding: 6px 14px;
       border-radius: 14px;
-      background: linear-gradient(135deg, rgba(249, 168, 212, 0.95), rgba(253, 164, 175, 0.9));
+      background: linear-gradient(135deg, rgba(108, 92, 231, 0.95), rgba(0, 210, 255, 0.9));
       white-space: nowrap;
-      box-shadow: 0 6px 18px rgba(249, 168, 212, 0.4);
+      box-shadow: 0 6px 18px rgba(108, 92, 231, 0.4);
       opacity: 0;
       pointer-events: none;
       transform: translateX(10px);
@@ -160,8 +160,8 @@ onUnmounted(() => {
     &:hover .dot-bar,
     &.active .dot-bar {
       width: 26px;
-      background: linear-gradient(90deg, #f9a8d4, #fda4af);
-      box-shadow: 0 0 12px rgba(253, 164, 175, 0.7);
+      background: linear-gradient(90deg, #6c5ce7, #00d2ff);
+      box-shadow: 0 0 12px rgba(0, 210, 255, 0.7);
     }
 
     &:hover .dot-label {

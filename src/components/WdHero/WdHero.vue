@@ -7,6 +7,7 @@
     <view class="bg-orb orb-1"></view>
     <view class="bg-orb orb-2"></view>
     <view class="bg-grid"></view>
+    <view class="scanline"></view>
 
     <!-- 品牌文字（霓虹流光特效） -->
     <view class="hero-content">
@@ -96,8 +97,8 @@ function initThree() {
   const count = 2000
   const positions = new Float32Array(count * 3)
   const colors = new Float32Array(count * 3)
-  const c1 = new THREE.Color(0xf9a8d4)
-  const c2 = new THREE.Color(0xfda4af)
+  const c1 = new THREE.Color(0x6c5ce7)
+  const c2 = new THREE.Color(0x00d2ff)
   for (let i = 0; i < count; i++) {
     positions[i * 3] = (Math.random() - 0.5) * 18
     positions[i * 3 + 1] = (Math.random() - 0.5) * 18
@@ -123,12 +124,7 @@ function initThree() {
   points = new THREE.Points(geometry, material)
   scene.add(points)
 
-  // 尊重系统减少动态偏好：reduce 时只渲染静态一帧
-  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    renderer.render(scene, camera)
-  } else {
-    animate()
-  }
+  animate()
 }
 
 function animate() {
@@ -211,7 +207,7 @@ onUnmounted(() => {
 .orb-1 {
   width: 480px;
   height: 480px;
-  background: rgba(249, 168, 212, 0.55);
+  background: rgba(108, 92, 231, 0.55);
   top: -120px;
   left: -120px;
   animation: float 8s ease-in-out infinite;
@@ -220,7 +216,7 @@ onUnmounted(() => {
 .orb-2 {
   width: 420px;
   height: 420px;
-  background: rgba(253, 164, 175, 0.4);
+  background: rgba(0, 210, 255, 0.4);
   bottom: -140px;
   right: -100px;
   animation: float 10s ease-in-out infinite reverse;
@@ -249,6 +245,25 @@ onUnmounted(() => {
   pointer-events: none;
 }
 
+/* 扫描线光效 */
+.scanline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -140px;
+  height: 140px;
+  background: linear-gradient(180deg, transparent, rgba(0, 210, 255, 0.05), transparent);
+  animation: scan 7s linear infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+@keyframes scan {
+  to {
+    top: 110vh;
+  }
+}
+
 /* 中央内容 */
 .hero-content {
   position: relative;
@@ -273,16 +288,16 @@ onUnmounted(() => {
     background: linear-gradient(
       180deg,
       #ffffff 0%,
-      #fbcfe8 35%,
-      #fda4af 70%,
-      #f9a8d4 100%
+      #a29bfe 35%,
+      #00d2ff 70%,
+      #6c5ce7 100%
     );
     background-size: 100% 220%;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    filter: drop-shadow(0 0 22px rgba(249, 168, 212, 0.65))
-      drop-shadow(0 0 60px rgba(253, 164, 175, 0.35));
+    filter: drop-shadow(0 0 22px rgba(108, 92, 231, 0.65))
+      drop-shadow(0 0 60px rgba(0, 210, 255, 0.35));
     opacity: 0;
     animation: letterPop 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards,
       hueDrift 5s ease-in-out infinite alternate;
@@ -293,24 +308,24 @@ onUnmounted(() => {
   from {
     opacity: 0;
     transform: translateY(40px) scale(0.7) rotateX(45deg);
-    filter: blur(14px) drop-shadow(0 0 10px rgba(249, 168, 212, 0.8));
+    filter: blur(14px) drop-shadow(0 0 10px rgba(108, 92, 231, 0.8));
   }
   to {
     opacity: 1;
     transform: translateY(0) scale(1) rotateX(0);
-    filter: blur(0) drop-shadow(0 0 22px rgba(249, 168, 212, 0.65))
-      drop-shadow(0 0 60px rgba(253, 164, 175, 0.35));
+    filter: blur(0) drop-shadow(0 0 22px rgba(108, 92, 231, 0.65))
+      drop-shadow(0 0 60px rgba(0, 210, 255, 0.35));
   }
 }
 
 @keyframes hueDrift {
   from {
-    filter: drop-shadow(0 0 22px rgba(249, 168, 212, 0.7))
-      drop-shadow(0 0 60px rgba(253, 164, 175, 0.4));
+    filter: drop-shadow(0 0 22px rgba(108, 92, 231, 0.7))
+      drop-shadow(0 0 60px rgba(0, 210, 255, 0.4));
   }
   to {
-    filter: drop-shadow(0 0 26px rgba(253, 164, 175, 0.8))
-      drop-shadow(0 0 70px rgba(249, 168, 212, 0.5));
+    filter: drop-shadow(0 0 26px rgba(0, 210, 255, 0.8))
+      drop-shadow(0 0 70px rgba(108, 92, 231, 0.5));
   }
 }
 
@@ -362,8 +377,8 @@ onUnmounted(() => {
   }
 
   .btn-primary {
-    background: linear-gradient(135deg, #ec4899, #db2777);
-    box-shadow: 0 8px 24px rgba(249, 168, 212, 0.4);
+    background: linear-gradient(135deg, #6c5ce7, #00d2ff);
+    box-shadow: 0 8px 24px rgba(108, 92, 231, 0.4);
     position: relative;
     overflow: hidden;
 
@@ -381,7 +396,7 @@ onUnmounted(() => {
 
     &:hover {
       transform: translateY(-3px);
-      box-shadow: 0 12px 30px rgba(253, 164, 175, 0.45);
+      box-shadow: 0 12px 30px rgba(0, 210, 255, 0.45);
     }
   }
 
@@ -390,8 +405,8 @@ onUnmounted(() => {
     background: rgba(255, 255, 255, 0.04);
 
     &:hover {
-      border-color: #fbcfe8;
-      background: rgba(249, 168, 212, 0.15);
+      border-color: #a29bfe;
+      background: rgba(108, 92, 231, 0.15);
       transform: translateY(-3px);
     }
   }
@@ -441,7 +456,7 @@ onUnmounted(() => {
       width: 4px;
       height: 8px;
       border-radius: 2px;
-      background: #fda4af;
+      background: #00d2ff;
       animation: wheel 1.6s ease infinite;
     }
   }
@@ -455,25 +470,6 @@ onUnmounted(() => {
   100% {
     opacity: 0;
     transform: translate(-50%, 12px);
-  }
-}
-
-/* 尊重系统减少动态偏好：关闭所有装饰动画 */
-@media (prefers-reduced-motion: reduce) {
-  .bg-orb,
-  .b-letter,
-  .brand-sub text,
-  .hero-actions,
-  .btn-primary::before,
-  .scroll-hint .mouse::after {
-    animation: none !important;
-  }
-
-  .b-letter,
-  .brand-sub text,
-  .hero-actions {
-    opacity: 1 !important;
-    transform: none !important;
   }
 }
 

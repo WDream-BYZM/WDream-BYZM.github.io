@@ -8,6 +8,7 @@
     <!-- 功能模块：游戏 / AI 聊天 入口 -->
     <view class="features" id="features">
       <view class="section-head">
+        <text class="section-sub">FEATURES</text>
         <text class="section-title">{{ t('features.title') }}</text>
         <view class="section-line"></view>
       </view>
@@ -59,10 +60,18 @@ function go(path) {
   .section-head {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     margin-bottom: 60rpx;
 
+    .section-sub {
+      color: #00d2ff;
+      font-size: 13px;
+      letter-spacing: 4px;
+      font-weight: 600;
+    }
+
     .section-title {
+      margin-top: 14rpx;
       font-size: 38px;
       font-weight: 800;
       color: #e8ecf7;
@@ -73,7 +82,7 @@ function go(path) {
       width: 60px;
       height: 4px;
       border-radius: 2px;
-      background: linear-gradient(90deg, #f9a8d4, #fda4af);
+      background: linear-gradient(90deg, #6c5ce7, #00d2ff);
     }
   }
 
@@ -98,8 +107,8 @@ function go(path) {
 
       &:hover {
         transform: translateY(-6px);
-        border-color: rgba(249, 168, 212, 0.55);
-        box-shadow: 0 14px 36px rgba(249, 168, 212, 0.2);
+        border-color: rgba(108, 92, 231, 0.55);
+        box-shadow: 0 14px 36px rgba(108, 92, 231, 0.2);
       }
 
       .fc-emoji {
@@ -125,7 +134,7 @@ function go(path) {
       }
 
       .fc-arrow {
-        color: #fbcfe8;
+        color: #a29bfe;
         font-size: 22px;
       }
     }

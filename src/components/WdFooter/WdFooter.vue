@@ -49,7 +49,7 @@ const version = pkg.version
     width: 34px;
     height: 34px;
     border-radius: 10px;
-    background: linear-gradient(135deg, #ec4899, #db2777);
+    background: linear-gradient(135deg, #6c5ce7, #00d2ff);
     display: flex;
     align-items: center;
     justify-content: center;
