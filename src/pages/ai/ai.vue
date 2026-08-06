@@ -6,7 +6,6 @@
       <view class="back-btn" @click="goBack">
         <text>← 返回</text>
       </view>
-      <text class="ph-sub">{{ t('ai.subtitle') }}</text>
       <text class="ph-title">{{ t('ai.title') }}</text>
     </view>
 
@@ -65,8 +64,8 @@ function goBack() {
     }
 
     &:hover {
-      border-color: rgba(108, 92, 231, 0.5);
-      background: rgba(108, 92, 231, 0.15);
+      border-color: rgba(52, 211, 153, 0.5);
+      background: rgba(52, 211, 153, 0.15);
 
       text {
         color: #fff;
@@ -75,7 +74,7 @@ function goBack() {
   }
 
   .ph-sub {
-    color: #00d2ff;
+    color: #2dd4bf;
     font-size: 13px;
     letter-spacing: 4px;
     font-weight: 600;
