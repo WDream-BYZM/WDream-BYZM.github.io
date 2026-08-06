@@ -67,7 +67,7 @@ const stats = computed(() => [
     width: 60px;
     height: 4px;
     border-radius: 2px;
-    background: linear-gradient(90deg, #34d399, #2dd4bf);
+    background: linear-gradient(90deg, #f9a8d4, #fda4af);
   }
 }
 

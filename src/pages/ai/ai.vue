@@ -64,8 +64,8 @@ function goBack() {
     }
 
     &:hover {
-      border-color: rgba(52, 211, 153, 0.5);
-      background: rgba(52, 211, 153, 0.15);
+      border-color: rgba(249, 168, 212, 0.5);
+      background: rgba(249, 168, 212, 0.15);
 
       text {
         color: #fff;
@@ -74,7 +74,7 @@ function goBack() {
   }
 
   .ph-sub {
-    color: #2dd4bf;
+    color: #fda4af;
     font-size: 13px;
     letter-spacing: 4px;
     font-weight: 600;

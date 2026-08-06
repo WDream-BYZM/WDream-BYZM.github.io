@@ -73,7 +73,7 @@ function go(path) {
       width: 60px;
       height: 4px;
       border-radius: 2px;
-      background: linear-gradient(90deg, #34d399, #2dd4bf);
+      background: linear-gradient(90deg, #f9a8d4, #fda4af);
     }
   }
 
@@ -98,8 +98,8 @@ function go(path) {
 
       &:hover {
         transform: translateY(-6px);
-        border-color: rgba(52, 211, 153, 0.55);
-        box-shadow: 0 14px 36px rgba(52, 211, 153, 0.2);
+        border-color: rgba(249, 168, 212, 0.55);
+        box-shadow: 0 14px 36px rgba(249, 168, 212, 0.2);
       }
 
       .fc-emoji {
@@ -125,7 +125,7 @@ function go(path) {
       }
 
       .fc-arrow {
-        color: #6ee7b7;
+        color: #fbcfe8;
         font-size: 22px;
       }
     }

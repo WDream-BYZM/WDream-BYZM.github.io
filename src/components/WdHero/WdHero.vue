@@ -96,8 +96,8 @@ function initThree() {
   const count = 2000
   const positions = new Float32Array(count * 3)
   const colors = new Float32Array(count * 3)
-  const c1 = new THREE.Color(0x34d399)
-  const c2 = new THREE.Color(0x2dd4bf)
+  const c1 = new THREE.Color(0xf9a8d4)
+  const c2 = new THREE.Color(0xfda4af)
   for (let i = 0; i < count; i++) {
     positions[i * 3] = (Math.random() - 0.5) * 18
     positions[i * 3 + 1] = (Math.random() - 0.5) * 18
@@ -211,7 +211,7 @@ onUnmounted(() => {
 .orb-1 {
   width: 480px;
   height: 480px;
-  background: rgba(52, 211, 153, 0.55);
+  background: rgba(249, 168, 212, 0.55);
   top: -120px;
   left: -120px;
   animation: float 8s ease-in-out infinite;
@@ -220,7 +220,7 @@ onUnmounted(() => {
 .orb-2 {
   width: 420px;
   height: 420px;
-  background: rgba(45, 212, 191, 0.4);
+  background: rgba(253, 164, 175, 0.4);
   bottom: -140px;
   right: -100px;
   animation: float 10s ease-in-out infinite reverse;
@@ -273,16 +273,16 @@ onUnmounted(() => {
     background: linear-gradient(
       180deg,
       #ffffff 0%,
-      #6ee7b7 35%,
-      #2dd4bf 70%,
-      #34d399 100%
+      #fbcfe8 35%,
+      #fda4af 70%,
+      #f9a8d4 100%
     );
     background-size: 100% 220%;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    filter: drop-shadow(0 0 22px rgba(52, 211, 153, 0.65))
-      drop-shadow(0 0 60px rgba(45, 212, 191, 0.35));
+    filter: drop-shadow(0 0 22px rgba(249, 168, 212, 0.65))
+      drop-shadow(0 0 60px rgba(253, 164, 175, 0.35));
     opacity: 0;
     animation: letterPop 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards,
       hueDrift 5s ease-in-out infinite alternate;
@@ -293,24 +293,24 @@ onUnmounted(() => {
   from {
     opacity: 0;
     transform: translateY(40px) scale(0.7) rotateX(45deg);
-    filter: blur(14px) drop-shadow(0 0 10px rgba(52, 211, 153, 0.8));
+    filter: blur(14px) drop-shadow(0 0 10px rgba(249, 168, 212, 0.8));
   }
   to {
     opacity: 1;
     transform: translateY(0) scale(1) rotateX(0);
-    filter: blur(0) drop-shadow(0 0 22px rgba(52, 211, 153, 0.65))
-      drop-shadow(0 0 60px rgba(45, 212, 191, 0.35));
+    filter: blur(0) drop-shadow(0 0 22px rgba(249, 168, 212, 0.65))
+      drop-shadow(0 0 60px rgba(253, 164, 175, 0.35));
   }
 }
 
 @keyframes hueDrift {
   from {
-    filter: drop-shadow(0 0 22px rgba(52, 211, 153, 0.7))
-      drop-shadow(0 0 60px rgba(45, 212, 191, 0.4));
+    filter: drop-shadow(0 0 22px rgba(249, 168, 212, 0.7))
+      drop-shadow(0 0 60px rgba(253, 164, 175, 0.4));
   }
   to {
-    filter: drop-shadow(0 0 26px rgba(45, 212, 191, 0.8))
-      drop-shadow(0 0 70px rgba(52, 211, 153, 0.5));
+    filter: drop-shadow(0 0 26px rgba(253, 164, 175, 0.8))
+      drop-shadow(0 0 70px rgba(249, 168, 212, 0.5));
   }
 }
 
@@ -362,8 +362,8 @@ onUnmounted(() => {
   }
 
   .btn-primary {
-    background: linear-gradient(135deg, #34d399, #2dd4bf);
-    box-shadow: 0 8px 24px rgba(52, 211, 153, 0.4);
+    background: linear-gradient(135deg, #ec4899, #db2777);
+    box-shadow: 0 8px 24px rgba(249, 168, 212, 0.4);
     position: relative;
     overflow: hidden;
 
@@ -381,7 +381,7 @@ onUnmounted(() => {
 
     &:hover {
       transform: translateY(-3px);
-      box-shadow: 0 12px 30px rgba(45, 212, 191, 0.45);
+      box-shadow: 0 12px 30px rgba(253, 164, 175, 0.45);
     }
   }
 
@@ -390,8 +390,8 @@ onUnmounted(() => {
     background: rgba(255, 255, 255, 0.04);
 
     &:hover {
-      border-color: #6ee7b7;
-      background: rgba(52, 211, 153, 0.15);
+      border-color: #fbcfe8;
+      background: rgba(249, 168, 212, 0.15);
       transform: translateY(-3px);
     }
   }
@@ -441,7 +441,7 @@ onUnmounted(() => {
       width: 4px;
       height: 8px;
       border-radius: 2px;
-      background: #2dd4bf;
+      background: #fda4af;
       animation: wheel 1.6s ease infinite;
     }
   }

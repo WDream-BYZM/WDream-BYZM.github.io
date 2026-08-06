@@ -39,7 +39,7 @@ const games = computed(() => [
     emoji: '🎮',
     name: t('games.items.tetris.name'),
     desc: t('games.items.tetris.desc'),
-    gradient: 'linear-gradient(135deg, #34d399, #2dd4bf)',
+    gradient: 'linear-gradient(135deg, #f9a8d4, #fda4af)',
     playable: true,
     url: '/legacy/tetris/index.html'
   },
@@ -48,7 +48,7 @@ const games = computed(() => [
     emoji: '🐍',
     name: t('games.items.snake.name'),
     desc: t('games.items.snake.desc'),
-    gradient: 'linear-gradient(135deg, #2dd4bf, #5eead4)',
+    gradient: 'linear-gradient(135deg, #fda4af, #fde68a)',
     playable: true,
     url: '/legacy/snake/index.html'
   },
@@ -57,7 +57,7 @@ const games = computed(() => [
     emoji: '🔢',
     name: t('games.items.g2048.name'),
     desc: t('games.items.g2048.desc'),
-    gradient: 'linear-gradient(135deg, #5eead4, #ff6b9d)',
+    gradient: 'linear-gradient(135deg, #fde68a, #f9a8d4)',
     playable: false,
     url: ''
   },
@@ -66,7 +66,7 @@ const games = computed(() => [
     emoji: '✈️',
     name: t('games.items.airplane.name'),
     desc: t('games.items.airplane.desc'),
-    gradient: 'linear-gradient(135deg, #ff6b9d, #2dd4bf)',
+    gradient: 'linear-gradient(135deg, #fbcfe8, #f9a8d4)',
     playable: true,
     url: '/legacy/airplane/index.html'
   },
@@ -75,7 +75,7 @@ const games = computed(() => [
     emoji: '🦘',
     name: t('games.items.jump.name'),
     desc: t('games.items.jump.desc'),
-    gradient: 'linear-gradient(135deg, #2dd4bf, #ff6b9d)',
+    gradient: 'linear-gradient(135deg, #f9a8d4, #fde68a)',
     playable: true,
     url: '/legacy/jump/index.html'
   }
@@ -116,13 +116,13 @@ function openGame(game) {
 
     &:hover {
       transform: translateY(-8px);
-      border-color: rgba(52, 211, 153, 0.6);
-      box-shadow: 0 18px 44px rgba(52, 211, 153, 0.22);
+      border-color: rgba(249, 168, 212, 0.6);
+      box-shadow: 0 18px 44px rgba(249, 168, 212, 0.22);
     }
 
     &.playable:hover {
-      border-color: rgba(45, 212, 191, 0.7);
-      box-shadow: 0 18px 44px rgba(45, 212, 191, 0.25);
+      border-color: rgba(253, 164, 175, 0.7);
+      box-shadow: 0 18px 44px rgba(253, 164, 175, 0.25);
     }
 
     .card-glow {
@@ -132,7 +132,7 @@ function openGame(game) {
       width: 160px;
       height: 160px;
       border-radius: 50%;
-      background: linear-gradient(135deg, rgba(52, 211, 153, 0.35), rgba(45, 212, 191, 0.35));
+      background: linear-gradient(135deg, rgba(249, 168, 212, 0.35), rgba(253, 164, 175, 0.35));
       filter: blur(30px);
       opacity: 0.5;
       transition: opacity 0.3s ease;
@@ -155,7 +155,7 @@ function openGame(game) {
         align-items: center;
         justify-content: center;
         font-size: 30px;
-        box-shadow: 0 8px 20px rgba(52, 211, 153, 0.3);
+        box-shadow: 0 8px 20px rgba(249, 168, 212, 0.3);
       }
 
       .card-status {
@@ -173,11 +173,11 @@ function openGame(game) {
         }
 
         &.playing {
-          background: rgba(45, 212, 191, 0.15);
+          background: rgba(253, 164, 175, 0.15);
           animation: pulse 2s ease infinite;
 
           text {
-            color: #2dd4bf;
+            color: #fda4af;
           }
         }
       }
@@ -206,14 +206,14 @@ function openGame(game) {
       margin-top: 26rpx;
 
       text {
-        color: #6ee7b7;
+        color: #fbcfe8;
         font-size: 14px;
         font-weight: 600;
       }
     }
 
     &.playable .card-footer text {
-      color: #2dd4bf;
+      color: #fda4af;
     }
   }
 }
@@ -221,10 +221,10 @@ function openGame(game) {
 @keyframes pulse {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.4);
+    box-shadow: 0 0 0 0 rgba(253, 164, 175, 0.4);
   }
   50% {
-    box-shadow: 0 0 0 8px rgba(45, 212, 191, 0);
+    box-shadow: 0 0 0 8px rgba(253, 164, 175, 0);
   }
 }
 </style>
