@@ -65,33 +65,13 @@
         </view>
       </view>
 
-      <!-- 在线房间列表 -->
+      <!-- 在线房间列表：均为 PeerJS P2P -->
       <view v-if="gameIdx === 0" class="rooms-panel">
         <view class="rooms-head">
-          <view class="rooms-title">🛰️ {{ t('games.multi.roomsTitle') }}</view>
-          <view class="rooms-sub">{{ t('games.multi.roomsSub') }}</view>
+          <view class="rooms-title">🛰️ {{ t('games.multi.roomsTetrisTitle') }}</view>
+          <view class="rooms-sub">{{ t('games.multi.roomsTetrisSub') }}</view>
         </view>
-        <view v-if="!MULTI_ENABLED" class="rooms-empty">🔧 {{ t('games.multi.maintenance') }}</view>
-        <view v-else-if="loadingRooms" class="rooms-empty">…</view>
-        <view v-else-if="rooms.length === 0" class="rooms-empty">{{ t('games.multi.roomsEmpty') }}</view>
-        <view v-else class="rooms-list">
-          <view
-            v-for="r in rooms"
-            :key="r.roomId"
-            class="room-row"
-            @click="joinRoomByCode(r.roomId)"
-          >
-            <view class="rr-left">
-              <view class="rr-code">{{ r.roomId }}</view>
-              <view class="rr-game">{{ r.game === 'tetris' ? t('games.multi.gameTetris') : r.game }}</view>
-            </view>
-            <view class="rr-mid">
-              <text class="rr-count">{{ r.players.length }}/{{ r.maxPlayers }}</text>
-              <text class="rr-players">{{ r.players.join('、') }}</text>
-            </view>
-            <view class="btn-join-sm">{{ t('games.multi.join') }} →</view>
-          </view>
-        </view>
+        <view class="rooms-empty">{{ t('games.multi.peerDesc') }}</view>
       </view>
 
       <!-- 飞行棋：PeerJS P2P 说明 -->
@@ -113,18 +93,15 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
-// 联机服务器 HTTP 接口地址（俄罗斯方块 WebSocket 方案，与 legacy/multi/config.js 保持一致）
-const MULTI_HTTP = 'https://byzm-desktop.tail2a2672.ts.net'
+// 俄罗斯方块联机（PeerJS P2P 直连）：无需服务器，启用
+const TETRIS_ENABLED = true
 
-// 俄罗斯方块联机（WebSocket 服务器方案）：服务器未部署，禁用
-const MULTI_ENABLED = false
-
-// 飞行棋联机（PeerJS P2P 直连）：浏览器点对点，无需服务器，启用
+// 飞行棋联机（PeerJS P2P 直连）：无需服务器，启用
 const FLIGHT_ENABLED = true
 
 const gameOptions = [t('games.multi.gameTetris'), t('games.multi.gameAirplane')]
@@ -133,26 +110,9 @@ const gameIdx = ref(1)
 const playerIdx = ref(2)
 
 // 当前所选游戏联机是否可用（不可用则禁用按钮并提示维护）
-const isDisabled = computed(() => (gameIdx.value === 0 ? !MULTI_ENABLED : !FLIGHT_ENABLED))
+const isDisabled = computed(() => (gameIdx.value === 0 ? !TETRIS_ENABLED : !FLIGHT_ENABLED))
 const nickname = ref(localStorage.getItem('byzm_name') || '')
 const roomInput = ref('')
-
-// 在线房间列表
-const rooms = ref([])
-const loadingRooms = ref(true)
-let roomsTimer = null
-
-async function loadRooms() {
-  try {
-    const res = await fetch(MULTI_HTTP + '/rooms', { mode: 'cors' })
-    const data = await res.json()
-    rooms.value = (data.rooms || []).filter((r) => r.players && r.players.length > 0)
-  } catch (e) {
-    rooms.value = []
-  } finally {
-    loadingRooms.value = false
-  }
-}
 
 function joinRoomByCode(room) {
   if (isDisabled.value) {
@@ -164,19 +124,7 @@ function joinRoomByCode(room) {
   goMulti(room, max, 'join')
 }
 
-onMounted(() => {
-  if (!MULTI_ENABLED) {
-    loadingRooms.value = false
-    return
-  }
-  loadingRooms.value = true
-  loadRooms()
-  roomsTimer = setInterval(loadRooms, 5000)
-})
-
-onUnmounted(() => {
-  if (roomsTimer) clearInterval(roomsTimer)
-})
+onMounted(() => {})
 
 function onGameChange(e) {
   gameIdx.value = +e.detail.value
@@ -228,8 +176,8 @@ function goMulti(room, max, mode) {
     // 飞行棋：PeerJS P2P 联机（mode=create 房主 / mode=join 加入）
     window.location.href = `/legacy/airplane/index.html?mode=${mode}&room=${room}&max=${max}&name=${name}`
   } else {
-    // 俄罗斯方块：WebSocket 服务器方案
-    window.location.href = `/legacy/multi/index.html?game=tetris&room=${room}&max=${max}&name=${name}`
+    // 俄罗斯方块：PeerJS P2P 联机（mode=create 房主 / mode=join 加入）
+    window.location.href = `/legacy/multi/index.html?mode=${mode}&game=tetris&room=${room}&max=${max}&name=${name}`
   }
   /* #endif */
 }

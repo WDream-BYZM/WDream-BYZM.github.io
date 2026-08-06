@@ -149,19 +149,8 @@
   var MAX = parseInt(params.get('max') || '4', 10)
   var MY_NAME = (params.get('name') || localStorage.getItem('byzm_name') || '玩家').slice(0, 12)
   localStorage.setItem('byzm_name', MY_NAME)
-
-  var wsUrl = (window.MULTI_CONFIG && window.MULTI_CONFIG.wsUrl) || ''
-  // 支持 ?ws= 参数临时覆盖服务器地址（测试用）
-  var wsParam = params.get('ws')
-  if (wsParam) wsUrl = wsParam
-  if (!wsUrl) {
-    wsUrl = location.protocol === 'https:' ? 'wss://' : 'ws://'
-    wsUrl += location.host
-  }
-  // 规范化基础地址：去掉末尾斜杠和可能已存在的 /room
-  wsUrl = wsUrl.replace(/\/+$/, '').replace(/\/room$/, '')
-  // ★ 关键：必须拼上房间号（Cloudflare Worker 要求 /room/<roomId>）
-  wsUrl += '/room/' + ROOM
+  // 联机方式：mode=create 房主 / mode=join 加入（PeerJS P2P，免服务器）
+  var IS_HOST = params.get('mode') === 'create'
 
   // ========== DOM ==========
   var $ = function (id) { return document.getElementById(id) }
@@ -170,7 +159,6 @@
   var btnReady = $('btnReady'), btnStart = $('btnStart'), btnCopy = $('btnCopy')
 
   // ========== 房间状态 ==========
-  var ws = null
   var me = null           // { id, name }
   var hostId = null
   var players = []        // [{ id, name }]
@@ -184,55 +172,149 @@
   var COLORS = ['#00d2ff', '#ff6b9d', '#ffe066', '#7b68ee']
   var AV_COLORS = ['#00d2ff', '#ff6b9d', '#ffe066', '#a29bfe']
 
-  // ========== WebSocket ==========
+  // ========== PeerJS 联机（P2P，免服务器） ==========
   function setDot(cls) { dot.className = 'dot ' + cls }
 
-  function connect() {
-    setDot('bad')
-    ws = new WebSocket(wsUrl)
-    ws.onopen = function () {
-      setDot('ok')
-      ws.send(JSON.stringify({ type: 'join', name: MY_NAME }))
-    }
-    ws.onclose = function () {
-      setDot('bad')
-      if (!started) setTimeout(connect, 1500)
-    }
-    ws.onerror = function () { setDot('bad') }
-    ws.onmessage = function (e) {
-      var msg
-      try { msg = JSON.parse(e.data) } catch (err) { return }
-      handleMsg(msg)
+  // 多 CDN 加载 PeerJS
+  function lPJ(attempt) {
+    attempt = attempt || 0
+    return new Promise(function (ok, no) {
+      if (window.Peer) return ok()
+      var srcs = [
+        'https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js',
+        'https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js'
+      ]
+      if (attempt >= srcs.length) return no(new Error('CDN加载失败'))
+      var s = document.createElement('script')
+      s.src = srcs[attempt]
+      s.onload = function () { setTimeout(function () { window.Peer ? ok() : lPJ(attempt + 1).then(ok).catch(no) }, 500) }
+      s.onerror = function () { lPJ(attempt + 1).then(ok).catch(no) }
+      document.head.appendChild(s)
+    })
+  }
+
+  var peer = null
+  var conns = {}          // host: guestId -> conn ; guest: { host: conn }
+  var myId = null         // 自己的玩家 id
+
+  function setPlayers(list, hid) {
+    players = list || []
+    hostId = hid || null
+    players.forEach(function (p) { if (!(p.id in ready)) ready[p.id] = false })
+    renderPlayers()
+  }
+
+  // 发送（对局内/大厅调用）：broadcast / room
+  function send(obj) {
+    var d = obj && obj.data
+    if (!d) return
+    if (IS_HOST) {
+      // 房主：本机处理 + 转发给所有客人
+      onPeer({ from: myId, data: d })
+      Object.keys(conns).forEach(function (k) {
+        try { conns[k].send({ type: 'peer', from: myId, data: d }) } catch (e) {}
+      })
+    } else {
+      // 客人：发给房主，由房主转发
+      if (conns.host) try { conns.host.send({ type: 'peer', data: d }) } catch (e) {}
     }
   }
 
-  function handleMsg(msg) {
+  // 接收远端消息
+  function handleIncoming(msg) {
+    if (!msg) return
     switch (msg.type) {
       case 'welcome':
         me = { id: msg.id, name: MY_NAME }
         hostId = msg.hostId
+        myId = msg.id
+        setPlayers(msg.players, msg.hostId)
         break
       case 'players':
-        players = msg.players || []
-        hostId = msg.hostId
-        players.forEach(function (p) { if (!(p.id in ready)) ready[p.id] = false })
-        renderPlayers()
-        break
       case 'playerLeft':
-        players = msg.players || []
-        hostId = msg.hostId
-        renderPlayers()
+        setPlayers(msg.players, msg.hostId)
         break
       case 'peer':
         onPeer(msg)
         break
-      case 'error':
-        alert('服务器错误：' + msg.msg)
-        break
     }
   }
 
-  function send(obj) { if (ws && ws.readyState === 1) ws.send(JSON.stringify(obj)) }
+  // 房主端收到客人消息
+  function onHostMsg(conn, msg) {
+    if (msg.type === 'join') {
+      var id = 'p' + Math.random().toString(36).slice(2, 8)
+      conn.playerId = id
+      conns[id] = conn
+      players.push({ id: id, name: msg.name || '玩家' })
+      ready[id] = false
+      alive[id] = true
+      var pl = players.map(function (p) { return { id: p.id, name: p.name } })
+      try { conn.send({ type: 'welcome', id: id, hostId: 'host', players: pl }) } catch (e) {}
+      Object.keys(conns).forEach(function (k) { try { conns[k].send({ type: 'players', players: pl, hostId: 'host' }) } catch (e) {} })
+      renderPlayers()
+    } else if (msg.type === 'peer') {
+      var from = conn.playerId
+      var d = msg.data
+      onPeer({ from: from, data: d })
+      Object.keys(conns).forEach(function (k) {
+        if (k !== from) { try { conns[k].send({ type: 'peer', from: from, data: d }) } catch (e) {} }
+      })
+    }
+  }
+
+  function initHost() {
+    setDot('bad')
+    lPJ().then(function () {
+      peer = new Peer('tetris_' + ROOM, { debug: 0 })
+      peer.on('open', function () {
+        setDot('ok')
+        myId = 'host'
+        me = { id: 'host', name: MY_NAME }
+        hostId = 'host'
+        players = [{ id: 'host', name: MY_NAME }]
+        ready.host = false
+        alive.host = true
+        renderPlayers()
+      })
+      peer.on('connection', function (conn) {
+        conn.on('open', function () {
+          conn.on('data', function (m) { onHostMsg(conn, m) })
+          conn.on('close', function () {
+            var pid = conn.playerId
+            if (pid && conns[pid]) {
+              delete conns[pid]
+              players = players.filter(function (p) { return p.id !== pid })
+              delete alive[pid]
+              var pl = players.map(function (p) { return { id: p.id, name: p.name } })
+              Object.keys(conns).forEach(function (k) { try { conns[k].send({ type: 'playerLeft', players: pl, hostId: 'host' }) } catch (e) {} })
+              renderPlayers()
+            }
+          })
+        })
+      })
+      peer.on('error', function () { setDot('bad') })
+    }).catch(function () { setDot('bad') })
+  }
+
+  function initGuest() {
+    setDot('bad')
+    lPJ().then(function () {
+      peer = new Peer('g' + Math.random().toString(36).slice(2, 8), { debug: 0 })
+      peer.on('open', function () {
+        var c = peer.connect('tetris_' + ROOM, { reliable: true })
+        c.on('open', function () {
+          setDot('ok')
+          conns.host = c
+          c.on('data', function (m) { handleIncoming(m) })
+          c.on('close', function () { setDot('bad') })
+          c.send({ type: 'join', name: MY_NAME })
+        })
+      })
+      peer.on('error', function () { setDot('bad') })
+    }).catch(function () { setDot('bad') })
+  }
 
   // ========== 大厅渲染 ==========
   function renderPlayers() {
@@ -669,7 +751,8 @@
 
   // ========== 启动 ==========
   $('roomCode').textContent = ROOM
-  connect()
+  if (IS_HOST) initHost()
+  else initGuest()
 })()
 </script>
 </body>

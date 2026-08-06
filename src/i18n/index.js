@@ -80,6 +80,8 @@ const messages = {
         roomsEmpty: '暂无在线房间，创建一个房间开始对战吧',
         roomsAirplaneTitle: '飞行棋 · P2P 房间',
         roomsAirplaneSub: 'PEER-TO-PEER',
+        roomsTetrisTitle: '俄罗斯方块 · P2P 房间',
+        roomsTetrisSub: 'PEER-TO-PEER',
         peerDesc: '浏览器直连对战：点击「创建房间」生成 4 位房间号发给好友，或输入房间号加入。无需服务器，免费可用。',
         maintenance: '联机功能维护中，敬请期待'
       }
@@ -200,6 +202,8 @@ const messages = {
         roomsEmpty: 'No active rooms. Create one to start playing!',
         roomsAirplaneTitle: 'Flying Chess · P2P Rooms',
         roomsAirplaneSub: 'PEER-TO-PEER',
+        roomsTetrisTitle: 'Tetris · P2P Rooms',
+        roomsTetrisSub: 'PEER-TO-PEER',
         peerDesc: 'Browser peer-to-peer: create a room and share the 4-digit code, or join with a code. No server needed, free to use.',
         maintenance: 'Multiplayer is under maintenance, coming soon'
       }
