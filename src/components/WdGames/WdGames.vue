@@ -78,6 +78,15 @@ const games = computed(() => [
     gradient: 'linear-gradient(135deg, #00d2ff, #ff6b9d)',
     playable: true,
     url: '/legacy/jump/index.html'
+  },
+  {
+    key: 'nes',
+    emoji: '🕹️',
+    name: t('games.items.nes.name'),
+    desc: t('games.items.nes.desc'),
+    gradient: 'linear-gradient(135deg, #6c5ce7, #ff6b9d)',
+    playable: true,
+    url: '/legacy/nes/index.html'
   }
 ])
 

@@ -56,6 +56,11 @@ const messages = {
           name: '飞行棋',
           desc: '经典飞行棋，掷骰子起飞，踩到对方可送回基地，2-4 人同屏游玩。',
           tag: '经典'
+        },
+        nes: {
+          name: 'NES 红白机',
+          desc: '浏览器运行 FC/NES 游戏模拟器，支持载入 .nes 游戏文件。',
+          tag: '模拟器'
         }
       },
       multi: {
@@ -178,6 +183,11 @@ const messages = {
           name: 'Flying Chess',
           desc: 'Classic flying chess. Roll the dice to take off, land on rivals to send them home. 2-4 players.',
           tag: 'Classic'
+        },
+        nes: {
+          name: 'NES Console',
+          desc: 'Run NES/FC games in the browser. Load your own .nes ROM files.',
+          tag: 'Emulator'
         }
       },
       multi: {

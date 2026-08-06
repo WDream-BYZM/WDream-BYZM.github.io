@@ -93,7 +93,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -124,7 +124,9 @@ function joinRoomByCode(room) {
   goMulti(room, max, 'join')
 }
 
-onMounted(() => {})
+onMounted(() => {
+  // 预留：页面挂载初始化
+})
 
 function onGameChange(e) {
   gameIdx.value = +e.detail.value
