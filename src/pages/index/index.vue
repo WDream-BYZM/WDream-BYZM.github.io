@@ -42,6 +42,39 @@ import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
+// 板块滚动进入过渡：进入视口时淡入上移（H5；轮询等待元素渲染，最可靠）
+if (typeof window !== 'undefined') {
+  setTimeout(function () {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    var shown = {}
+    var initialized = false
+    var timer = setInterval(function () {
+      var els = Array.prototype.slice.call(document.querySelectorAll('#about, #features, #contact'))
+      if (!els.length) return // 页面尚未渲染完，下一轮再试
+      if (!initialized) {
+        initialized = true
+        els.forEach(function (el) { el.classList.add('reveal-pre') })
+      }
+      var vh = window.innerHeight || document.documentElement.clientHeight
+      els.forEach(function (el) {
+        if (shown[el.id]) return
+        var r = el.getBoundingClientRect()
+        // 布局未完成时元素无尺寸，跳过避免误判
+        if (!r.width && !r.height) return
+        if (r.top < vh * 0.88) {
+          el.classList.add('reveal-in')
+          el.classList.remove('reveal-pre')
+          shown[el.id] = true
+        }
+      })
+      if (els.every(function (el) { return shown[el.id] })) {
+        clearInterval(timer)
+        timer = null
+      }
+    }, 500)
+  }, 300)
+}
+
 function go(path) {
   uni.navigateTo({ url: path })
 }
