@@ -7,9 +7,8 @@
       :class="{ playable: game.playable }"
       @click="openGame(game)"
     >
-      <view class="card-glow"></view>
       <view class="card-top">
-        <view class="card-icon" :style="{ background: game.gradient }">
+        <view class="card-icon">
           <text>{{ game.emoji }}</text>
         </view>
         <view class="card-status" :class="{ playing: game.playable }">
@@ -39,7 +38,6 @@ const games = computed(() => [
     emoji: '🎮',
     name: t('games.items.tetris.name'),
     desc: t('games.items.tetris.desc'),
-    gradient: 'linear-gradient(135deg, #6c5ce7, #00d2ff)',
     playable: true,
     url: '/legacy/tetris/index.html'
   },
@@ -48,7 +46,6 @@ const games = computed(() => [
     emoji: '🐍',
     name: t('games.items.snake.name'),
     desc: t('games.items.snake.desc'),
-    gradient: 'linear-gradient(135deg, #00d2ff, #7b68ee)',
     playable: true,
     url: '/legacy/snake/index.html'
   },
@@ -57,7 +54,6 @@ const games = computed(() => [
     emoji: '🔢',
     name: t('games.items.g2048.name'),
     desc: t('games.items.g2048.desc'),
-    gradient: 'linear-gradient(135deg, #7b68ee, #ff6b9d)',
     playable: false,
     url: ''
   },
@@ -66,7 +62,6 @@ const games = computed(() => [
     emoji: '✈️',
     name: t('games.items.airplane.name'),
     desc: t('games.items.airplane.desc'),
-    gradient: 'linear-gradient(135deg, #ff6b9d, #00d2ff)',
     playable: true,
     url: '/legacy/airplane/index.html'
   },
@@ -75,7 +70,6 @@ const games = computed(() => [
     emoji: '🦘',
     name: t('games.items.jump.name'),
     desc: t('games.items.jump.desc'),
-    gradient: 'linear-gradient(135deg, #00d2ff, #ff6b9d)',
     playable: true,
     url: '/legacy/jump/index.html'
   },
@@ -84,7 +78,6 @@ const games = computed(() => [
     emoji: '🕹️',
     name: t('games.items.nes.name'),
     desc: t('games.items.nes.desc'),
-    gradient: 'linear-gradient(135deg, #6c5ce7, #ff6b9d)',
     playable: true,
     url: '/legacy/nes/index.html'
   }
@@ -109,46 +102,27 @@ function openGame(game) {
 .games-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 28rpx;
+  gap: 16px;
 
   .game-card {
     position: relative;
-    flex: 1 1 calc(33.333% - 19px);
+    flex: 1 1 calc(33.333% - 11px);
     min-width: 240px;
-    padding: 36rpx 32rpx;
-    border-radius: 22px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 24px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     overflow: hidden;
     cursor: pointer;
-    transition: all 0.35s ease;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.12s ease-out;
 
     &:hover {
-      transform: translateY(-8px);
-      border-color: rgba(108, 92, 231, 0.6);
-      box-shadow: 0 18px 44px rgba(108, 92, 231, 0.22);
+      border-color: rgba(10, 132, 255, 0.45);
+      background: rgba(255, 255, 255, 0.07);
     }
 
-    &.playable:hover {
-      border-color: rgba(0, 210, 255, 0.7);
-      box-shadow: 0 18px 44px rgba(0, 210, 255, 0.25);
-    }
-
-    .card-glow {
-      position: absolute;
-      top: -60px;
-      right: -60px;
-      width: 160px;
-      height: 160px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, rgba(108, 92, 231, 0.35), rgba(0, 210, 255, 0.35));
-      filter: blur(30px);
-      opacity: 0.5;
-      transition: opacity 0.3s ease;
-    }
-
-    &:hover .card-glow {
-      opacity: 0.9;
+    &:active {
+      transform: scale(0.98);
     }
 
     .card-top {
@@ -157,19 +131,20 @@ function openGame(game) {
       justify-content: space-between;
 
       .card-icon {
-        width: 60px;
-        height: 60px;
-        border-radius: 16px;
+        width: 52px;
+        height: 52px;
+        border-radius: 13px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 30px;
-        box-shadow: 0 8px 20px rgba(108, 92, 231, 0.3);
+        font-size: 26px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
       }
 
       .card-status {
-        width: 34px;
-        height: 34px;
+        width: 30px;
+        height: 30px;
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.06);
         display: flex;
@@ -177,63 +152,53 @@ function openGame(game) {
         justify-content: center;
 
         text {
-          font-size: 14px;
-          color: #8a93ab;
+          font-size: 12px;
+          color: #6e6e73;
         }
 
         &.playing {
-          background: rgba(0, 210, 255, 0.15);
-          animation: pulse 2s ease infinite;
+          background: rgba(10, 132, 255, 0.15);
 
           text {
-            color: #00d2ff;
+            color: #0a84ff;
           }
         }
       }
     }
 
     .card-body {
-      margin-top: 28rpx;
+      margin-top: 20px;
       display: flex;
       flex-direction: column;
 
       .card-name {
-        color: #e8ecf7;
-        font-size: 19px;
+        color: #f5f5f7;
+        font-size: 18px;
         font-weight: 700;
+        letter-spacing: -0.01em;
       }
 
       .card-desc {
-        margin-top: 12rpx;
-        color: #8a93ab;
+        margin-top: 8px;
+        color: #98989d;
         font-size: 14px;
-        line-height: 1.7;
+        line-height: 1.6;
       }
     }
 
     .card-footer {
-      margin-top: 26rpx;
+      margin-top: 18px;
 
       text {
-        color: #a29bfe;
+        color: #6e6e73;
         font-size: 14px;
         font-weight: 600;
       }
     }
 
     &.playable .card-footer text {
-      color: #00d2ff;
+      color: #0a84ff;
     }
-  }
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 rgba(0, 210, 255, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 8px rgba(0, 210, 255, 0);
   }
 }
 </style>

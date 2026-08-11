@@ -95,8 +95,10 @@ const messages = {
       title: '功能板块',
       games: '游戏',
       ai: 'AI 聊天',
+      opensource: '开源项目',
       gamesDesc: '俄罗斯方块、贪吃蛇、2048 小游戏',
-      aiDesc: '文字对话与图片识别智能助手'
+      aiDesc: '文字对话与图片识别智能助手',
+      opensourceDesc: 'PC 灵动岛小组件，免费开源'
     },
     ai: {
       title: 'AI 聊天',
@@ -107,6 +109,29 @@ const messages = {
       image: '[图片]',
       visionPrefix: '（图片识别结果：',
       visionUnconfigured: '图片识别服务尚未配置，请提供视觉 AI 的接入信息。'
+    },
+    opensource: {
+      title: '开源项目',
+      subtitle: 'OPEN SOURCE PROJECTS',
+      tag: '开源 · 免费',
+      name: 'PC Dynamic Island',
+      nameZh: 'PC灵动岛',
+      slogan: '在 Windows 上复刻苹果灵动岛，将通知、音乐、系统状态等融合进一块微型悬浮面板。',
+      modules: [
+        { name: '总览', desc: '实时时钟、日期、时段问候' },
+        { name: 'AI 对话', desc: '接入 DeepSeek 等 OpenAI 兼容 API，可自定义助手' },
+        { name: '翻译', desc: 'AI 即时翻译' },
+        { name: '消息', desc: '复制即上岛，剪贴板通知' },
+        { name: '搜索', desc: '快速搜索' },
+        { name: '天气', desc: '实时天气 + 3 天预报，免费 API 无需 key' },
+        { name: '计时', desc: '倒计时圆环进度，可暂停/继续/重置' },
+        { name: '状态', desc: '系统状态一览（音乐等）' },
+        { name: '设置', desc: '切换城市、窗口置顶、双模式、退出' }
+      ],
+      download: '下载安装包',
+      github: 'GitHub 源码',
+      soon: '安装包即将上线，敬请期待',
+      date: '8月11日 星期二'
     },
     contact: {
       title: '联系我',
@@ -222,8 +247,10 @@ const messages = {
       title: 'Features',
       games: 'Games',
       ai: 'AI Chat',
+      opensource: 'Open Source',
       gamesDesc: 'Tetris, Snake, 2048 mini games',
-      aiDesc: 'Text chat and image recognition AI'
+      aiDesc: 'Text chat and image recognition AI',
+      opensourceDesc: 'PC Dynamic Island widget, free & open source'
     },
     ai: {
       title: 'AI Chat',
@@ -235,6 +262,29 @@ const messages = {
       visionPrefix: '(Image recognition result: ',
       visionUnconfigured:
         'Image recognition service is not configured yet. Please provide the vision AI access info.'
+    },
+    opensource: {
+      title: 'Open Source',
+      subtitle: 'OPEN SOURCE PROJECTS',
+      tag: 'Open Source · Free',
+      name: 'PC Dynamic Island',
+      nameZh: '',
+      slogan: 'Recreate the Apple Dynamic Island on Windows — merging notifications, music, and system status into one tiny floating panel.',
+      modules: [
+        { name: 'Overview', desc: 'Live clock, date & time-of-day greeting' },
+        { name: 'AI Chat', desc: 'OpenAI-compatible agents (DeepSeek, etc.)' },
+        { name: 'Translate', desc: 'AI instant translation' },
+        { name: 'Messages', desc: 'Copy anything, it pops onto the Island' },
+        { name: 'Search', desc: 'Quick search' },
+        { name: 'Weather', desc: 'Current + 3-day forecast, free API' },
+        { name: 'Timer', desc: 'Countdown ring, pause / resume / reset' },
+        { name: 'Status', desc: 'System overview (music, etc.)' },
+        { name: 'Settings', desc: 'City, always-on-top, dual mode, exit' }
+      ],
+      download: 'Download App',
+      github: 'GitHub Source',
+      soon: 'Installation package coming soon',
+      date: 'Tue, Aug 11'
     },
     contact: {
       title: 'Contact Me',

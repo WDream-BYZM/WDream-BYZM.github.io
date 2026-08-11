@@ -2,7 +2,6 @@
   <view class="wd-section" id="ai">
     <view class="section-inner">
       <view class="section-head">
-        <text class="section-sub">{{ t('ai.subtitle') }}</text>
         <text class="section-title">{{ t('ai.title') }}</text>
         <view class="section-line"></view>
       </view>
@@ -230,32 +229,26 @@ function requestDeepSeek(msgs) {
   align-items: center;
   margin-bottom: 60rpx;
 
-  .section-sub {
-    color: #00d2ff;
-    font-size: 13px;
-    letter-spacing: 4px;
-    font-weight: 600;
-  }
-
   .section-title {
-    margin-top: 14rpx;
-    font-size: 38px;
+    font-size: 36px;
     font-weight: 800;
-    color: #e8ecf7;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: #f5f5f7;
   }
 
   .section-line {
-    margin-top: 20rpx;
-    width: 60px;
-    height: 4px;
+    margin-top: 24rpx;
+    width: 40px;
+    height: 3px;
     border-radius: 2px;
-    background: linear-gradient(90deg, #6c5ce7, #00d2ff);
+    background: #0a84ff;
   }
 }
 
 .chat-box {
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
   background: rgba(255, 255, 255, 0.03);
   overflow: hidden;
 
@@ -266,37 +259,37 @@ function requestDeepSeek(msgs) {
 
     .msg {
       display: flex;
-      margin-bottom: 28rpx;
+      margin-bottom: 20px;
       align-items: flex-start;
 
       .msg-avatar {
-        width: 38px;
-        height: 38px;
-        border-radius: 12px;
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        font-size: 11px;
+        font-size: 10px;
         font-weight: 800;
         letter-spacing: 0.5px;
 
         &.assistant {
-          background: linear-gradient(135deg, #6c5ce7, #00d2ff);
+          background: #0a84ff;
           color: #fff;
-          margin-right: 14rpx;
+          margin-right: 12px;
         }
 
         &.user {
-          background: rgba(0, 210, 255, 0.15);
-          color: #00d2ff;
-          margin-left: 14rpx;
+          background: rgba(255, 255, 255, 0.1);
+          color: #f5f5f7;
+          margin-left: 12px;
         }
       }
 
       .msg-bubble {
         max-width: 78%;
-        padding: 16px 18px;
+        padding: 12px 16px;
         border-radius: 16px;
         font-size: 14px;
         line-height: 1.7;
@@ -311,7 +304,7 @@ function requestDeepSeek(msgs) {
         }
 
         text {
-          color: #e8ecf7;
+          color: #f5f5f7;
           white-space: pre-wrap;
         }
 
@@ -324,7 +317,7 @@ function requestDeepSeek(msgs) {
             width: 6px;
             height: 6px;
             border-radius: 50%;
-            background: #a29bfe;
+            background: #0a84ff;
             animation: blink 1.2s ease infinite;
 
             &:nth-child(2) {
@@ -340,8 +333,8 @@ function requestDeepSeek(msgs) {
 
       &.assistant {
         .msg-bubble {
-          background: rgba(108, 92, 231, 0.12);
-          border: 1px solid rgba(108, 92, 231, 0.25);
+          background: rgba(255, 255, 255, 0.06);
+          border: 1px solid rgba(255, 255, 255, 0.1);
         }
       }
 
@@ -349,8 +342,8 @@ function requestDeepSeek(msgs) {
         flex-direction: row-reverse;
 
         .msg-bubble {
-          background: rgba(0, 210, 255, 0.12);
-          border: 1px solid rgba(0, 210, 255, 0.3);
+          background: rgba(10, 132, 255, 0.16);
+          border: 1px solid rgba(10, 132, 255, 0.3);
         }
       }
     }
@@ -359,10 +352,10 @@ function requestDeepSeek(msgs) {
   .chat-input {
     display: flex;
     align-items: center;
-    gap: 16rpx;
-    padding: 24rpx 26rpx;
-    border-top: 1px solid rgba(255, 255, 255, 0.07);
-    background: rgba(11, 15, 28, 0.5);
+    gap: 10px;
+    padding: 14px 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.4);
 
     .img-btn {
       width: 44px;
@@ -374,37 +367,34 @@ function requestDeepSeek(msgs) {
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.25s ease;
+      transition: background 0.15s ease;
 
       text {
         font-size: 20px;
       }
 
       &:hover {
-        border-color: rgba(108, 92, 231, 0.5);
-        background: rgba(108, 92, 231, 0.15);
-        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.1);
       }
 
       &.disabled {
         opacity: 0.5;
         cursor: not-allowed;
-        transform: none;
       }
     }
 
     .input-field {
       flex: 1;
       height: 44px;
-      padding: 0 20px;
+      padding: 0 18px;
       border-radius: 22px;
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #e8ecf7;
+      color: #f5f5f7;
       font-size: 14px;
 
       &:focus {
-        border-color: rgba(0, 210, 255, 0.5);
+        border-color: rgba(10, 132, 255, 0.5);
       }
     }
 
@@ -412,13 +402,13 @@ function requestDeepSeek(msgs) {
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #6c5ce7, #00d2ff);
+      background: #0a84ff;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.25s ease;
-      box-shadow: 0 6px 18px rgba(108, 92, 231, 0.4);
+      transition: transform 0.12s ease-out, background 0.15s ease;
+      box-shadow: 0 6px 18px rgba(10, 132, 255, 0.4);
 
       text {
         color: #fff;
@@ -427,8 +417,12 @@ function requestDeepSeek(msgs) {
       }
 
       &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 24px rgba(0, 210, 255, 0.45);
+        background: #2b8cff;
+      }
+
+      &:active {
+        background: #0070e0;
+        transform: scale(0.94);
       }
 
       &.disabled {

@@ -5,30 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>贪吃蛇</title>
 <style>
-  .home-btn { position: fixed; top: 20px; left: 20px; z-index: 30; padding: 10px 22px; border-radius: 20px; background: rgba(21,26,44,.85); border: 1px solid rgba(255,255,255,.15); color: #e8ecf7; text-decoration: none; font-size: 14px; font-weight: 600; font-family: 'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; backdrop-filter: blur(6px); transition: all .25s ease; }
-  .home-btn:hover { border-color: rgba(108,92,231,.6); background: rgba(108,92,231,.25); color: #fff; }
+  .home-btn { position: fixed; top: max(14px, env(safe-area-inset-top)); left: 14px; z-index: 30; padding: 9px 16px; border-radius: 999px; background: rgba(28,28,30,.72); border: 1px solid rgba(255,255,255,.12); color: #0a84ff; text-decoration: none; font-size: 14px; font-weight: 600; font-family: -apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC','Microsoft YaHei',system-ui,sans-serif; -webkit-backdrop-filter: blur(16px) saturate(180%); backdrop-filter: blur(16px) saturate(180%); transition: opacity .15s ease; }
+  .home-btn:active { opacity: .55; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { height: 100%; overflow: hidden; background: linear-gradient(145deg,#0b0f1c 0%,#121a33 100%); font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+  html, body { height: 100%; overflow: hidden; background: radial-gradient(1000px 500px at 50% -10%,#1d1d20 0%,rgba(29,29,32,0) 60%),#000; font-family: -apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC','Microsoft YaHei',system-ui,sans-serif; }
   body { display: flex; align-items: center; justify-content: center; }
   .wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 20px; }
-  .score { color: #a29bfe; font-size: 22px; font-weight: 700; letter-spacing: 2px; }
-  .score span { color: #00d2ff; font-size: 30px; margin-left: 8px; }
-  canvas { background: #0c0f18; border-radius: 16px; box-shadow: 0 12px 30px rgba(0,0,0,.6), 0 0 0 2px #2f354a; display: block; max-width: 92vw; height: auto; }
+  .score { color: #98989d; font-size: 22px; font-weight: 700; letter-spacing: 1px; }
+  .score span { color: #f5f5f7; font-size: 30px; margin-left: 8px; }
+  canvas { background: #0a0a0c; border-radius: 16px; box-shadow: 0 14px 34px rgba(0,0,0,.5), 0 0 0 2px rgba(255,255,255,.14); display: block; max-width: 92vw; height: auto; }
   .controls { display: flex; gap: 10px; margin-top: 6px; }
-  .btn { padding: 10px 24px; border: none; border-radius: 22px; background: linear-gradient(135deg,#6c5ce7,#00d2ff); color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; letter-spacing: 1px; }
-  .btn:active { transform: scale(.95); }
+  .btn { padding: 12px 26px; border: none; border-radius: 12px; background: #0a84ff; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 24px rgba(10,132,255,.3); transition: transform .12s ease-out, background .15s ease; }
+  .btn:active { transform: scale(.97); background: #0070e0; }
   .pad { display: grid; grid-template-columns: repeat(3,54px); grid-template-rows: repeat(2,54px); gap: 6px; margin-top: 10px; }
-  .pad button { border: 1px solid rgba(255,255,255,.15); background: rgba(255,255,255,.06); color: #e8ecf7; font-size: 22px; border-radius: 10px; cursor: pointer; }
-  .pad button:active { background: rgba(108,92,231,.4); }
+  .pad button { border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.06); color: #f5f5f7; font-size: 22px; border-radius: 10px; cursor: pointer; transition: background .15s ease; }
+  .pad button:active { background: rgba(255,255,255,.16); }
   .pad .up { grid-column: 2; }
   .pad .left { grid-column: 1; grid-row: 2; }
   .pad .right { grid-column: 3; grid-row: 2; }
   .pad .down { grid-column: 2; grid-row: 2; }
-  #overlay { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(5,8,16,.7); z-index: 20; }
+  #overlay { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,.72); z-index: 20; }
   #overlay.show { display: flex; }
-  .card { background: #151a2c; padding: 40px 56px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,.1); }
+  .card { background: #1c1c1e; padding: 40px 56px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,.12); box-shadow: 0 16px 40px rgba(0,0,0,.5); }
   .card h2 { color: #fff; font-size: 30px; margin-bottom: 10px; }
-  .card p { color: #a29bfe; font-size: 18px; margin-bottom: 26px; }
+  .card p { color: #98989d; font-size: 18px; margin-bottom: 26px; }
   @media (hover: none) { .pad { display: grid; } }
   @media (hover: hover) and (min-width: 700px) { .pad { display: none; } }
 </style>
@@ -51,7 +51,7 @@
 <div id="overlay">
   <div class="card">
     <h2>游戏结束</h2>
-    <p>得分 <b id="final" style="color:#00d2ff">0</b></p>
+    <p>得分 <b id="final" style="color:#0a84ff">0</b></p>
     <button class="btn" id="again">再来一局</button>
   </div>
 </div>
@@ -133,15 +133,15 @@
     for (var i = 0; i <= COLS; i++) { ctx.beginPath(); ctx.moveTo(i * CELL, 0); ctx.lineTo(i * CELL, canvas.height); ctx.stroke() }
     for (var j = 0; j <= ROWS; j++) { ctx.beginPath(); ctx.moveTo(0, j * CELL); ctx.lineTo(canvas.width, j * CELL); ctx.stroke() }
     // 食物
-    ctx.fillStyle = '#ff6b9d'
+    ctx.fillStyle = '#ff453a'
     ctx.beginPath()
     ctx.arc(food.x * CELL + CELL / 2, food.y * CELL + CELL / 2, CELL * 0.32, 0, Math.PI * 2)
     ctx.fill()
     // 蛇
     snake.forEach(function (s, idx) {
       var g = ctx.createLinearGradient(s.x * CELL, s.y * CELL, s.x * CELL + CELL, s.y * CELL + CELL)
-      g.addColorStop(0, '#6c5ce7')
-      g.addColorStop(1, '#00d2ff')
+      g.addColorStop(0, '#5ea5ff')
+      g.addColorStop(1, '#0a84ff')
       ctx.fillStyle = idx === 0 ? '#ffffff' : g
       var pad = idx === 0 ? 2 : 3
       ctx.fillRect(s.x * CELL + pad, s.y * CELL + pad, CELL - pad * 2, CELL - pad * 2)

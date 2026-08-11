@@ -29,6 +29,14 @@
           </view>
           <text class="fc-arrow">→</text>
         </view>
+        <view class="feature-card" @click="go('/pages/opensource/opensource')">
+          <text class="fc-emoji">📦</text>
+          <view class="fc-info">
+            <text class="fc-name">{{ t('features.opensource') }}</text>
+            <text class="fc-desc">{{ t('features.opensourceDesc') }}</text>
+          </view>
+          <text class="fc-arrow">→</text>
+        </view>
       </view>
     </view>
 

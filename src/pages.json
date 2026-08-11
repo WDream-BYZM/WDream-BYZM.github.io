@@ -28,6 +28,13 @@
         "navigationStyle": "custom",
         "navigationBarTitleText": "AI 聊天"
       }
+    },
+    {
+      "path": "pages/opensource/opensource",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "开源项目"
+      }
     }
   ],
   "globalStyle": {

@@ -4,21 +4,18 @@
 
     <view class="page-hero">
       <view class="back-btn" @click="goBack">
-        <text>← 返回</text>
+        <text>‹ 返回</text>
       </view>
-      <text class="ph-sub">{{ t('games.subtitle') }}</text>
       <text class="ph-title">{{ t('games.title') }}</text>
     </view>
 
     <view class="page-body">
       <!-- 联机对战 · 开房间 -->
       <view class="multi-panel">
-        <view class="mp-glow"></view>
         <view class="mp-head">
           <view class="mp-icon">🎮</view>
           <view class="mp-head-text">
             <view class="mp-title">{{ t('games.multi.title') }}</view>
-            <view class="mp-sub">{{ t('games.multi.subtitle') }}</view>
           </view>
         </view>
         <view class="mp-desc">{{ t('games.multi.desc') }}</view>
@@ -69,7 +66,6 @@
       <view v-if="gameIdx === 0" class="rooms-panel">
         <view class="rooms-head">
           <view class="rooms-title">🛰️ {{ t('games.multi.roomsTetrisTitle') }}</view>
-          <view class="rooms-sub">{{ t('games.multi.roomsTetrisSub') }}</view>
         </view>
         <view class="rooms-empty">{{ t('games.multi.peerDesc') }}</view>
       </view>
@@ -78,7 +74,6 @@
       <view v-else class="rooms-panel">
         <view class="rooms-head">
           <view class="rooms-title">🛰️ {{ t('games.multi.roomsAirplaneTitle') }}</view>
-          <view class="rooms-sub">{{ t('games.multi.roomsAirplaneSub') }}</view>
         </view>
         <view class="rooms-empty">{{ t('games.multi.peerDesc') }}</view>
       </view>
@@ -197,7 +192,7 @@ function goBack() {
 <style lang="scss" scoped>
 .page {
   min-height: 100vh;
-  background: #0b0f1c;
+  background: #000;
 }
 
 .page-hero {
@@ -210,43 +205,30 @@ function goBack() {
 
   .back-btn {
     position: absolute;
-    left: 40rpx;
-    top: 120rpx;
-    padding: 10px 22px;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    left: 24px;
+    top: 110px;
+    padding: 10px 14px;
+    border-radius: 10px;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: opacity 0.15s ease;
 
     text {
-      color: #a9b2c9;
-      font-size: 14px;
+      color: #0a84ff;
+      font-size: 16px;
       font-weight: 600;
     }
 
-    &:hover {
-      border-color: rgba(108, 92, 231, 0.5);
-      background: rgba(108, 92, 231, 0.15);
-
-      text {
-        color: #fff;
-      }
+    &:active {
+      opacity: 0.55;
     }
   }
 
-  .ph-sub {
-    color: #00d2ff;
-    font-size: 13px;
-    letter-spacing: 4px;
-    font-weight: 600;
-  }
-
   .ph-title {
-    margin-top: 14rpx;
     font-size: 42px;
     font-weight: 800;
-    color: #e8ecf7;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: #f5f5f7;
   }
 }
 
@@ -259,24 +241,11 @@ function goBack() {
 /* 联机对战面板 */
 .multi-panel {
   position: relative;
-  padding: 40rpx 36rpx;
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 32px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   overflow: hidden;
-
-  .mp-glow {
-    position: absolute;
-    top: -70px;
-    right: -70px;
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, rgba(108, 92, 231, 0.4), rgba(0, 210, 255, 0.4));
-    filter: blur(34px);
-    opacity: 0.55;
-    pointer-events: none;
-  }
 
   .mp-head {
     display: flex;
@@ -284,15 +253,15 @@ function goBack() {
     gap: 18rpx;
 
     .mp-icon {
-      width: 68rpx;
-      height: 68rpx;
-      border-radius: 18rpx;
-      background: linear-gradient(135deg, #6c5ce7, #00d2ff);
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 34rpx;
-      box-shadow: 0 8px 20px rgba(108, 92, 231, 0.35);
+      font-size: 24px;
     }
 
     .mp-head-text {
@@ -300,24 +269,17 @@ function goBack() {
       flex-direction: column;
 
       .mp-title {
-        color: #e8ecf7;
+        color: #f5f5f7;
         font-size: 22px;
         font-weight: 800;
-      }
-
-      .mp-sub {
-        margin-top: 2rpx;
-        color: #00d2ff;
-        font-size: 11px;
-        letter-spacing: 4px;
-        font-weight: 600;
+        letter-spacing: -0.01em;
       }
     }
   }
 
   .mp-desc {
-    margin-top: 18rpx;
-    color: #8a93ab;
+    margin-top: 12px;
+    color: #98989d;
     font-size: 14px;
     line-height: 1.7;
   }
@@ -357,32 +319,32 @@ function goBack() {
       }
 
       .mp-label {
-        color: #8a93ab;
+        color: #98989d;
         font-size: 13px;
         font-weight: 600;
       }
 
       .mp-select {
-        padding: 18rpx 22rpx;
-        border-radius: 14px;
+        padding: 13px 16px;
+        border-radius: 12px;
         background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        color: #e8ecf7;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        color: #f5f5f7;
         font-size: 15px;
         cursor: pointer;
-        transition: border-color 0.25s ease;
+        transition: border-color 0.2s ease;
 
         &:hover {
-          border-color: rgba(0, 210, 255, 0.5);
+          border-color: rgba(10, 132, 255, 0.5);
         }
       }
 
       .mp-input {
-        padding: 18rpx 22rpx;
-        border-radius: 14px;
+        padding: 13px 16px;
+        border-radius: 12px;
         background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        color: #e8ecf7;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        color: #f5f5f7;
         font-size: 15px;
       }
     }
@@ -392,23 +354,24 @@ function goBack() {
     align-items: center;
 
     .btn-create {
-      padding: 18rpx 44rpx;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #6c5ce7, #00d2ff);
+      padding: 13px 36px;
+      border-radius: 12px;
+      background: #0a84ff;
       color: #fff;
       font-size: 16px;
       font-weight: 700;
       cursor: pointer;
       text-align: center;
-      transition: transform 0.15s ease, box-shadow 0.25s ease;
-      box-shadow: 0 10px 24px rgba(108, 92, 231, 0.3);
+      transition: transform 0.12s ease-out, background 0.15s ease;
+      box-shadow: 0 8px 24px rgba(10, 132, 255, 0.3);
 
       &:active {
-        transform: scale(0.96);
+        background: #0070e0;
+        transform: scale(0.97);
       }
 
       &:hover {
-        box-shadow: 0 14px 30px rgba(0, 210, 255, 0.35);
+        background: #2b8cff;
       }
     }
 
@@ -423,19 +386,19 @@ function goBack() {
       }
 
       .btn-join {
-        padding: 18rpx 36rpx;
-        border-radius: 14px;
+        padding: 13px 30px;
+        border-radius: 12px;
         background: rgba(255, 255, 255, 0.07);
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        color: #00d2ff;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        color: #0a84ff;
         font-size: 16px;
         font-weight: 700;
         cursor: pointer;
-        transition: all 0.25s ease;
+        transition: background 0.15s ease, border-color 0.15s ease;
 
         &:hover {
-          border-color: rgba(0, 210, 255, 0.6);
-          background: rgba(0, 210, 255, 0.12);
+          border-color: rgba(10, 132, 255, 0.5);
+          background: rgba(10, 132, 255, 0.1);
         }
       }
     }
@@ -449,27 +412,20 @@ function goBack() {
 /* 在线房间列表 */
 .rooms-panel {
   margin-top: 28rpx;
-  padding: 36rpx;
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 28px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 
   .rooms-head {
     display: flex;
     flex-direction: column;
 
     .rooms-title {
-      color: #e8ecf7;
+      color: #f5f5f7;
       font-size: 18px;
       font-weight: 800;
-    }
-
-    .rooms-sub {
-      margin-top: 4rpx;
-      color: #00d2ff;
-      font-size: 11px;
-      letter-spacing: 4px;
-      font-weight: 600;
+      letter-spacing: -0.01em;
     }
   }
 
@@ -477,7 +433,7 @@ function goBack() {
     margin-top: 22rpx;
     padding: 30rpx 0;
     text-align: center;
-    color: #565d75;
+    color: #6e6e73;
     font-size: 14px;
   }
 
@@ -499,8 +455,8 @@ function goBack() {
       transition: all 0.25s ease;
 
       &:hover {
-        border-color: rgba(0, 210, 255, 0.5);
-        background: rgba(0, 210, 255, 0.06);
+        border-color: rgba(10, 132, 255, 0.4);
+        background: rgba(10, 132, 255, 0.06);
       }
 
       .rr-left {
@@ -509,14 +465,14 @@ function goBack() {
         min-width: 150rpx;
 
         .rr-code {
-          color: #00d2ff;
+          color: #0a84ff;
           font-size: 24px;
           font-weight: 800;
           letter-spacing: 4px;
         }
 
         .rr-game {
-          color: #8a93ab;
+          color: #98989d;
           font-size: 12px;
           margin-top: 2rpx;
         }
@@ -528,14 +484,14 @@ function goBack() {
         flex-direction: column;
 
         .rr-count {
-          color: #e8ecf7;
+          color: #f5f5f7;
           font-size: 14px;
           font-weight: 700;
         }
 
         .rr-players {
           margin-top: 4rpx;
-          color: #565d75;
+          color: #6e6e73;
           font-size: 12px;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -544,13 +500,14 @@ function goBack() {
       }
 
       .btn-join-sm {
-        padding: 12rpx 24rpx;
-        border-radius: 12px;
-        background: linear-gradient(135deg, #6c5ce7, #00d2ff);
+        padding: 10px 22px;
+        border-radius: 10px;
+        background: #0a84ff;
         color: #fff;
         font-size: 13px;
         font-weight: 700;
         white-space: nowrap;
+        cursor: pointer;
       }
     }
   }

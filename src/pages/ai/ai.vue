@@ -4,9 +4,8 @@
 
     <view class="page-hero">
       <view class="back-btn" @click="goBack">
-        <text>← 返回</text>
+        <text>‹ 返回</text>
       </view>
-      <text class="ph-sub">{{ t('ai.subtitle') }}</text>
       <text class="ph-title">{{ t('ai.title') }}</text>
     </view>
 
@@ -36,7 +35,7 @@ function goBack() {
 <style lang="scss" scoped>
 .page {
   min-height: 100vh;
-  background: #0b0f1c;
+  background: #000;
 }
 
 .page-hero {
@@ -49,43 +48,30 @@ function goBack() {
 
   .back-btn {
     position: absolute;
-    left: 40rpx;
-    top: 120rpx;
-    padding: 10px 22px;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    left: 24px;
+    top: 110px;
+    padding: 10px 14px;
+    border-radius: 10px;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: opacity 0.15s ease;
 
     text {
-      color: #a9b2c9;
-      font-size: 14px;
+      color: #0a84ff;
+      font-size: 16px;
       font-weight: 600;
     }
 
-    &:hover {
-      border-color: rgba(108, 92, 231, 0.5);
-      background: rgba(108, 92, 231, 0.15);
-
-      text {
-        color: #fff;
-      }
+    &:active {
+      opacity: 0.55;
     }
   }
 
-  .ph-sub {
-    color: #00d2ff;
-    font-size: 13px;
-    letter-spacing: 4px;
-    font-weight: 600;
-  }
-
   .ph-title {
-    margin-top: 14rpx;
     font-size: 42px;
     font-weight: 800;
-    color: #e8ecf7;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: #f5f5f7;
   }
 }
 
