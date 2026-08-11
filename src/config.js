@@ -70,7 +70,7 @@ export default {
   // 把安装包上传到你的存储/网盘后，将「直链」填到 downloadUrl 即可（留空 = 暂未开放下载，按钮会提示敬请期待）
   opensource: {
     downloadUrl:
-      'https://github.com/WDream-BYZM/PC-Dynamic-Island/releases/latest/download/PC%20Dynamic%20Island%20Setup%201.0.0.exe',
+      'https://github.com/WDream-BYZM/PC-Dynamic-Island/releases/latest/download/PC-Dynamic-Island-Setup-1.1.0.exe',
     githubUrl: 'https://github.com/WDream-BYZM/PC-Dynamic-Island'
   }
 }
